@@ -18,7 +18,7 @@ class UserModel extends Model
     'avatar' => ['type' => 'string', 'nullable' => true],
     'is_active' => ['type' => 'boolean', 'nullable' => false, 'default' => true],
     'last_login_at' => ['type' => 'datetime', 'nullable' => true],
-    'role' => ['type' => 'string', 'nullable' => false, 'default' => 'admin'],
+    'role' => ['type' => 'enum', 'values' => ['admin', 'approver'], 'nullable' => false, 'default' => 'approver']
   ];
 
   protected array $seed = [
@@ -29,7 +29,7 @@ class UserModel extends Model
       'avatar' => null,
       'is_active' => 1,
       'last_login_at' => null,
-      'role' => 'super_admin',
+      'role' => 'admin',
     ],
     [
       'email' => 'bondan@inbitef.ac.id',
@@ -38,7 +38,7 @@ class UserModel extends Model
       'avatar' => null,
       'is_active' => 1,
       'last_login_at' => null,
-      'role' => 'admin',
+      'role' => 'approver',
     ],
   ];
 
