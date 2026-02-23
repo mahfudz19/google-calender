@@ -6,13 +6,13 @@
     </div>
     <div class="header-actions">
       <div class="filter-tabs">
-        <a data-spa href="/approval" class="tab-btn <?= strpos($_SERVER['REQUEST_URI'], '/approval/history') === false ? 'active' : '' ?>">
+        <a data-spa href="<?= getBaseUrl('/approval') ?>" class="tab-btn <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) === false ? 'active' : '' ?>">
           Menunggu
-          <?php if (isset($approvals) && strpos($_SERVER['REQUEST_URI'], '/approval/history') === false): ?>
+          <?php if (isset($approvals) && strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) === false): ?>
             <span class="badge"><?= count($approvals) ?></span>
           <?php endif; ?>
         </a>
-        <a data-spa href="/approval/history" class="tab-btn <?= strpos($_SERVER['REQUEST_URI'], '/approval/history') !== false ? 'active' : '' ?>">Riwayat</a>
+        <a data-spa href="<?= getBaseUrl('/approval/history') ?>" class="tab-btn <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) !== false ? 'active' : '' ?>">Riwayat</a>
       </div>
     </div>
   </header>
