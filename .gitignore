@@ -1,4 +1,6 @@
 composer.lock
 vendor
 .env
-storage/secrets/*
+storage/secrets
+storage/cache
+public/build
