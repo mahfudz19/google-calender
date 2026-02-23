@@ -100,20 +100,4 @@ class AuthController
       ['meta' => ['title' => 'Dashboard']]
     );
   }
-
-  public function superAdminTest(Request $request, Response $response)
-  {
-    return $response->json([
-      'ok' => true,
-      'page' => 'super_admin',
-    ]);
-  }
-
-  public function adminTest(Request $request, Response $response)
-  {
-    return $response->json([
-      'ok' => true,
-      'page' => 'admin',
-    ]);
-  }
 }
