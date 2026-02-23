@@ -1,6 +1,7 @@
 <?php
 
 use Addon\Controllers\AgendaController;
+use Addon\Controllers\ApprovalController;
 use Addon\Controllers\AuthController;
 use Addon\Controllers\UserController;
 
@@ -25,11 +26,12 @@ $router->group(['middleware' => ['auth']], function ($router) {
   $router->group(['middleware' => ['role:approver,admin']], function ($router) {
 
     // Halaman antrian persetujuan
-    $router->get('/approval', [AgendaController::class, 'index']);
+    $router->get('/approval', [ApprovalController::class, 'index']);
+    $router->get('/approval/history', [ApprovalController::class, 'history']);
 
     // Aksi Approve/Reject
-    $router->post('/agenda/:id/approve', [AgendaController::class, 'approve']);
-    $router->post('/agenda/:id/reject', [AgendaController::class, 'reject']);
+    $router->post('/approval/:id/approve', [ApprovalController::class, 'approve']);
+    $router->post('/approval/:id/reject', [ApprovalController::class, 'reject']);
   });
 
   // --- Role: Admin Only (User Management) ---
