@@ -64,6 +64,11 @@ class UserModel extends Model
       return false;
     }
 
+    // Auto-update updated_at if not provided
+    if (!isset($data['updated_at'])) {
+      $data['updated_at'] = date('Y-m-d H:i:s');
+    }
+
     $setParts = [];
     foreach ($data as $column => $value) {
       $setParts[] = "{$column} = :{$column}";
@@ -94,6 +99,7 @@ class UserModel extends Model
   {
     $data = [
       'last_login_at' => date('Y-m-d H:i:s'),
+      'updated_at' => date('Y-m-d H:i:s')
     ];
 
     if ($name !== null) {
@@ -109,5 +115,34 @@ class UserModel extends Model
     }
 
     return $this->updateById($id, $data);
+  }
+
+  public function createFromGoogle(array $data): bool
+  {
+    $now = date('Y-m-d H:i:s');
+
+    $defaults = [
+      'google_id' => null,
+      'name' => null,
+      'avatar' => null,
+      'is_active' => 1,
+      'role' => 'approver',
+      'created_at' => $now,
+      'updated_at' => $now
+    ];
+
+    $insertData = array_merge($defaults, $data);
+
+    // Ensure email is present
+    if (empty($insertData['email'])) {
+      return false;
+    }
+
+    $columns = implode(', ', array_keys($insertData));
+    $placeholders = ':' . implode(', :', array_keys($insertData));
+
+    $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+
+    return $this->getDb()->query($sql, $insertData);
   }
 }
