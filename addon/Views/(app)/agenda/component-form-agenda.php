@@ -201,7 +201,7 @@ $location = $agenda['location'] ?? '';
 </div>
 <?php endif; ?>
 
-<form action="<?= $actionUrl ?>" method="POST" data-spa data-spa-method="POST">
+<form action="<?= $actionUrl ?>" method="POST" data-spa>
   <div class="form-group">
     <label class="form-label">Judul Agenda <span style="color:red">*</span></label>
     <input type="text" name="title" class="form-control" value="<?= htmlspecialchars($title) ?>" required placeholder="Contoh: Rapat Koordinasi Q3" autofocus>

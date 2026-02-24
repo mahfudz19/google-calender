@@ -64,7 +64,7 @@
       <!-- Kolom Aksi (Kanan) -->
       <?php if (!$isHistory): ?>
         <div class="card-actions">
-          <form action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa data-spa-method="POST" onsubmit="return confirm('Tolak agenda ini?');">
+          <form action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa onsubmit="return confirm('Tolak agenda ini?');">
             <button type="submit" class="btn-action btn-reject">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -74,7 +74,7 @@
             </button>
           </form>
 
-          <form action="/approval/<?= $item['id'] ?>/approve" method="POST" data-spa data-spa-method="POST" onsubmit="return confirm('Setujui agenda ini?');">
+          <form action="/approval/<?= $item['id'] ?>/approve" method="POST" data-spa onsubmit="return confirm('Setujui agenda ini?');">
             <button type="submit" class="btn-action btn-approve">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>

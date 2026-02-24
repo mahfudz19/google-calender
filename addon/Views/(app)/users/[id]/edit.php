@@ -20,7 +20,6 @@
     action="/users/<?= $item['id'] ?>/update"
     method="POST"
     data-spa
-    data-spa-method="POST"
     style="max-width: 500px;">
     <div style="margin-bottom: 24px;">
       <label class="label-large" style="display: block; margin-bottom: 8px;">Role</label>
