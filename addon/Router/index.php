@@ -22,7 +22,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
   // 3. Manajemen Pengajuan Saya (Self Service)
   $router->get('/agenda', [AgendaController::class, 'myAgenda']);
-  $router->get('/agenda/:id', [AgendaController::class, 'show']);
+  // $router->get('/agenda/:id', [AgendaController::class, 'show']);
   $router->get('/agenda/:id/edit', [AgendaController::class, 'edit']);
   $router->post('/agenda/:id/update', [AgendaController::class, 'update']);
   $router->post('/agenda/:id/cancel', [AgendaController::class, 'cancel']);

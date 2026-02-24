@@ -14,7 +14,7 @@
   <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
     <?php
     // Asumsi ID ada di $agenda['id']
-    $actionUrl = "/agenda/{$agenda['id']}/update";
+    $actionUrl = getBaseUrl("/agenda/{$agenda['id']}/update");
     $submitLabel = 'Simpan Perubahan';
 
     // Path ke component harus naik satu level dari folder [id]

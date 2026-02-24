@@ -6,8 +6,9 @@ use App\Core\Http\Request;
 use App\Core\Http\Response;
 use App\Core\View\View;
 use App\Core\Http\RedirectResponse;
-use Addon\Models\ApprovalModel; // Menggunakan model yang sama dengan approval
+use Addon\Models\ApprovalModel;
 use App\Services\SessionService;
+use Error;
 
 class AgendaController
 {
@@ -36,34 +37,38 @@ class AgendaController
   }
 
   // Proses Simpan Pengajuan
-  public function store(Request $request, Response $response): RedirectResponse
+  public function store(Request $request, Response $response)
   {
-    $data = $request->getBody();
-    $user = $this->session->get('user');
+    try {
+      $data = $request->getBody();
+      $user = $this->session->get('user');
 
-    // Tambahkan info requester otomatis
-    $data['requester_name'] = $user['name'] ?? 'Guest';
-    $data['requester_email'] = $user['email'] ?? null;
-    $data['requester_role'] = $user['role'] ?? 'user';
-    $data['requester_avatar'] = $user['avatar'] ?? null;
-    $data['status'] = 'pending'; // Default status
+      // Tambahkan info requester otomatis
+      $data['requester_name'] = $user['name'] ?? 'Guest';
+      $data['requester_email'] = $user['email'] ?? null;
+      $data['requester_role'] = $user['role'] ?? 'user';
+      $data['requester_avatar'] = $user['avatar'] ?? null;
+      $data['status'] = 'pending'; // Default status
 
-    $this->model->create($data);
+      $this->model->create($data);
 
-    return $response->redirect('/agenda');
+
+      return $response->redirect('/agenda');
+    } catch (\Throwable $th) {
+      return $response->redirect('/agenda/create?error=500&message=' . urlencode($th->getMessage()));
+    }
   }
 
   // Halaman "Pengajuan Saya"
   public function myAgenda(Request $request, Response $response): View
   {
     $user = $this->session->get('user');
-    // TODO: Filter by requester_email di model nanti
-    // $myAgendas = $this->model->getByRequester($user['email']);
-    $myAgendas = []; // Placeholder
+    $myAgendas = $this->model->getByRequester($user['email']);
 
-    return $response->renderPage([
-      'myAgendas' => $myAgendas
-    ], ['meta' => ['title' => 'Pengajuan Saya']]);
+    return $response->renderPage(
+      ['myAgendas' => $myAgendas],
+      ['meta' => ['title' => 'Pengajuan Saya']]
+    );
   }
 
   // Detail Agenda

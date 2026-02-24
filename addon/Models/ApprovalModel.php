@@ -3,6 +3,7 @@
 namespace Addon\Models;
 
 use App\Core\Database\Model;
+use Exception;
 
 class ApprovalModel extends Model
 {
@@ -61,14 +62,20 @@ class ApprovalModel extends Model
         if (empty($data)) {
             return false;
         }
+        $return = false;
 
-        $columns = array_keys($data);
-        $placeholders = array_map(fn($col) => ':' . $col, $columns);
+        try {
+            $columns = array_keys($data);
+            $placeholders = array_map(fn($col) => ':' . $col, $columns);
 
-        $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ")
-                VALUES (" . implode(', ', $placeholders) . ")";
+            $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
+            $return = $this->getDb()->prepare($sql)->execute($data);
+        } catch (\Throwable $th) {
+            throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
+            
+        }
 
-        return $this->getDb()->query($sql, $data);
+        return $return;
     }
 
     public function updateById(string|int $id, array $data): bool
@@ -115,5 +122,12 @@ class ApprovalModel extends Model
     public function updateStatus(string|int $id, string $status): bool
     {
         return $this->updateById($id, ['status' => $status]);
+    }
+
+    public function getByRequester(string $email): array
+    {
+        $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE requester_email = :email ORDER BY updated_at DESC");
+        $stmt->execute(['email' => $email]);
+        return $stmt->fetchAll();
     }
 }

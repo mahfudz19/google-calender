@@ -9,6 +9,37 @@
  * - $submitLabel (string): Label tombol submit
  */
 
+// Handle error message dari query string
+$errorCode = $_GET['error'] ?? null;
+$errorMessage = $_GET['message'] ?? null;
+$displayError = null;
+
+if ($errorCode && $errorMessage) {
+  // Decode URL-encoded message
+  $decodedMessage = urldecode($errorMessage);
+  
+  // Custom error messages untuk common errors
+  switch ($errorCode) {
+    case '500':
+      if (strpos($decodedMessage, "Field 'created_at' doesn't have a default value") !== false) {
+        $displayError = "Terjadi kesalahan database: Field created_at tidak memiliki nilai default. Silakan hubungi administrator.";
+      } elseif (strpos($decodedMessage, "SQLSTATE") !== false) {
+        $displayError = "Terjadi kesalahan database. Silakan coba lagi atau hubungi administrator.";
+      } else {
+        $displayError = "Terjadi kesalahan server: " . $decodedMessage;
+      }
+      break;
+    case '400':
+      $displayError = "Data yang dikirim tidak valid: " . $decodedMessage;
+      break;
+    case '403':
+      $displayError = "Anda tidak memiliki izin untuk melakukan aksi ini.";
+      break;
+    default:
+      $displayError = $decodedMessage;
+  }
+}
+
 $agenda = $agenda ?? [];
 $title = $agenda['title'] ?? '';
 $description = $agenda['description'] ?? '';
@@ -29,7 +60,6 @@ $location = $agenda['location'] ?? '';
     margin-bottom: 0.5rem;
     font-weight: 600;
     color: #374151;
-    font-size: 0.95rem;
   }
 
   .form-control {
@@ -37,22 +67,33 @@ $location = $agenda['location'] ?? '';
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
   }
 
   .form-control:focus {
-    border-color: #4f46e5;
     outline: none;
+    border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
   }
 
+  .row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .row-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .form-actions {
-    margin-top: 2.5rem;
     display: flex;
     gap: 1rem;
-    align-items: center;
+    justify-content: flex-end;
+    margin-top: 2rem;
   }
 
   .btn-submit {
@@ -63,7 +104,6 @@ $location = $agenda['location'] ?? '';
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 1rem;
     transition: background 0.2s;
   }
 
@@ -73,39 +113,93 @@ $location = $agenda['location'] ?? '';
 
   .btn-cancel {
     background: white;
-    color: #4b5563;
+    color: #6b7280;
     border: 1px solid #d1d5db;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-weight: 600;
     text-decoration: none;
-    font-size: 1rem;
-    transition: background 0.2s;
+    font-weight: 600;
+    transition: all 0.2s;
   }
 
   .btn-cancel:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: #f9fafb;
+    border-color: #9ca3af;
   }
 
-  .row-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  /* Error Alert Styles */
+  .error-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
-  @media(min-width: 640px) {
-    .row-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+  .error-icon {
+    color: #dc2626;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
   }
 
-  .helper-text {
+  .error-content {
+    flex: 1;
+  }
+
+  .error-title {
+    font-weight: 600;
+    color: #dc2626;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+  }
+
+  .error-message {
+    color: #991b1b;
+    margin: 0;
     font-size: 0.85rem;
-    color: #6b7280;
-    margin-top: 0.25rem;
+    line-height: 1.4;
+  }
+
+  .error-close {
+    background: none;
+    border: none;
+    color: #991b1b;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .error-close:hover {
+    background: #fecaca;
   }
 </style>
+
+<!-- Error Alert -->
+<?php if ($displayError): ?>
+<div class="error-alert">
+  <div class="error-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+  </div>
+  <div class="error-content">
+    <div class="error-title">Terjadi Kesalahan</div>
+    <div class="error-message"><?= htmlspecialchars($displayError) ?></div>
+  </div>
+  <button class="error-close" onclick="this.parentElement.remove()" title="Tutup">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+</div>
+<?php endif; ?>
 
 <form action="<?= $actionUrl ?>" method="POST" data-spa data-spa-method="POST">
   <div class="form-group">
@@ -141,3 +235,17 @@ $location = $agenda['location'] ?? '';
     <a href="<?= getBaseUrl('/agenda') ?>" class="btn-cancel">Batal</a>
   </div>
 </form>
+
+<script>
+// Auto-hide error setelah 10 detik
+document.addEventListener('DOMContentLoaded', function() {
+  const errorAlert = document.querySelector('.error-alert');
+  if (errorAlert) {
+    setTimeout(() => {
+      errorAlert.style.transition = 'opacity 0.3s';
+      errorAlert.style.opacity = '0';
+      setTimeout(() => errorAlert.remove(), 300);
+    }, 10000);
+  }
+});
+</script>

@@ -18,22 +18,22 @@ $role = $_SESSION['user']['role'] ?? 'user';
       </a>
 
       <div class="nav-links">
-        <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/dashboard')) !== false ? 'active' : '' ?>">
+        <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="nav-link" data-nav-path="<?= getBaseUrl('/dashboard') ?>">
           Dashboard
         </a>
-        <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/agenda')) !== false ? 'active' : '' ?>">
+        <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="nav-link" data-nav-path="<?= getBaseUrl('/agenda') ?>">
           Pengajuan Saya
         </a>
 
         <?php if (in_array($role, ['admin', 'approver'])): ?>
-          <a data-spa href="<?= getBaseUrl('/approval') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval')) !== false ? 'active' : '' ?>">
+          <a data-spa href="<?= getBaseUrl('/approval') ?>" class="nav-link" data-nav-path="<?= getBaseUrl('/approval') ?>">
             Persetujuan
             <!-- Badge bisa ditambah disini nanti -->
           </a>
         <?php endif; ?>
 
         <?php if ($role === 'admin'): ?>
-          <a data-spa href="<?= getBaseUrl('/users') ?>" class="nav-link <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/users')) !== false ? 'active' : '' ?>">
+          <a data-spa href="<?= getBaseUrl('/users') ?>" class="nav-link" data-nav-path="<?= getBaseUrl('/users') ?>">
             Users
           </a>
         <?php endif; ?>

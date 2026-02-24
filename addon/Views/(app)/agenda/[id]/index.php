@@ -4,8 +4,8 @@
  * View: Detail Agenda (Read Only)
  * Variabel: $agenda
  */
-$start = new DateTime($agenda['start_time']);
-$end = new DateTime($agenda['end_time']);
+$start = new DateTime($agenda['start_time'] ?? '');
+$end = new DateTime($agenda['end_time'] ?? '');
 ?>
 <div style="max-width: 800px; margin: 0 auto; padding: 2rem 1rem;">
   <!-- Header & Navigasi -->
@@ -17,7 +17,7 @@ $end = new DateTime($agenda['end_time']);
       Kembali
     </a>
 
-    <?php if ($agenda['status'] === 'pending'): ?>
+    <?php if ($agenda && $agenda['status'] === 'pending'): ?>
       <div style="display: flex; gap: 0.5rem;">
         <a href="/agenda/<?= $agenda['id'] ?>/edit" style="background: white; color: #4f46e5; border: 1px solid #4f46e5; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
           Edit
@@ -38,13 +38,13 @@ $end = new DateTime($agenda['end_time']);
                 elseif ($agenda['status'] == 'rejected') echo 'background:#fee2e2; color:#991b1b;';
                 else echo 'background:#ffedd5; color:#9a3412;';
                 ?>">
-        <?= ucfirst($agenda['status']) ?>
+        <?= $agenda ? ucfirst($agenda['status']) : 'Unknown' ?>
       </span>
     </div>
 
     <div style="padding: 2rem;">
       <!-- Judul -->
-      <h1 style="margin: 0 0 1.5rem 0; font-size: 2rem; color: #111827; line-height: 1.2;"><?= htmlspecialchars($agenda['title']) ?></h1>
+      <h1 style="margin: 0 0 1.5rem 0; font-size: 2rem; color: #111827; line-height: 1.2;"><?= htmlspecialchars($agenda['title'] ?? '') ?></h1>
 
       <!-- Grid Info -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem;">

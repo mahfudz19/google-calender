@@ -12,7 +12,7 @@
 
   <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
     <?php
-    $actionUrl = '/agenda/store';
+    $actionUrl = getBaseUrl('/agenda/store');
     $submitLabel = 'Ajukan Sekarang';
     // Variabel $agenda tidak diset (kosong) untuk mode create
 
