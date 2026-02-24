@@ -5,7 +5,7 @@ use Addon\Controllers\ApprovalController;
 use Addon\Controllers\AuthController;
 use Addon\Controllers\UserController;
 
-$router->get('/', [AuthController::class, 'index']);
+$router->get('/', [AuthController::class, 'index'], ['guest']);
 
 $router->get('/login', [AuthController::class, 'login']);
 $router->get('/auth/callback', [AuthController::class, 'callback']);

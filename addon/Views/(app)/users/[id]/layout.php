@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <div class="mazu-card" style="padding: 24px;" data-layout="addon/Views/(app)/users/[id]/layout.php">
+  <div class="mazu-card" style="padding: 24px;" data-layout="(app)/users/[id]/layout.php">
     <?= $children; ?>
   </div>
 </div>

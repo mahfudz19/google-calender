@@ -64,7 +64,7 @@ $role = $_SESSION['user']['role'] ?? 'user';
   </nav>
 
   <!-- Main Content Wrapper -->
-  <main style="flex: 1; padding: 0;" data-layout="addon/Views/(app)/layout.php">
+  <main style="flex: 1; padding: 0;" data-layout="(app)/layout.php">
     <?= $children; ?>
   </main>
   <!-- App Footer -->

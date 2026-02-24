@@ -24,11 +24,8 @@ class GuestMiddleware implements MiddlewareInterface
 
   public function handle($request, Closure $next, array $params = [])
   {
-    // Cek key session yang sama dengan AuthMiddleware
     if ($this->session->get('is_logged_in') === true) {
-       // Lempar exception yang akan ditangkap oleh Handler untuk redirect ke dashboard/home
-       // Pesan 'RedirectIfAuthenticated' adalah sinyal khusus untuk Exception Handler
-       throw new AuthorizationException('RedirectIfAuthenticated');
+      throw new AuthorizationException('RedirectIfAuthenticated', '/dashboard');
     }
 
     return $next($request);
