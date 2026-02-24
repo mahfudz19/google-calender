@@ -16,7 +16,7 @@
     $submitLabel = 'Ajukan Sekarang';
     // Variabel $agenda tidak diset (kosong) untuk mode create
 
-    include __DIR__ . '/component-form-agenda.php';
+    include __DIR__ . '/form-agenda.php';
     ?>
   </div>
 </div>

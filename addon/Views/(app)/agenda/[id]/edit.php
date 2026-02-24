@@ -18,7 +18,7 @@
     $submitLabel = 'Simpan Perubahan';
 
     // Path ke component harus naik satu level dari folder [id]
-    include dirname(__DIR__) . '/component-form-agenda.php';
+    include dirname(__DIR__) . '/form-agenda.php';
     ?>
   </div>
 </div>

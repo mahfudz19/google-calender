@@ -72,14 +72,48 @@
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                 </a>
-                <form action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa onsubmit="return confirm('Batalkan pengajuan ini?');" style="margin:0;">
-                  <button type="submit" class="btn-icon delete" title="Batalkan Pengajuan">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    </svg>
-                  </button>
-                </form>
+
+                <!-- Modal Dialog untuk Konfirmasi - ID Unik -->
+                <dialog id="cancelModal_<?= $item['id'] ?>" class="confirm-modal">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3>Konfirmasi Pembatalan</h3>
+                      <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="modal-body">
+                      <p>Apakah Anda yakin ingin membatalkan pengajuan agenda ini?</p>
+                      <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+                        <strong><?= htmlspecialchars($item['title']) ?></strong>
+                      </p>
+                    </div>
+
+                    <form method="dialog" class="modal-actions">
+                      <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
+                        Tidak, Batal
+                      </button>
+                      <button type="submit" form="cancelForm_<?= $item['id'] ?>" class="btn-confirm">
+                        Ya, Batalkan Pengajuan
+                      </button>
+                    </form>
+                  </div>
+                </dialog>
+
+                <!-- Hidden Form yang akan di-submit - ID Unik -->
+                <form id="cancelForm_<?= $item['id'] ?>" action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa style="display: none;"></form>
+
+                <!-- Trigger Button - ID Unik -->
+                <button type="button" onclick="document.getElementById('cancelModal_<?= $item['id'] ?>').showModal()" class="btn-icon delete" title="Batalkan Pengajuan">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
               </div>
             <?php endif; ?>
           </div>
