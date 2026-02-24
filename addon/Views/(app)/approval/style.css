@@ -261,3 +261,26 @@
     flex-direction: row;
   }
 }
+
+/* Additional styles for approval modals */
+.btn-confirm.btn-reject {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.btn-confirm.btn-reject:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.btn-confirm.btn-approve {
+  background: #059669;
+  color: white;
+  border-color: #059669;
+}
+
+.btn-confirm.btn-approve:hover {
+  background: #047857;
+  border-color: #047857;
+}
