@@ -82,19 +82,34 @@
                 <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
                   <strong><?= htmlspecialchars($item['title']) ?></strong>
                 </p>
-                <p style="font-size: 0.85rem; color: #dc2626; margin-top: 0.5rem;">
+
+                <!-- Form untuk comment -->
+                <form id="rejectCommentForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa style="margin-top: 1rem;">
+                  <div class="form-group">
+                    <label for="comment_<?= $item['id'] ?>" class="form-label">Alasan Penolakan <span style="color:red">*</span></label>
+                    <textarea
+                      id="comment_<?= $item['id'] ?>"
+                      name="comment"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Jelaskan alasan penolakan agenda ini..."
+                      required></textarea>
+                  </div>
+
+                  <div class="modal-actions" style="margin-top: 1rem;">
+                    <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
+                      Batal
+                    </button>
+                    <button type="submit" class="btn-confirm btn-reject">
+                      Ya, Tolak Agenda
+                    </button>
+                  </div>
+                </form>
+
+                <p style="font-size: 0.85rem; color: #dc2626; margin-top: 1rem;">
                   ⚠️ Tindakan ini tidak dapat dibatalkan.
                 </p>
               </div>
-
-              <form method="dialog" class="modal-actions">
-                <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
-                  Batal
-                </button>
-                <button type="submit" form="rejectForm_<?= $item['id'] ?>" class="btn-confirm btn-reject">
-                  Ya, Tolak Agenda
-                </button>
-              </form>
             </div>
           </dialog>
 
@@ -133,7 +148,6 @@
           </dialog>
 
           <!-- Hidden Forms -->
-          <form id="rejectForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa style="display: none;"></form>
           <form id="approveForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/approve" method="POST" data-spa style="display: none;"></form>
 
           <!-- Trigger Buttons -->

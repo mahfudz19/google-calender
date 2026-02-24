@@ -77,9 +77,10 @@ class AgendaController
     $id = $request->param('id');
     $agenda = $this->model->find($id);
 
-    return $response->renderPage([
-      'agenda' => $agenda
-    ], ['meta' => ['title' => 'Detail Agenda']]);
+    return $response->renderPage(
+      ['agenda' => $agenda],
+      ['meta' => ['title' => 'Detail Agenda']]
+    );
   }
 
   // Form Edit Agenda
@@ -90,35 +91,39 @@ class AgendaController
 
     // TODO: Cek apakah status masih pending & milik user ini
 
-    return $response->renderPage([
-      'agenda' => $agenda
-    ], ['meta' => ['title' => 'Edit Agenda']]);
+    return $response->renderPage(
+      ['agenda' => $agenda],
+      ['meta' => ['title' => 'Edit Agenda']]
+    );
   }
 
   // Proses Update Agenda
   public function update(Request $request, Response $response): RedirectResponse
   {
-    $id = $request->param('id');
-    $data = $request->getBody();
+    try {
+      $id = $request->param('id');
+      $data = $request->getBody();
 
-    $this->model->updateById($id, $data);
+      $this->model->updateById($id, $data);
 
-    return $response->redirect('/agenda');
+      return $response->redirect('/agenda');
+    } catch (\Throwable $th) {
+      return $response->redirect('/agenda/create?error=500&message=' . urlencode($th->getMessage()));
+    }
   }
 
   // Batalkan Pengajuan
   public function cancel(Request $request, Response $response): RedirectResponse
   {
-    $id = $request->param('id');
+    try {
+      $id = $request->param('id');
 
-    // Soft delete atau set status cancelled
-    // $this->model->deleteById($id); 
-    // Atau lebih baik:
-    // $this->model->updateStatus($id, 'cancelled');
+      // Sementara delete dulu sesuai model yang ada
+      $this->model->deleteById($id);
 
-    // Sementara delete dulu sesuai model yang ada
-    $this->model->deleteById($id);
-
-    return $response->redirect('/agenda');
+      return $response->redirect('/agenda');
+    } catch (\Throwable $th) {
+      return $response->redirect('/agenda?error=500&message=' . urlencode($th->getMessage()));
+    }
   }
 }

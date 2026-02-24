@@ -57,46 +57,45 @@ class ApprovalModel extends Model
         return $row === false ? null : $row;
     }
 
-    public function create(array $data): bool
+    public function create(array $data)
     {
-        if (empty($data)) {
-            return false;
-        }
-        $return = false;
-
         try {
+            if (empty($data)) {
+                throw new Exception('data is empty');
+            }
             $columns = array_keys($data);
             $placeholders = array_map(fn($col) => ':' . $col, $columns);
 
             $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
-            $return = $this->getDb()->prepare($sql)->execute($data);
+            return $this->getDb()->prepare($sql)->execute($data);
         } catch (\Throwable $th) {
             throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
-            
         }
-
-        return $return;
     }
 
-    public function updateById(string|int $id, array $data): bool
+    public function updateById(string|int $id, array $data)
     {
-        if (empty($data)) {
-            return false;
+        try {
+            if (empty($data)) {
+                throw new Exception('data is empty');
+            }
+    
+            if (!isset($data['updated_at'])) {
+                $data['updated_at'] = date('Y-m-d H:i:s');
+            }
+    
+            $setParts = [];
+            foreach ($data as $column => $value) {
+                $setParts[] = "{$column} = :{$column}";
+            }
+    
+            $sql = "UPDATE {$this->table} SET " . implode(', ', $setParts) . " WHERE id = :id";
+            $data['id'] = $id;
+    
+            return $this->getDb()->query($sql, $data);
+        } catch (\Throwable $th) {
+            throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
         }
-
-        if (!isset($data['updated_at'])) {
-            $data['updated_at'] = date('Y-m-d H:i:s');
-        }
-
-        $setParts = [];
-        foreach ($data as $column => $value) {
-            $setParts[] = "{$column} = :{$column}";
-        }
-
-        $sql = "UPDATE {$this->table} SET " . implode(', ', $setParts) . " WHERE id = :id";
-        $data['id'] = $id;
-
-        return $this->getDb()->query($sql, $data);
     }
 
     public function deleteById(string|int $id): bool
@@ -119,9 +118,14 @@ class ApprovalModel extends Model
         return $stmt->fetchAll();
     }
 
-    public function updateStatus(string|int $id, string $status): bool
+    public function updateStatus(string|int $id, string $status, ?string $comment = null): bool
     {
-        return $this->updateById($id, ['status' => $status]);
+        $data = ['status' => $status];
+        if ($comment) {
+            $data['type'] = $comment;
+        }
+
+        return $this->updateById($id, $data);
     }
 
     public function getByRequester(string $email): array
