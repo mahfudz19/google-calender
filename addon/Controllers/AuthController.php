@@ -7,6 +7,7 @@ use App\Core\Http\Response;
 use App\Core\View\View;
 use Addon\Services\GoogleAuthService;
 use Addon\Models\UserModel;
+use App\Exceptions\HttpException;
 use App\Services\SessionService;
 use Exception;
 
@@ -29,23 +30,21 @@ class AuthController
       $url = $this->googleAuth->getAuthUrl();
       return $response->redirect($url);
     } catch (Exception $e) {
-      return $response
-        ->setStatusCode(500)
-        ->setContent('Error initializing login: ' . $e->getMessage());
+      throw new HttpException(500, $e->getMessage());
     }
   }
 
   public function callback(Request $request, Response $response)
   {
     $code = $request->query['code'] ?? null;
-
-    if (!$code) {
-      return $response
-        ->setStatusCode(400)
-        ->setContent('Error: Authorization code not found');
-    }
+    $errorCode = 500;
 
     try {
+      if (!$code) {
+        $errorCode = 400;
+        throw new Exception('Authorization code not found');
+      }
+
       $userData = $this->googleAuth->handleCallback($code);
 
       // Cek user di database (untuk menentukan apakah dia Admin/Privileged)
@@ -57,7 +56,8 @@ class AuthController
       if ($user) {
         // User ditemukan di DB (Admin/Super Admin/Staff)
         if (isset($user['is_active']) && !$user['is_active']) {
-          return $response->setStatusCode(403)->setContent('Akun dinonaktifkan.');
+          $errorCode = 403;
+          throw new Exception('Akun dinonaktifkan');
         }
 
         $this->users->touchLogin($user['id'], $userData['name'] ?? null, $userData['picture'] ?? null, $userData['google_id'] ?? null);
@@ -78,9 +78,7 @@ class AuthController
 
       return $response->redirect('/dashboard');
     } catch (Exception $e) {
-      return $response
-        ->setStatusCode(500)
-        ->setContent('Login Failed: ' . $e->getMessage());
+      throw new HttpException($errorCode, 'Login Failed: ' . $e->getMessage());
     }
   }
 
