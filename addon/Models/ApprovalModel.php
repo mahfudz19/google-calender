@@ -2,11 +2,13 @@
 
 namespace Addon\Models;
 
+use Addon\Controllers\UserController;
 use App\Core\Database\Model;
 use Exception;
 
 class ApprovalModel extends Model
 {
+    private UserController $user_controller;
     protected ?string $connection = null; // Nama koneksi database (opsional)
     protected string $table = 'approvals';
     protected bool $timestamps = true;
@@ -79,19 +81,19 @@ class ApprovalModel extends Model
             if (empty($data)) {
                 throw new Exception('data is empty');
             }
-    
+
             if (!isset($data['updated_at'])) {
                 $data['updated_at'] = date('Y-m-d H:i:s');
             }
-    
+
             $setParts = [];
             foreach ($data as $column => $value) {
                 $setParts[] = "{$column} = :{$column}";
             }
-    
+
             $sql = "UPDATE {$this->table} SET " . implode(', ', $setParts) . " WHERE id = :id";
             $data['id'] = $id;
-    
+
             return $this->getDb()->query($sql, $data);
         } catch (\Throwable $th) {
             throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
@@ -118,20 +120,79 @@ class ApprovalModel extends Model
         return $stmt->fetchAll();
     }
 
-    public function updateStatus(string|int $id, string $status, ?string $comment = null): bool
-    {
-        $data = ['status' => $status];
-        if ($comment) {
-            $data['type'] = $comment;
-        }
-
-        return $this->updateById($id, $data);
-    }
 
     public function getByRequester(string $email): array
     {
         $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE requester_email = :email ORDER BY updated_at DESC");
         $stmt->execute(['email' => $email]);
         return $stmt->fetchAll();
+    }
+
+    public function checkTimeConflict(string $startTime, string $endTime, ?int $excludeId = null): array
+    {
+        $sql = "SELECT * FROM {$this->table} 
+            WHERE status = 'approved' 
+            AND (
+                (start_time < :end_time AND end_time > :start_time)
+            )";
+
+        $params = [
+            'start_time' => $startTime,
+            'end_time' => $endTime
+        ];
+
+        // Exclude current agenda dari pengecekan (untuk update)
+        if ($excludeId) {
+            $sql .= " AND id != :exclude_id";
+            $params['exclude_id'] = $excludeId;
+        }
+
+        $stmt = $this->getDb()->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll();
+    }
+
+    public function hasTimeConflict(string $startTime, string $endTime, ?int $excludeId = null): bool
+    {
+        $conflicts = $this->checkTimeConflict($startTime, $endTime, $excludeId);
+        return !empty($conflicts);
+    }
+
+    public function updateStatus(string|int $id, string $status, ?string $comment = null): bool
+    {
+        // Ambil data agenda yang akan di-approve
+        $agenda = $this->find($id);
+        if (!$agenda) {
+            throw new \Exception("Agenda tidak ditemukan");
+        }
+
+        // Jika status = 'approved', cek conflict terlebih dahulu
+        if ($status === 'approved') {
+            // Cek time conflict dengan agenda yang sudah approved
+            $conflicts = $this->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $id);
+
+            if (!empty($conflicts)) {
+                $conflictList = [];
+                foreach ($conflicts as $conflict) {
+                    $conflictList[] = "- {$conflict['title']} (" . date('d M Y H:i', strtotime($conflict['start_time'])) . " - " . date('H:i', strtotime($conflict['end_time'])) . ")";
+                }
+
+                throw new \Exception("Conflict detected! Agenda ini bertabrakan dengan:\n" . implode("\n", $conflictList));
+            }
+
+            $users = $this->user_controller->getInbitefAkun();
+            dd($users);
+        }
+
+        $data = ['status' => $status];
+        if ($comment) $data['type'] = $comment;
+
+        return $this->updateById($id, $data);
+    }
+
+    public function getConflictingAgendas(string $startTime, string $endTime, ?int $excludeId = null): array
+    {
+        return $this->checkTimeConflict($startTime, $endTime, $excludeId);
     }
 }

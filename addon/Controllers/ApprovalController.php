@@ -35,10 +35,14 @@ class ApprovalController
 
   public function approve(Request $request, Response $response): RedirectResponse
   {
-    $id = $request->param('id');
-    $this->model->updateStatus($id, 'approved');
+    try {
+      $id = $request->param('id');
+      $this->model->updateStatus($id, 'approved');
 
-    return $response->redirect('/approval');
+      return $response->redirect('/approval');
+    } catch (\Throwable $th) {
+      return $response->redirect('/approval?error=500&message=' . urlencode($th->getMessage()));
+    }
   }
 
   public function reject(Request $request, Response $response): RedirectResponse
@@ -47,8 +51,6 @@ class ApprovalController
       $id = $request->param('id');
       $body = $request->getBody();
       $this->model->updateStatus($id, 'rejected', $body['comment']);
-      // throw new \Exception("Error Processing Request", 1);
-      
 
       return $response->redirect('/approval');
     } catch (\Throwable $th) {

@@ -1,3 +1,63 @@
+<?php
+// Handle error message dari query string
+$errorCode = $_GET['error'] ?? null;
+$errorMessage = $_GET['message'] ?? null;
+$displayError = null;
+
+if ($errorCode && $errorMessage) {
+    // Decode URL-encoded message
+    $decodedMessage = urldecode($errorMessage);
+    
+    // Custom error messages
+    switch ($errorCode) {
+        case '500':
+            if (strpos($decodedMessage, 'Conflict detected') !== false) {
+                $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
+            } elseif (strpos($decodedMessage, 'user_controller') !== false) {
+                $displayError = "Terjadi kesalahan sistem: Tidak dapat mengakses data pengguna Google. Silakan coba lagi atau hubungi administrator.";
+            } else {
+                $displayError = "Terjadi kesalahan server: " . $decodedMessage;
+            }
+            break;
+        case 'conflict':
+            if (strpos($decodedMessage, 'Conflict detected') !== false) {
+                $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
+            } else {
+                $displayError = $decodedMessage;
+            }
+            break;
+        case '400':
+            $displayError = "Data yang dikirim tidak valid: " . $decodedMessage;
+            break;
+        default:
+            $displayError = $decodedMessage;
+    }
+}
+?>
+
+<!-- Error Alert -->
+<?php if ($displayError): ?>
+<div class="error-alert" style="margin-bottom: 2rem;">
+    <div class="error-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+    </div>
+    <div class="error-content">
+        <div class="error-title">Terjadi Kesalahan</div>
+        <div class="error-message"><?= htmlspecialchars($displayError) ?></div>
+    </div>
+    <button class="error-close" onclick="this.parentElement.remove()" title="Tutup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+</div>
+<?php endif; ?>
+
 <?php if (empty($approvals)): ?>
   <div class="empty-state">
     <div class="empty-icon">🎉</div>
@@ -148,7 +208,7 @@
           </dialog>
 
           <!-- Hidden Forms -->
-          <form id="approveForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/approve" method="POST" data-spa style="display: none;"></form>
+          <form id="approveForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/approve" method="POST" style="display: none;"></form>
 
           <!-- Trigger Buttons -->
           <button type="button" onclick="document.getElementById('rejectModal_<?= $item['id'] ?>').showModal()" class="btn-action btn-reject">

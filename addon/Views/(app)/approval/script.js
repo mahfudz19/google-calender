@@ -45,3 +45,15 @@ function checkEmptyState() {
     `;
   }
 }
+
+// Auto-hide error setelah 10 detik
+document.addEventListener('DOMContentLoaded', function() {
+    const errorAlert = document.querySelector('.error-alert');
+    if (errorAlert) {
+        setTimeout(() => {
+            errorAlert.style.transition = 'opacity 0.3s';
+            errorAlert.style.opacity = '0';
+            setTimeout(() => errorAlert.remove(), 300);
+        }, 10000);
+    }
+});

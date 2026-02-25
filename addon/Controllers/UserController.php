@@ -20,7 +20,7 @@ class UserController
     $this->model = $model;
   }
 
-  private function getInbitefAkun()
+  public function getInbitefAkun()
   {
     try {
       // 1. Inisialisasi Service
@@ -35,7 +35,7 @@ class UserController
 
       return $users;
     } catch (\Exception $e) {
-      return false;
+      throw new \Exception($e->getMessage() ?? "Tidak ditemukan data user dari google", 1);
     }
   }
 
@@ -44,8 +44,10 @@ class UserController
     $params = $this->getQueryParams($request);
 
     // 1. Ambil Data dari Google Directory (Raw Array)
-    $googleUsers = $this->getInbitefAkun();
-    if ($googleUsers === false) {
+    $googleUsers = [];
+    try {
+      $googleUsers = $this->getInbitefAkun();
+    } catch (\Throwable $th) {
       $googleUsers = [];
     }
 

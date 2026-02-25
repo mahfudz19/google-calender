@@ -318,3 +318,64 @@
 .form-control::placeholder {
   color: #9ca3af;
 }
+
+
+/* Error Alert Styles */
+.error-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.error-icon {
+    color: #dc2626;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.error-content {
+    flex: 1;
+}
+
+.error-title {
+    font-weight: 600;
+    color: #dc2626;
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.error-message {
+    color: #991b1b;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.error-close {
+    background: none;
+    border: none;
+    color: #991b1b;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.error-close:hover {
+    background: #fecaca;
+}
+
+/* Auto-hide error setelah 10 detik */
+.error-alert {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
