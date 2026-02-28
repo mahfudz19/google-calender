@@ -33,8 +33,8 @@ return [
   'timezone' => env('APP_TIMEZONE', date_default_timezone_get()),
 
   'queue' => [
-    'driver' => env('QUEUE_DRIVER', 'redis'),
-    'connection' => env('QUEUE_CONNECTION', 'redis_queue'),
+    'driver' => env('QUEUE_DRIVER', 'database'),
+    'connection' => env('QUEUE_CONNECTION', 'mysql'),
     'default' => env('QUEUE_NAME', 'default'),
   ],
 

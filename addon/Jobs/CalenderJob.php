@@ -1,76 +1,5 @@
 <?php
 
-namespace App\Console\Commands;
-
-use App\Core\Foundation\Application;
-use App\Console\Contracts\CommandInterface;
-
-class MakeJobCommand implements CommandInterface
-{
-    public function __construct(
-        private Application $app,
-    ) {}
-
-    public function getName(): string
-    {
-        return 'make:job';
-    }
-
-    public function getDescription(): string
-    {
-        return 'Membuat job baru dengan progress tracking di addon/Jobs';
-    }
-
-    public function handle(array $arguments): int
-    {
-        $name = $arguments[0] ?? null;
-        if (!$name) {
-            echo color("Error: Nama job harus diisi.\n", "red");
-            return 1;
-        }
-
-        $name = ucfirst($name);
-
-        if (!str_ends_with($name, 'Job')) {
-            $name .= 'Job';
-        }
-
-        // Pastikan folder addon/Jobs ada
-        $jobsDir = __DIR__ . '/../../../addon/Jobs';
-        if (!is_dir($jobsDir)) {
-            if (!mkdir($jobsDir, 0755, true)) {
-                echo color("Error: Tidak dapat membuat folder addon/Jobs\n", "red");
-                return 1;
-            }
-        }
-
-        $path = $jobsDir . "/{$name}.php";
-
-        if (file_exists($path)) {
-            echo color("Error: Job sudah ada!\n", "red");
-            return 1;
-        }
-
-        $template = $this->getJobTemplate($name);
-
-        // Fix: Replace {{CLASS_NAME}} dengan nama yang benar
-        $content = str_replace('{{CLASS_NAME}}', $name, $template);
-
-        if (file_put_contents($path, $content) === false) {
-            echo color("Error: Gagal membuat file job\n", "red");
-            return 1;
-        }
-
-        echo color("SUCCESS:", "green") . " Job dibuat di " . color($path, "blue") . "\n";
-
-        return 0;
-    }
-
-    private function getJobTemplate(string $name): string
-    {
-        return <<<'PHP'
-<?php
-
 declare(strict_types=1);
 
 namespace Addon\Jobs;
@@ -78,7 +7,7 @@ namespace Addon\Jobs;
 use App\Core\Foundation\Application;
 use App\Core\Database\DatabaseManager;
 
-class {{CLASS_NAME}}
+class CalenderJob
 {
     private ?int $jobId = null;
     private $db;
@@ -205,8 +134,5 @@ class {{CLASS_NAME}}
     {
         echo "Cleaning up after job completion\n";
         // Add your cleanup logic here
-    }
-}
-PHP;
     }
 }

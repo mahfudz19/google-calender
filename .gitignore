@@ -3,4 +3,5 @@ vendor
 .env
 storage/secrets
 storage/cache
+storage/logs
 public/build

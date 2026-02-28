@@ -2,115 +2,108 @@
 
 namespace Addon\Services;
 
-use Google\Client;
-use Google\Service\Calendar;
-use Google\Service\Calendar\Event;
-use App\Services\ConfigService;
-use Exception;
+use Google_Client;
+use Google_Service_Calendar;
+use Google_Service_Calendar_Event;
+use Google_Service_Calendar_EventDateTime;
+use Google_Service_Calendar_EventAttendee;
 
 class GoogleCalendarService
 {
-  private Client $client;
-  private ?Calendar $service = null;
+  private Google_Client $client;
+  private ?Google_Service_Calendar $service = null;
 
-  /**
-   * Constructor
-   * Setup Google Client dasar saat class diinisialisasi.
-   */
   public function __construct()
   {
-    // 1. Setup Client
-    $this->client = new Client();
-
-    // Ambil path auth file dari Environment/Config agar tidak hardcode
-    // Menggunakan helper env() dari framework Mazu Anda
-    $authConfigPath = env('GOOGLE_AUTH_CONFIG', __DIR__ . '/../../storage/secrets/broadcast-agenda-kampus-597196c77bd7.json');
-
-    if (!file_exists($authConfigPath)) {
-      throw new Exception("Google Auth File not found at: " . $authConfigPath);
-    }
-
-    $this->client->setAuthConfig($authConfigPath);
-
-    // Set Scopes (Wajib Calendar)
-    $this->client->addScope(Calendar::CALENDAR);
-
-    // Opsional: Set Access Type offline jika butuh refresh token jangka panjang (biasanya service account auto-refresh)
-    $this->client->setAccessType('offline');
+    $this->client = new Google_Client();
+    // Sesuaikan path ke file JSON Service Account Anda
+    $this->client->setAuthConfig(__DIR__ . '/../../../credentials/service-account.json');
+    $this->client->addScope(Google_Service_Calendar::CALENDAR);
   }
 
   /**
-   * Impersonate User (Domain-Wide Delegation)
-   * Mengubah subjek akses menjadi email target.
-   * * @param string $emailTarget Email user pemilik kalender (misal: dosen@inbitef.ac.id)
-   * @return self
+   * Impersonate akun Google Workspace (Super Admin atau Organizer)
    */
-  public function impersonate(string $emailTarget): self
+  public function impersonate(string $email): self
   {
-    // Validasi format email sederhana
-    if (!filter_var($emailTarget, FILTER_VALIDATE_EMAIL)) {
-      throw new Exception("Invalid target email for impersonation.");
-    }
-
-    // Logic Inti DWD: Set Subject
-    $this->client->setSubject($emailTarget);
-
-    // Re-inisialisasi Service Calendar dengan identitas baru
-    $this->service = new Calendar($this->client);
-
-    return $this; // Return self untuk method chaining
+    $this->client->setSubject($email);
+    $this->service = new Google_Service_Calendar($this->client);
+    return $this;
   }
 
   /**
-   * Insert Event ke Kalender Primary User yang sedang di-impersonate
-   * * @param array $agendaData Data agenda (title, start, end, location, description)
-   * @return string ID Event yang berhasil dibuat
+   * Helper private untuk membangun objek Event Google
    */
-  public function insertEvent(array $agendaData): string
+  private function buildEventObject(array $data, ?Google_Service_Calendar_Event $event = null): Google_Service_Calendar_Event
   {
-    if (!$this->service) {
-      throw new Exception("Please call impersonate() before inserting an event.");
+    if (!$event) {
+      $event = new Google_Service_Calendar_Event();
     }
 
-    // Mapping Data Agenda ke Google Event Object
-    // Support field lengkap: description, location, attendees, dll.
-    $eventConfig = [
-      'summary' => $agendaData['title'] ?? 'Agenda Kampus',
-      'description' => $agendaData['description'] ?? '',
-      'location' => $agendaData['location'] ?? '',
-      'start' => [
-        'dateTime' => $agendaData['start_time'], // Wajib format ISO 8601 (2023-10-25T09:00:00+07:00)
-        'timeZone' => 'Asia/Jakarta',
-      ],
-      'end' => [
-        'dateTime' => $agendaData['end_time'],
-        'timeZone' => 'Asia/Jakarta',
-      ],
-    ];
+    if (isset($data['title'])) $event->setSummary($data['title']);
+    if (isset($data['description'])) $event->setDescription($data['description']);
+    if (isset($data['location'])) $event->setLocation($data['location']);
 
-    // Tambahkan Attendees jika ada
-    if (!empty($agendaData['attendees']) && is_array($agendaData['attendees'])) {
-      // Format: [['email' => 'a@test.com'], ['email' => 'b@test.com']]
-      $eventConfig['attendees'] = $agendaData['attendees'];
+    if (isset($data['start_time'])) {
+      $start = new Google_Service_Calendar_EventDateTime();
+      $start->setDateTime($data['start_time']);
+      $event->setStart($start);
     }
 
-    $event = new Event($eventConfig);
+    if (isset($data['end_time'])) {
+      $end = new Google_Service_Calendar_EventDateTime();
+      $end->setDateTime($data['end_time']);
+      $event->setEnd($end);
+    }
 
-    // Insert ke kalender 'primary' milik user yang di-impersonate
-    $createdEvent = $this->service->events->insert('primary', $event);
+    // MAP ATTENDEES (Tanpa Looping API, hanya menyiapkan format array untuk Google)
+    if (isset($data['attendees']) && is_array($data['attendees'])) {
+      $attendeesArray = [];
+      foreach ($data['attendees'] as $att) {
+        $attendee = new Google_Service_Calendar_EventAttendee();
+        $attendee->setEmail($att['email']);
+        $attendeesArray[] = $attendee;
+      }
+      $event->setAttendees($attendeesArray);
+    }
 
+    return $event;
+  }
+
+  /**
+   * INSERT: Membuat event baru
+   */
+  public function insertEvent(array $data, array $optParams = []): string
+  {
+    $event = $this->buildEventObject($data);
+    $createdEvent = $this->service->events->insert('primary', $event, $optParams);
     return $createdEvent->getId();
   }
 
   /**
-   * Mengambil daftar event dari kalender user
-   * @param string $timeMin Waktu mulai (ISO 8601), default: sekarang
-   * @param int $maxResults Jumlah maksimal event yang diambil
+   * UPDATE: Mengubah event yang sudah ada (Menggunakan PATCH agar bisa parsial)
    */
+  public function updateEvent(string $eventId, array $data, array $optParams = []): string
+  {
+    // Build event object hanya dengan data yang dikirimkan (parsial)
+    $event = $this->buildEventObject($data);
+    $updatedEvent = $this->service->events->patch('primary', $eventId, $event, $optParams);
+    return $updatedEvent->getId();
+  }
+
+  /**
+   * DELETE: Menghapus event
+   */
+  public function deleteEvent(string $eventId, array $optParams = []): bool
+  {
+    $this->service->events->delete('primary', $eventId, $optParams);
+    return true;
+  }
+
   public function listEvents(string $timeMin = 'now', int $maxResults = 10): array
   {
     if (!$this->service) {
-      throw new Exception("Please call impersonate() first.");
+      throw new \Exception("Please call impersonate() first.");
     }
 
     if ($timeMin === 'now') {

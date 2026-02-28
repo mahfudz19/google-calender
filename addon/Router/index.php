@@ -3,6 +3,7 @@
 use Addon\Controllers\AgendaController;
 use Addon\Controllers\ApprovalController;
 use Addon\Controllers\AuthController;
+use Addon\Controllers\QueueController;
 use Addon\Controllers\UserController;
 
 $router->get('/', [AuthController::class, 'index'], ['guest']);
@@ -50,5 +51,10 @@ $router->group(['middleware' => ['auth']], function ($router) {
     $router->post('/users/:id/update', [UserController::class, 'update']);
     $router->post('/users/:id/delete', [UserController::class, 'destroy']);
     $router->post('/users/register-from-google', [UserController::class, 'registerFromGoogle']);
+
+    // test job
+    $router->get('/queue-monitor', [QueueController::class, 'monitor']);
+    $router->get('/queue-monitor/:id', [QueueController::class, 'show']);
+    $router->get('/test-job', [QueueController::class, 'testJob']);
   });
 });

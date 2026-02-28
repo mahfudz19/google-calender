@@ -43,26 +43,26 @@ class ApiController
     }
   }
 
-  public function checkSchedule(Request $request, Response $response)
-  {
-    try {
-      $gcal = new GoogleCalendarService();
+  // public function checkSchedule(Request $request, Response $response)
+  // {
+  //   try {
+  //     $gcal = new GoogleCalendarService();
 
-      // Target User yang mau diintip jadwalnya
-      $targetEmail = 'sultan.syahabana@inbitef.ac.id';
+  //     // Target User yang mau diintip jadwalnya
+  //     $targetEmail = 'sultan.syahabana@inbitef.ac.id';
 
-      // Ambil 10 event ke depan
-      $events = $gcal->impersonate($targetEmail)->listEvents();
+  //     // Ambil 10 event ke depan
+  //     $events = $gcal->impersonate($targetEmail)->listEvents();
 
-      return $response->json([
-        'status' => 'success',
-        'target' => $targetEmail,
-        'upcoming_events' => $events
-      ]);
-    } catch (\Exception $e) {
-      return $response->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-    }
-  }
+  //     return $response->json([
+  //       'status' => 'success',
+  //       'target' => $targetEmail,
+  //       'upcoming_events' => $events
+  //     ]);
+  //   } catch (\Exception $e) {
+  //     return $response->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+  //   }
+  // }
 
   public function test(Request $request, Response $response): JsonResponse
   {
