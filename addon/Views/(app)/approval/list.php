@@ -5,57 +5,57 @@ $errorMessage = $_GET['message'] ?? null;
 $displayError = null;
 
 if ($errorCode && $errorMessage) {
-    // Decode URL-encoded message
-    $decodedMessage = urldecode($errorMessage);
-    
-    // Custom error messages
-    switch ($errorCode) {
-        case '500':
-            if (strpos($decodedMessage, 'Conflict detected') !== false) {
-                $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
-            } elseif (strpos($decodedMessage, 'user_controller') !== false) {
-                $displayError = "Terjadi kesalahan sistem: Tidak dapat mengakses data pengguna Google. Silakan coba lagi atau hubungi administrator.";
-            } else {
-                $displayError = "Terjadi kesalahan server: " . $decodedMessage;
-            }
-            break;
-        case 'conflict':
-            if (strpos($decodedMessage, 'Conflict detected') !== false) {
-                $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
-            } else {
-                $displayError = $decodedMessage;
-            }
-            break;
-        case '400':
-            $displayError = "Data yang dikirim tidak valid: " . $decodedMessage;
-            break;
-        default:
-            $displayError = $decodedMessage;
-    }
+  // Decode URL-encoded message
+  $decodedMessage = urldecode($errorMessage);
+
+  // Custom error messages
+  switch ($errorCode) {
+    case '500':
+      if (strpos($decodedMessage, 'Conflict detected') !== false) {
+        $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
+      } elseif (strpos($decodedMessage, 'user_controller') !== false) {
+        $displayError = "Terjadi kesalahan sistem: Tidak dapat mengakses data pengguna Google. Silakan coba lagi atau hubungi administrator.";
+      } else {
+        $displayError = "Terjadi kesalahan server: " . $decodedMessage;
+      }
+      break;
+    case 'conflict':
+      if (strpos($decodedMessage, 'Conflict detected') !== false) {
+        $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
+      } else {
+        $displayError = $decodedMessage;
+      }
+      break;
+    case '400':
+      $displayError = "Data yang dikirim tidak valid: " . $decodedMessage;
+      break;
+    default:
+      $displayError = $decodedMessage;
+  }
 }
 ?>
 
 <!-- Error Alert -->
 <?php if ($displayError): ?>
-<div class="error-alert" style="margin-bottom: 2rem;">
+  <div class="error-alert" style="margin-bottom: 2rem;">
     <div class="error-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
     </div>
     <div class="error-content">
-        <div class="error-title">Terjadi Kesalahan</div>
-        <div class="error-message"><?= htmlspecialchars($displayError) ?></div>
+      <div class="error-title">Terjadi Kesalahan</div>
+      <div class="error-message"><?= htmlspecialchars($displayError) ?></div>
     </div>
     <button class="error-close" onclick="this.parentElement.remove()" title="Tutup">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
     </button>
-</div>
+  </div>
 <?php endif; ?>
 
 <?php if (empty($approvals)): ?>
@@ -226,6 +226,81 @@ if ($errorCode && $errorMessage) {
             Setujui
           </button>
         </div>
+      <?php else: ?>
+        <style>
+          .btn-icon.delete {
+            color: #dc2626;
+          }
+
+          .btn-icon.delete:hover {
+            background: #fef2f2;
+            color: #b91c1c;
+          }
+
+          .btn-confirm.btn-delete {
+            background: #dc2626;
+          }
+
+          .btn-confirm.btn-delete:hover {
+            background: #b91c1c;
+          }
+        </style>
+        <?php if ($item['status'] === 'approved'): ?>
+          <div class="card-actions">
+            <!-- Edit Button -->
+            <a data-spa href="/agenda/<?= $item['id'] ?>/edit" class="btn-icon" title="Edit Agenda">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </a>
+
+            <!-- Delete Modal -->
+            <dialog id="deleteModal_<?= $item['id'] ?>" class="confirm-modal">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3>Konfirmasi Hapus</h3>
+                  <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="modal-body">
+                  <p>Apakah Anda yakin ingin menghapus agenda ini?</p>
+                  <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+                    <strong><?= htmlspecialchars($item['title']) ?></strong>
+                  </p>
+                  <p style="font-size: 0.85rem; color: #dc2626; margin-top: 0.5rem;">
+                    ⚠️ Agenda akan dihapus dari kalender semua peserta.
+                  </p>
+                </div>
+
+                <form method="dialog" class="modal-actions">
+                  <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
+                    Tidak, Batal
+                  </button>
+                  <button type="submit" form="deleteForm_<?= $item['id'] ?>" class="btn-confirm btn-delete">
+                    Ya, Hapus Agenda
+                  </button>
+                </form>
+              </div>
+            </dialog>
+
+            <!-- Hidden Delete Form -->
+            <form id="deleteForm_<?= $item['id'] ?>" action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa style="display: none;"></form>
+
+            <!-- Delete Trigger Button -->
+            <button type="button" onclick="document.getElementById('deleteModal_<?= $item['id'] ?>').showModal()" class="btn-icon delete" title="Hapus Agenda">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   <?php endforeach; ?>

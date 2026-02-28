@@ -7,11 +7,14 @@ use App\Core\Http\Response;
 use App\Core\View\View;
 use App\Core\Http\RedirectResponse;
 use Addon\Models\ApprovalModel;
+use Addon\Services\GoogleCalendarService;
 use App\Services\SessionService;
 use Error;
 
 class AgendaController
 {
+  private string $adminEmail = 'mahfudz@inbitef.ac.id';
+
   public function __construct(
     private ApprovalModel $model,
     private SessionService $session
@@ -104,11 +107,34 @@ class AgendaController
       $id = $request->param('id');
       $data = $request->getBody();
 
+      $oldAgenda = $this->model->find($id);
+
+      // 1. Update ke Database
       $this->model->updateById($id, $data);
+
+      // 2. Jika agenda sudah "approved", edit juga di Google Calendar
+      if ($oldAgenda['status'] === 'approved' && !empty($oldAgenda['google_event_id'])) {
+        $gcal = new GoogleCalendarService();
+
+        $updatedEventData = [
+          'title'       => $data['title'] ?? $oldAgenda['title'],
+          'description' => $data['description'] ?? $oldAgenda['description'],
+          'location'    => $data['location'] ?? $oldAgenda['location'],
+          'start_time'  => isset($data['start_time']) ? date('c', strtotime($data['start_time'])) : null,
+          'end_time'    => isset($data['end_time']) ? date('c', strtotime($data['end_time'])) : null,
+        ];
+
+        // Hilangkan field yang null agar method patch GCal tidak error
+        $updatedEventData = array_filter($updatedEventData);
+
+        // Update via Google API
+        $gcal->impersonate($this->adminEmail)
+          ->updateEvent($oldAgenda['google_event_id'], $updatedEventData, ['sendUpdates' => 'all']);
+      }
 
       return $response->redirect('/agenda');
     } catch (\Throwable $th) {
-      return $response->redirect('/agenda/create?error=500&message=' . urlencode($th->getMessage()));
+      return $response->redirect('/agenda/edit?error=500&message=' . urlencode($th->getMessage()));
     }
   }
 
@@ -117,8 +143,17 @@ class AgendaController
   {
     try {
       $id = $request->param('id');
+      $agenda = $this->model->find($id);
 
-      // Sementara delete dulu sesuai model yang ada
+      // 1. Jika agenda sudah disetujui, HAPUS dulu dari Google Calendar
+      if ($agenda['status'] === 'approved' && !empty($agenda['google_event_id'])) {
+        $gcal = new GoogleCalendarService();
+        // Hapus dan kirim notifikasi batal ke peserta
+        $gcal->impersonate($this->adminEmail)
+          ->deleteEvent($agenda['google_event_id'], ['sendUpdates' => 'all']);
+      }
+
+      // 2. Hapus dari Database Lokal
       $this->model->deleteById($id);
 
       return $response->redirect('/agenda');

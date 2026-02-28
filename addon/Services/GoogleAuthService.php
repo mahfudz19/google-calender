@@ -49,15 +49,8 @@ class GoogleAuthService
     $oauth2 = new Oauth2($this->client);
     $userInfo = $oauth2->userinfo->get();
 
-    $email = $userInfo->email;
-    $allowedDomain = env('GOOGLE_ALLOWED_DOMAIN', '@inbitef.ac.id');
-
-    if ($allowedDomain && !str_ends_with($email, $allowedDomain)) {
-      throw new Exception('Akses Ditolak: Hanya email ' . $allowedDomain . ' yang diizinkan.');
-    }
-
     return [
-      'email' => $email,
+      'email' => $userInfo->email,
       'name' => $userInfo->name,
       'picture' => $userInfo->picture,
       'google_id' => $userInfo->id,

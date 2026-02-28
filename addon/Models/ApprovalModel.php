@@ -32,6 +32,7 @@ class ApprovalModel extends Model
         'requester_email' => ['type' => 'string', 'nullable' => true],
         'requester_role' => ['type' => 'string', 'nullable' => true],
         'requester_avatar' => ['type' => 'string', 'nullable' => true],
+        'google_event_id' => ['type' => 'string', 'nullable' => true],
         'status' => [
             'type' => 'enum',
             'values' => ['pending', 'approved', 'rejected'],
@@ -159,38 +160,14 @@ class ApprovalModel extends Model
         return !empty($conflicts);
     }
 
-    public function updateStatus(string|int $id, string $status, ?string $comment = null): bool
+    public function updateStatus(string|int $id, string $status, ?string $comment = null, ?string $googleEventId = null): bool
     {
-        // Ambil data agenda yang akan di-approve
-        $agenda = $this->find($id);
-        if (!$agenda) {
-            throw new \Exception("Agenda tidak ditemukan");
-        }
-
-        // Jika status = 'approved', cek conflict terlebih dahulu
-        if ($status === 'approved') {
-            // Cek time conflict dengan agenda yang sudah approved
-            $conflicts = $this->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $id);
-
-            if (!empty($conflicts)) {
-                $conflictList = [];
-                foreach ($conflicts as $conflict) {
-                    $conflictList[] = "- {$conflict['title']} (" . date('d M Y H:i', strtotime($conflict['start_time'])) . " - " . date('H:i', strtotime($conflict['end_time'])) . ")";
-                }
-
-                throw new \Exception("Conflict detected! Agenda ini bertabrakan dengan:\n" . implode("\n", $conflictList));
-            }
-
-            $users = $this->user_controller->getInbitefAkun();
-            dd($users);
-        }
-
         $data = ['status' => $status];
         if ($comment) $data['type'] = $comment;
+        if ($googleEventId) $data['google_event_id'] = $googleEventId;
 
         return $this->updateById($id, $data);
     }
-
     public function getConflictingAgendas(string $startTime, string $endTime, ?int $excludeId = null): array
     {
         return $this->checkTimeConflict($startTime, $endTime, $excludeId);

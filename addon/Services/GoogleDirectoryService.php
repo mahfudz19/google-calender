@@ -49,7 +49,7 @@ class GoogleDirectoryService
    * Ambil semua user di domain
    * @return array List of emails
    */
-  public function getAllUsers(string $domain = 'inbitef.ac.id'): array
+  public function getAllUsers(?string $domain = null): array
   {
     if (!$this->service) {
       throw new Exception("Please call impersonate() with Super Admin email first.");
@@ -60,10 +60,15 @@ class GoogleDirectoryService
 
     do {
       $params = [
-        'domain' => $domain,
-        'maxResults' => 100, // Max per page
-        'pageToken' => $pageToken
+        'maxResults' => 100,
+        'pageToken' => $pageToken,
+        'customer' => 'my_customer'
       ];
+
+      // Hanya tambahkan domain jika ada
+      if ($domain) {
+        $params['domain'] = $domain;
+      }
 
       $results = $this->service->users->listUsers($params);
 

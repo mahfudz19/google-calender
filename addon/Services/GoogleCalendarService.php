@@ -17,7 +17,7 @@ class GoogleCalendarService
   {
     $this->client = new Google_Client();
     // Sesuaikan path ke file JSON Service Account Anda
-    $this->client->setAuthConfig(__DIR__ . '/../../../credentials/service-account.json');
+    $this->client->setAuthConfig(env('GOOGLE_AUTH_CONFIG', __DIR__ . '/../../storage/secrets/broadcast-agenda-kampus-597196c77bd7.json'));
     $this->client->addScope(Google_Service_Calendar::CALENDAR);
   }
 
