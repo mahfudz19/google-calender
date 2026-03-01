@@ -166,14 +166,11 @@ class CalenderJob
     {
         // Kirim event dan dapatkan ID-nya
         echo ('Kirim data approvals dengan id =' . $id . ', dan dapatkan ID-nya');
-        dump($eventData);
-        // $gcal = new GoogleCalendarService();
-        // $googleEventId = $gcal->impersonate($this->adminEmail)->insertEvent($eventData, ['sendUpdates' => 'all']);
+        $gcal = new GoogleCalendarService();
+        $googleEventId = $gcal->impersonate($this->adminEmail)->insertEvent($eventData, ['sendUpdates' => 'all']);
 
-        // // 4. Update Database (Ubah status & simpan ID Event GCal)
-        // $this->model->updateStatus($id, 'approved', null, $googleEventId);
-        sleep(5);
-        $this->model->updateStatus($id, 'approved');
+        // 4. Update Database (Ubah status & simpan ID Event GCal)
+        $this->model->updateStatus($id, 'approved', null, $googleEventId);
     }
 
     /**
