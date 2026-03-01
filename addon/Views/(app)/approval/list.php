@@ -102,7 +102,12 @@ if ($errorCode && $errorMessage) {
 
           <?php if ($isHistory): ?>
             <span class="status-badge status-<?= $item['status'] ?>">
-              <?= ucfirst($item['status']) ?>
+              <?php if ($item['status'] === 'processing'): ?>
+                <span class="processing-spinner"></span>
+                Processing
+              <?php else: ?>
+                <?= ucfirst($item['status']) ?>
+              <?php endif; ?>
             </span>
           <?php endif; ?>
         </div>
@@ -200,7 +205,9 @@ if ($errorCode && $errorMessage) {
                 <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
                   Batal
                 </button>
-                <button type="submit" form="approveForm_<?= $item['id'] ?>" class="btn-confirm btn-approve">
+                <button type="button"
+                  onclick="submitApprove(<?= $item['id'] ?>)"
+                  class="btn-confirm btn-approve">
                   Ya, Setujui Agenda
                 </button>
               </form>
@@ -219,24 +226,18 @@ if ($errorCode && $errorMessage) {
             Tolak
           </button>
 
-          <button type="button" onclick="document.getElementById('approveModal_<?= $item['id'] ?>').showModal()" class="btn-action btn-approve">
+          <button type="button"
+            onclick="handleApprove(<?= $item['id'] ?>)"
+            class="btn-action btn-approve"
+            id="approveBtn_<?= $item['id'] ?>">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            Setujui
+            <span id="approveBtnText_<?= $item['id'] ?>">Setujui</span>
           </button>
         </div>
       <?php else: ?>
         <style>
-          .btn-icon.delete {
-            color: #dc2626;
-          }
-
-          .btn-icon.delete:hover {
-            background: #fef2f2;
-            color: #b91c1c;
-          }
-
           .btn-confirm.btn-delete {
             background: #dc2626;
           }

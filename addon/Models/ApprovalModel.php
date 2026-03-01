@@ -35,7 +35,7 @@ class ApprovalModel extends Model
         'google_event_id' => ['type' => 'string', 'nullable' => true],
         'status' => [
             'type' => 'enum',
-            'values' => ['pending', 'approved', 'rejected'],
+            'values' => ['pending', 'processing', 'approved', 'rejected'],
             'nullable' => false,
             'default' => 'pending',
         ],

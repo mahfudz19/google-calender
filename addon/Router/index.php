@@ -37,6 +37,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
     // Aksi Approve/Reject
     $router->post('/approval/:id/approve', [ApprovalController::class, 'approve']);
+    $router->get('/approval/:id/status', [ApprovalController::class, 'checkStatus']);
     $router->post('/approval/:id/reject', [ApprovalController::class, 'reject']);
   });
 

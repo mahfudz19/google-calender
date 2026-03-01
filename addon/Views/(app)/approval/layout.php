@@ -13,7 +13,6 @@
           <?php endif; ?>
         </a>
         <a data-spa href="<?= getBaseUrl('/approval/history') ?>" class="tab-btn <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) !== false ? 'active' : '' ?>">Riwayat</a>
-        <button onclick="(function(){fetch('<?= getBaseUrl('/test-job') ?>');})()" class="tab-btn">Test Job</button>
       </div>
     </div>
   </header>

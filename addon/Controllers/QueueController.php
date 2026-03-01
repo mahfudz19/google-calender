@@ -13,14 +13,7 @@ use App\Core\Queue\JobDispatcher;
 
 class QueueController
 {
-  private QueueModel $model;
-  private JobDispatcher $dispatcher;
-
-  public function __construct(QueueModel $model, JobDispatcher $dispatcher)
-  {
-    $this->model = $model;
-    $this->dispatcher = $dispatcher;
-  }
+  public function __construct(private QueueModel $model, private JobDispatcher $dispatcher) {}
 
   // Controller hanya TRIGGER job
   public function testJob(Request $request, Response $response): JsonResponse

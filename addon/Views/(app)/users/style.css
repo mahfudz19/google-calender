@@ -113,24 +113,6 @@
   background-color: var(--md-sys-color-error);
 }
 
-.btn-icon {
-  color: var(--text-secondary);
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.btn-icon:hover {
-  background-color: var(--neutral-200);
-  color: var(--md-sys-color-primary);
-}
-
 .pagination-container {
   display: flex;
   justify-content: space-between;
