@@ -58,17 +58,15 @@ class QueueModel extends Model
 
     public function getQueueStats(): array
     {
-        $sql = "
-            SELECT 
-                queue,
-                COUNT(*) as total,
-                SUM(CASE WHEN reserved_at IS NULL THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN reserved_at IS NOT NULL THEN 1 ELSE 0 END) as processing,
-                SUM(CASE WHEN attempts >= 3 THEN 1 ELSE 0 END) as failed
-            FROM {$this->table} 
-            GROUP BY queue
-        ";
-        
+        $sql = "SELECT 
+                    queue,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN reserved_at IS NULL THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN reserved_at IS NOT NULL THEN 1 ELSE 0 END) as processing,
+                    SUM(CASE WHEN attempts >= 3 THEN 1 ELSE 0 END) as failed
+                FROM {$this->table} 
+                GROUP BY queue";
+
         $stmt = $this->getDb()->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -93,28 +91,28 @@ class QueueModel extends Model
     public function create(array $data): bool
     {
         if (empty($data)) return false;
-        
+
         $columns = array_keys($data);
         $placeholders = array_map(fn($col) => ':' . $col, $columns);
-        
+
         $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ")
                 VALUES (" . implode(', ', $placeholders) . ")";
-        
+
         return $this->getDb()->query($sql, $data);
     }
 
     public function updateById(string|int $id, array $data): bool
     {
         if (empty($data)) return false;
-        
+
         $setParts = [];
         foreach ($data as $column => $value) {
             $setParts[] = "{$column} = :{$column}";
         }
-        
+
         $sql = "UPDATE {$this->table} SET " . implode(', ', $setParts) . " WHERE id = :id";
         $data['id'] = $id;
-        
+
         return $this->getDb()->query($sql, $data);
     }
 
