@@ -21,7 +21,7 @@ class AuthController
 
   public function index(Request $request, Response $response)
   {
-    return $response->renderPage([]);
+    return $response->renderPage([], ['path' => '/login']);
   }
 
   public function login(Request $request, Response $response)
