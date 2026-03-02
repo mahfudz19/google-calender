@@ -124,11 +124,6 @@
 .content-container {
     max-width: 1280px;
     margin: 0 auto;
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-light);
 }
 
 /* Utilitas Helper */
@@ -177,5 +172,4 @@
     .btn-logout { background-color: var(--danger-light); color: var(--danger); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; }
 
     .app-main { padding: 1rem; }
-    .content-container { padding: 1.5rem 1rem; }
 }

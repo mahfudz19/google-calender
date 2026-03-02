@@ -27,21 +27,12 @@ class AgendaController
   // Dashboard Kalender Utama
   public function index(Request $request, Response $response): View
   {
-    // 1. Ambil data asli dari model
-    $allAgendas = $this->model->all() ?: [];
+    $data = $this->model->getAllApproved() ?: [];
 
-    // 2. Hitung statistik untuk UI Card
-    $approvedAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'approved');
-    $pendingAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'pending');
-
-    $stats = [
-      'total' => count($allAgendas),
-      'approved' => count($approvedAgendas),
-      'pending' => count($pendingAgendas),
-    ];
-
-    // 3. Render ke layout dengan parameter
-    return $response->renderPage(['stats' => $stats], ['meta'  => ['title' => 'Dashboard | Mazu Calendar']]);
+    return $response->renderPage(
+      ['total' => count($data), 'events' => $data],
+      ['meta'  => ['title' => 'Dashboard | Mazu Calendar']]
+    );
   }
 
   // Form Pengajuan Agenda Baru

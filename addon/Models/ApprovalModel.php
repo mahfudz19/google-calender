@@ -8,7 +8,6 @@ use Exception;
 
 class ApprovalModel extends Model
 {
-    private UserController $user_controller;
     protected ?string $connection = null; // Nama koneksi database (opsional)
     protected string $table = 'approvals';
     protected bool $timestamps = true;
@@ -47,6 +46,13 @@ class ApprovalModel extends Model
     public function all(): array
     {
         $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table}");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getAllApproved(): array
+    {
+        $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE status = 'approved'");
         $stmt->execute();
         return $stmt->fetchAll();
     }
