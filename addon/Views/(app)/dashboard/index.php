@@ -70,7 +70,7 @@ $recentAgendas = $recentAgendas ?? [];
               $icon = '❌';
             }
             ?>
-            <a href="/agenda/<?= $agenda['id'] ?? '' ?>" class="widget-item">
+            <a data-spa href="/agenda/<?= $agenda['id'] ?? '' ?>" class="widget-item">
               <div class="item-icon <?= $bgClass ?>"><?= $icon ?></div>
               <div class="item-info">
                 <strong><?= htmlspecialchars($agenda['title']) ?></strong>

@@ -71,3 +71,106 @@
     .filter-tabs { overflow-x: auto; white-space: nowrap; }
     .pagination-wrap { flex-direction: column; gap: 1rem; text-align: center; }
 }
+
+/* =======================================================
+   TAMBAHAN UNTUK HALAMAN CREATE, EDIT, DAN DETAIL VIEW
+   ======================================================= */
+
+/* Utilitas Navigasi */
+.btn-back {
+    display: inline-block; color: var(--md-sys-color-on-surface-variant); font-weight: 500; font-size: 0.95rem;
+    text-decoration: none; margin-bottom: 1.5rem; transition: color 0.2s;
+}
+.btn-back:hover { color: var(--md-sys-color-primary); }
+
+/* --- FORM CARD WRAPPER --- */
+.form-card-wrapper {
+    background: var(--md-sys-color-surface); border-radius: 16px; border: 1px solid var(--md-sys-color-outline-variant);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 2.5rem;
+}
+
+.form-header { margin-bottom: 2rem; border-bottom: 1px solid var(--md-sys-color-outline-variant); padding-bottom: 1.5rem; }
+.form-header h2 { color: var(--md-sys-color-on-background); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.4rem; }
+.form-header p { color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem; }
+
+/* Struktur Grid Form Mazu */
+.mazu-form .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.form-group.full-width { grid-column: span 2; }
+
+.mazu-form label {
+    display: block; font-weight: 600; font-size: 0.9rem; color: var(--md-sys-color-on-background); margin-bottom: 0.5rem;
+}
+.text-red { color: var(--md-sys-color-error); }
+
+.mazu-form .form-control {
+    width: 100%; padding: 0.85rem 1rem; font-size: 0.95rem; font-family: inherit;
+    border: 1px solid var(--md-sys-color-outline-variant); border-radius: 10px; background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-background); transition: all 0.2s ease; box-sizing: border-box;
+}
+.mazu-form .form-control:focus {
+    outline: none; border-color: var(--md-sys-color-primary); background-color: var(--md-sys-color-surface);
+    box-shadow: 0 0 0 4px var(--md-sys-color-primary-container);
+}
+
+.form-actions {
+    display: flex; justify-content: flex-end; align-items: center; gap: 1rem;
+    margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.btn-cancel { color: var(--md-sys-color-on-surface-variant); font-weight: 600; text-decoration: none; padding: 0.75rem 1.5rem; }
+.btn-cancel:hover { color: var(--md-sys-color-error); }
+.btn-submit {
+    background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); padding: 0.75rem 2rem; border: none;
+    border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0, 104, 116, 0.2);
+}
+.btn-submit:hover { background-color: #004d54; transform: translateY(-2px); }
+
+/* --- DETAIL CARD VIEW --- */
+.detail-card {
+    background: var(--md-sys-color-surface); border-radius: 16px; border: 1px solid var(--md-sys-color-outline-variant);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: hidden;
+}
+
+.detail-header {
+    background: var(--md-sys-color-surface-variant); padding: 2rem 2.5rem; border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    display: flex; justify-content: space-between; align-items: flex-start;
+}
+.detail-title-group h2 { font-size: 1.8rem; font-weight: 700; color: var(--md-sys-color-on-background); margin-bottom: 0.8rem; }
+.detail-badge { font-size: 0.85rem; padding: 0.4rem 1rem; }
+
+.detail-actions { display: flex; gap: 0.8rem; }
+.btn-outline-primary, .btn-outline-danger {
+    padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; cursor: pointer; transition: 0.2s; border: 1px solid;
+}
+.btn-outline-primary { color: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary); background: transparent; }
+.btn-outline-primary:hover { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.btn-outline-danger { color: var(--md-sys-color-error); border-color: var(--md-sys-color-error); background: transparent; }
+.btn-outline-danger:hover { background: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
+
+.detail-body { padding: 2.5rem; }
+.info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;
+}
+.info-box.full-width { grid-column: span 2; }
+.info-label { display: block; font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+.info-value { font-size: 1.1rem; color: var(--md-sys-color-on-background); font-weight: 500; }
+
+.detail-description {
+    background: var(--md-sys-color-surface-variant); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--md-sys-color-outline-variant);
+}
+.desc-text { color: var(--md-sys-color-on-background); line-height: 1.6; margin-top: 0.5rem; }
+
+/* RESPONSIVE MOBILE */
+@media (max-width: 768px) {
+    .mazu-form .form-grid { grid-template-columns: 1fr; }
+    .form-group.full-width { grid-column: span 1; }
+    .form-card-wrapper, .detail-body, .detail-header { padding: 1.5rem; }
+    .detail-header { flex-direction: column; gap: 1.5rem; }
+    .info-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+    .info-box.full-width { grid-column: span 1; }
+    .form-actions { flex-direction: column-reverse; align-items: stretch; }
+    .btn-submit { text-align: center; }
+    .btn-cancel { text-align: center; background: var(--md-sys-color-surface-variant); border-radius: 10px; }
+}
