@@ -117,3 +117,125 @@
     .search-wrapper input { width: 100%; }
     .table-footer { flex-direction: column; gap: 1rem; }
 }
+
+/* ====================================================
+   CSS-ONLY MODAL COMPONENT (MENGGUNAKAN :TARGET)
+   ==================================================== */
+
+.css-modal {
+    /* Sembunyikan modal secara default */
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* SIHIR UTAMA: Ketika ID modal ada di URL (#modal-xxx), tampilkan! */
+.css-modal:target {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Area gelap untuk Click-Away */
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    cursor: default;
+    text-decoration: none; /* Reset gaya A tag */
+}
+
+/* Boks Modal */
+.modal-content {
+    position: relative;
+    background-color: var(--md-sys-color-surface);
+    width: 90%;
+    max-width: 450px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 10000;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+/* Animasi Boks masuk */
+.css-modal:target .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+/* Layout Modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+.modal-title { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--md-sys-color-on-background); }
+.text-danger { color: var(--md-sys-color-error); }
+.text-left { text-align: left; }
+
+.modal-close {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 1.5rem;
+    text-decoration: none;
+    line-height: 1;
+    padding: 0.2rem;
+    transition: color 0.2s;
+}
+.modal-close:hover { color: var(--md-sys-color-error); }
+
+.modal-body {
+    padding: 1.5rem;
+    color: var(--md-sys-color-on-background);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.modal-body p { margin: 0; }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--md-sys-color-surface-variant);
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 0 0 16px 16px;
+}
+
+/* Tombol dalam Modal */
+.btn-cancel {
+    padding: 0.6rem 1.2rem;
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface-variant);
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.btn-cancel:hover { background-color: var(--md-sys-color-outline-variant); }
+
+.btn-confirm {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    transition: filter 0.2s;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+.btn-confirm:hover { filter: brightness(0.9); }
+
+.btn-confirm.danger { background-color: var(--md-sys-color-error); }
+.btn-confirm.success { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+
+/* Cegah modal merusak layout tabel */
+.action-buttons { position: relative; }

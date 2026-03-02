@@ -1,9 +1,10 @@
 <?php
-// Pastikan data users dari controller aman untuk diubah ke JSON
-$jsonUsers = json_encode($users ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-$loggedInEmail = $user_login['email'] ?? '';
+// Pastikan data aman untuk di-inject ke atribut HTML (mengubah kutip menjadi entitas HTML)
+$jsonUsers = htmlspecialchars(json_encode($users ?? []), ENT_QUOTES, 'UTF-8');
+$loggedInEmail = htmlspecialchars($user_login['email'] ?? '', ENT_QUOTES, 'UTF-8');
 ?>
-<div class="users-container">
+
+<div class="users-container" id="usersApp" data-users="<?= $jsonUsers ?>" data-email="<?= $loggedInEmail ?>">
   <div class="page-header">
     <div>
       <h2 class="page-title">Manajemen Pengguna</h2>
@@ -52,8 +53,3 @@ $loggedInEmail = $user_login['email'] ?? '';
   </div>
 
 </div>
-
-<script>
-  window.MAZU_USERS_DATA = <?= $jsonUsers ?>;
-  window.MAZU_LOGGED_IN_EMAIL = "<?= htmlspecialchars($loggedInEmail) ?>";
-</script>
