@@ -8,22 +8,22 @@
 
 /* --- KIRI: HEADER & KALENDER --- */
 .dash-header { margin-bottom: 1.5rem; }
-.dash-title { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem; }
-.dash-subtitle { color: var(--text-muted); font-size: 1rem; }
+.dash-title { font-size: 1.8rem; font-weight: 700; color: var(--md-sys-color-on-background); margin-bottom: 0.3rem; }
+.dash-subtitle { color: var(--md-sys-color-on-surface-variant); font-size: 1rem; }
 
 .calendar-card {
-    background: #ffffff;
+    background: var(--md-sys-color-surface);
     padding: 1.5rem;
     border-radius: 16px;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--md-sys-color-outline-variant);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     min-height: 600px;
 }
 
 /* Override FullCalendar Mazu Engine */
-.fc-toolbar-title { font-size: 1.25rem !important; font-weight: 700; color: var(--text-main); }
-.fc .fc-button-primary { background-color: #fff !important; color: var(--text-main) !important; border: 1px solid var(--border-light) !important; border-radius: 8px !important; text-transform: capitalize !important; font-weight: 500; }
-.fc .fc-button-primary:not(:disabled).fc-button-active { background-color: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; }
+.fc-toolbar-title { font-size: 1.25rem !important; font-weight: 700; color: var(--md-sys-color-on-background); }
+.fc .fc-button-primary { background-color: var(--md-sys-color-surface) !important; color: var(--md-sys-color-on-background) !important; border: 1px solid var(--md-sys-color-outline-variant) !important; border-radius: 8px !important; text-transform: capitalize !important; font-weight: 500; }
+.fc .fc-button-primary:not(:disabled).fc-button-active { background-color: var(--md-sys-color-primary) !important; color: var(--md-sys-color-on-primary) !important; border-color: var(--md-sys-color-primary) !important; }
 
 /* --- KANAN: SIDEBAR COMMAND CENTER --- */
 .dash-sidebar {
@@ -40,27 +40,27 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background-color: var(--primary);
-    color: #ffffff;
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
     padding: 1rem 1.5rem;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1.05rem;
     text-decoration: none;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+    box-shadow: 0 4px 14px rgba(0, 104, 116, 0.25);
 }
 .btn-create-agenda:hover {
-    background-color: #4338ca; /* Indigo Darker */
+    background-color: #004d54; /* Darker version of primary */
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+    box-shadow: 0 6px 20px rgba(0, 104, 116, 0.35);
 }
 
 /* Desain Widget */
 .widget-card {
-    background: #ffffff;
+    background: var(--md-sys-color-surface);
     border-radius: 16px;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--md-sys-color-outline-variant);
     padding: 1.25rem;
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
 }
@@ -68,7 +68,7 @@
 .widget-title {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-main);
+    color: var(--md-sys-color-on-background);
     margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
@@ -89,7 +89,7 @@
     transition: background 0.2s;
     border: 1px solid transparent;
 }
-.widget-item:hover { background: var(--app-bg); border-color: var(--border-light); }
+.widget-item:hover { background: var(--md-sys-color-surface-variant); border-color: var(--md-sys-color-outline-variant); }
 
 .item-icon {
     width: 42px; height: 42px;
@@ -99,15 +99,15 @@
 }
 
 .item-info { display: flex; flex-direction: column; overflow: hidden; }
-.item-info strong { color: var(--text-main); font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.item-info span { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.15rem; }
+.item-info strong { color: var(--md-sys-color-on-background); font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-info span { color: var(--md-sys-color-on-surface-variant); font-size: 0.75rem; margin-top: 0.15rem; }
 
-.empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.9rem; background: var(--app-bg); border-radius: 12px; border: 1px dashed var(--border-light); }
+.empty-state { text-align: center; padding: 2rem 1rem; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; background: var(--md-sys-color-surface-variant); border-radius: 12px; border: 1px dashed var(--md-sys-color-outline-variant); }
 
 /* Utilitas Warna Psikologis */
-.bg-orange { background: #fff7ed; color: #ea580c; }
-.bg-green { background: #f0fdf4; color: #16a34a; }
-.bg-red { background: #fef2f2; color: #dc2626; }
+.bg-orange { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary); }
+.bg-green { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary); }
+.bg-red { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); }
 
 /* Responsive Mobile Turun Ke Bawah */
 @media (max-width: 1024px) {

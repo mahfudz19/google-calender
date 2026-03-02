@@ -1,10 +1,9 @@
-
 .auth-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8fafc;
+  background-color: var(--md-sys-color-background);
   padding: 1rem;
 }
 
@@ -21,32 +20,32 @@
 .auth-logo {
   width: 64px;
   height: 64px;
-  background-color: #4f46e5;
+  background-color: var(--md-sys-color-primary);
   border-radius: 16px;
   margin: 0 auto 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--md-sys-color-on-primary);
 }
 
 .auth-title {
   font-size: 1.875rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--md-sys-color-on-background);
   margin: 0 0 0.75rem 0;
   letter-spacing: -0.025em;
 }
 
 .auth-subtitle {
-  color: #64748b;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 1.125rem;
   line-height: 1.6;
   margin: 0;
 }
 
 .auth-card {
-  background-color: white;
+  background-color: var(--md-sys-color-surface);
   border-radius: 24px;
   padding: 2.5rem;
   box-shadow:
@@ -62,12 +61,12 @@
 .auth-card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--md-sys-color-on-surface);
   margin: 0 0 0.5rem 0;
 }
 
 .auth-card-desc {
-  color: #94a3b8;
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 0.95rem;
   margin: 0;
 }
@@ -79,10 +78,10 @@
   gap: 12px;
   width: 100%;
   padding: 1rem;
-  background-color: white;
-  border: 1px solid #cbd5e1;
+  background-color: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 12px;
-  color: #475569;
+  color: var(--md-sys-color-on-surface-variant);
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s;
@@ -91,20 +90,20 @@
 }
 
 .btn-google:hover {
-  background-color: #f8fafc;
-  border-color: #94a3b8;
-  color: #1e293b;
+  background-color: var(--md-surface-1);
+  border-color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-background);
 }
 
 .auth-footer {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   text-align: center;
 }
 
 .auth-footer-text {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--md-sys-color-on-surface-variant);
   margin: 0;
 }

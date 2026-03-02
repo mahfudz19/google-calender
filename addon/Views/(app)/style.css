@@ -1,28 +1,18 @@
 /* Variabel Khusus Area App */
 :root {
     --navbar-height: 70px;
-    --nav-bg: #ffffff;
-    --app-bg: #f8fafc;
-    --primary: #4f46e5;
-    --primary-light: #e0e7ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-light: #e2e8f0;
-    --danger: #ef4444;
-    --danger-light: #fee2e2;
 }
-
 .app-wrapper {
     min-height: 100vh;
-    background-color: var(--app-bg);
+    background-color: var(--md-sys-color-background);
     display: flex;
     flex-direction: column;
 }
 
 /* === NAVBAR TOP === */
 .top-navbar {
-    background-color: var(--nav-bg);
-    border-bottom: 1px solid var(--border-light);
+    background-color: var(--md-sys-color-surface);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
     position: sticky;
     top: 0;
     z-index: 50;
@@ -54,7 +44,7 @@
 
 .nav-item {
     text-decoration: none;
-    color: var(--text-muted);
+    color: var(--md-sys-color-on-surface-variant);
     font-weight: 500;
     font-size: 0.95rem;
     padding: 0.5rem 1rem;
@@ -63,8 +53,8 @@
 }
 
 .nav-item:hover, .nav-item.active {
-    color: var(--primary);
-    background-color: var(--primary-light);
+    color: var(--md-sys-color-primary);
+    background-color: var(--md-sys-color-primary-container);
 }
 
 .nav-item.active {
@@ -83,7 +73,7 @@
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--border-light);
+    border: 2px solid var(--md-sys-color-outline-variant);
 }
 
 .profile-text {
@@ -94,16 +84,16 @@
 .profile-text .user-name {
     font-weight: 600;
     font-size: 0.9rem;
-    color: var(--text-main);
+    color: var(--md-sys-color-on-background);
 }
 
 .profile-text .user-role {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--md-sys-color-on-surface-variant);
 }
 
 .btn-logout-icon {
-    color: var(--danger);
+    color: var(--md-sys-color-error);
     padding: 0.5rem;
     border-radius: 8px;
     transition: 0.2s;
@@ -112,7 +102,7 @@
 }
 
 .btn-logout-icon:hover {
-    background-color: var(--danger-light);
+    background-color: var(--md-sys-color-error-container);
 }
 
 /* === MAIN KONTEN BOKS === */
@@ -127,7 +117,7 @@
 }
 
 /* Utilitas Helper */
-.mobile-menu-btn { display: none; background: none; border: none; color: var(--text-main); width: 40px; height: 40px; cursor: pointer; }
+.mobile-menu-btn { display: none; background: none; border: none; color: var(--md-sys-color-on-background); width: 40px; height: 40px; cursor: pointer; }
 .mobile-menu-btn svg { width: 24px; height: 24px; }
 .mobile-only { display: none !important; }
 
@@ -144,9 +134,9 @@
         position: absolute;
         top: var(--navbar-height);
         left: 0; right: 0;
-        background-color: var(--nav-bg);
+        background-color: var(--md-sys-color-surface);
         margin: 0; padding: 1.5rem;
-        border-bottom: 1px solid var(--border-light);
+        border-bottom: 1px solid var(--md-sys-color-outline-variant);
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         
         /* Animasi Sembunyi Tampil */
@@ -164,12 +154,12 @@
 
     .nav-profile.mobile-only {
         width: 100%; margin-top: 1rem; padding-top: 1rem;
-        border-top: 1px solid var(--border-light);
+        border-top: 1px solid var(--md-sys-color-outline-variant);
         justify-content: space-between;
     }
 
     .profile-info { display: flex; align-items: center; gap: 0.75rem; font-weight: 600; }
-    .btn-logout { background-color: var(--danger-light); color: var(--danger); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; }
+    .btn-logout { background-color: var(--md-sys-color-error-container); color: var(--md-sys-color-error); text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 500; font-size: 0.9rem; }
 
     .app-main { padding: 1rem; }
 }
