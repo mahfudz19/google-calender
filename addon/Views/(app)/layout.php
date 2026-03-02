@@ -6,7 +6,7 @@ $name = htmlspecialchars($user['name'] ?? 'User');
 $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 ?>
 
-<div data-layout="layout.php" class="app-wrapper">
+<div class="app-wrapper">
   <header class="top-navbar">
     <div class="nav-container">
       <a data-spa href="/dashboard" class="nav-brand">

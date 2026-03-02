@@ -1,124 +1,84 @@
-<div class="my-agenda-container">
-  <header class="page-header">
-    <h1 class="page-title">Pengajuan Saya</h1>
-    <a data-spa href="/agenda/create" class="btn-add">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      Buat Agenda Baru
-    </a>
-  </header>
+<?php
+$agendas = $agendas ?? [];
+$currentStatus = $currentStatus ?? null;
+$currentPage = $currentPage ?? 1;
+$totalPages = $totalPages ?? 1;
+$totalAgendas = $totalAgendas ?? 0;
+?>
+
+<div class="agenda-container">
+
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Agenda Saya</h2>
+      <p class="page-subtitle">Kelola dan pantau status pengajuan agenda akademik Anda.</p>
+    </div>
+    <a data-spa href="/agenda/create" class="btn-primary">+ Ajukan Agenda</a>
+  </div>
 
   <div class="filter-tabs">
-    <a data-spa href="#" class="tab-item active">Semua</a>
-    <a data-spa href="#" class="tab-item">Pending</a>
-    <a data-spa href="#" class="tab-item">Disetujui</a>
-    <a data-spa href="#" class="tab-item">Ditolak</a>
+    <a data-spa href="/agenda" class="tab-item <?= $currentStatus === null ? 'active' : '' ?>">Semua</a>
+    <a data-spa href="/agenda?status=pending" class="tab-item <?= $currentStatus === 'pending' ? 'active' : '' ?>">⏳ Menunggu</a>
+    <a data-spa href="/agenda?status=approved" class="tab-item <?= $currentStatus === 'approved' ? 'active' : '' ?>">✅ Disetujui</a>
+    <a data-spa href="/agenda?status=rejected" class="tab-item <?= $currentStatus === 'rejected' ? 'active' : '' ?>">❌ Ditolak</a>
   </div>
 
-  <div class="agenda-stack">
-    <?php if (empty($myAgendas)): ?>
+  <div class="agenda-card">
+    <?php if (empty($agendas)): ?>
       <div class="empty-state">
-        <span class="empty-icon">📭</span>
-        <h3>Belum ada pengajuan</h3>
-        <p>Anda belum pernah mengajukan agenda apapun. Mulai dengan membuat baru!</p>
+        <span class="empty-icon">📂</span>
+        <h3>Belum ada agenda</h3>
+        <p>Anda belum memiliki pengajuan agenda di kategori ini.</p>
       </div>
     <?php else: ?>
-      <?php foreach ($myAgendas as $item):
-        $start = new DateTime($item['start_time']);
-        $end = new DateTime($item['end_time']);
-        $isPending = $item['status'] === 'pending';
-      ?>
-        <div class="agenda-card">
-          <!-- Tanggal -->
-          <div class="card-date">
-            <span class="date-d"><?= $start->format('d') ?></span>
-            <span class="date-m"><?= $start->format('M') ?></span>
-          </div>
-
-          <!-- Info Utama -->
-          <div class="card-info">
-            <h3 class="card-title"><?= htmlspecialchars($item['title']) ?></h3>
-            <div class="card-meta">
-              <div class="meta-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <?= $start->format('H:i') ?> - <?= $end->format('H:i') ?>
-              </div>
-              <div class="meta-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                <?= htmlspecialchars($item['location']) ?>
+      <div class="agenda-list">
+        <?php foreach ($agendas as $agenda): ?>
+          <div class="agenda-item">
+            <div class="item-main">
+              <h3 class="item-title"><?= htmlspecialchars($agenda['title']) ?></h3>
+              <div class="item-meta">
+                <span>📅 <?= date('d M Y, H:i', strtotime($agenda['start_time'])) ?></span>
+                <span>📍 <?= htmlspecialchars($agenda['location'] ?? 'Virtual') ?></span>
               </div>
             </div>
+            <div class="item-action">
+              <?php
+              $badge = 'badge-orange';
+              $label = 'Pending';
+              if ($agenda['status'] === 'approved') {
+                $badge = 'badge-green';
+                $label = 'Approved';
+              } elseif ($agenda['status'] === 'rejected') {
+                $badge = 'badge-red';
+                $label = 'Rejected';
+              }
+              ?>
+              <span class="badge <?= $badge ?>"><?= $label ?></span>
+
+              <?php if ($agenda['status'] === 'pending'): ?>
+                <a data-spa href="/agenda/<?= $agenda['id'] ?>/edit" class="btn-outline-small">Edit</a>
+              <?php endif; ?>
+            </div>
           </div>
-
-          <!-- Status & Aksi -->
-          <div class="card-actions">
-            <span class="status-badge status-<?= $item['status'] ?>">
-              <?= ucfirst($item['status']) ?>
-            </span>
-
-            <?php if ($isPending): ?>
-              <div class="action-group">
-                <a data-spa href="/agenda/<?= $item['id'] ?>/edit" class="btn-icon" title="Edit Pengajuan">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                </a>
-
-                <!-- Modal Dialog untuk Konfirmasi - ID Unik -->
-                <dialog id="cancelModal_<?= $item['id'] ?>" class="confirm-modal">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h3>Konfirmasi Pembatalan</h3>
-                      <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div class="modal-body">
-                      <p>Apakah Anda yakin ingin membatalkan pengajuan agenda ini?</p>
-                      <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
-                        <strong><?= htmlspecialchars($item['title']) ?></strong>
-                      </p>
-                    </div>
-
-                    <form method="dialog" class="modal-actions">
-                      <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
-                        Tidak, Batal
-                      </button>
-                      <button type="submit" form="cancelForm_<?= $item['id'] ?>" class="btn-confirm">
-                        Ya, Batalkan Pengajuan
-                      </button>
-                    </form>
-                  </div>
-                </dialog>
-
-                <!-- Hidden Form yang akan di-submit - ID Unik -->
-                <form id="cancelForm_<?= $item['id'] ?>" action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa style="display: none;"></form>
-
-                <!-- Trigger Button - ID Unik -->
-                <button type="button" onclick="document.getElementById('cancelModal_<?= $item['id'] ?>').showModal()" class="btn-icon delete" title="Batalkan Pengajuan">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </div>
-            <?php endif; ?>
-          </div>
-        </div>
-      <?php endforeach; ?>
+        <?php endforeach; ?>
+      </div>
     <?php endif; ?>
   </div>
+
+  <?php if ($totalPages > 1): ?>
+    <div class="pagination-wrap">
+      <span class="page-info">Menampilkan <?= count($agendas) ?> dari <?= $totalAgendas ?> agenda</span>
+      <div class="pagination">
+        <?php
+        $prevDisabled = $currentPage <= 1 ? 'disabled' : '';
+        $nextDisabled = $currentPage >= $totalPages ? 'disabled' : '';
+        $statusQuery = $currentStatus ? "&status={$currentStatus}" : "";
+        ?>
+        <a data-spa href="/agenda?page=<?= $currentPage - 1 ?><?= $statusQuery ?>" class="btn-page <?= $prevDisabled ?>">« Prev</a>
+        <span class="page-current">Hal <?= $currentPage ?> / <?= $totalPages ?></span>
+        <a data-spa href="/agenda?page=<?= $currentPage + 1 ?><?= $statusQuery ?>" class="btn-page <?= $nextDisabled ?>">Next »</a>
+      </div>
+    </div>
+  <?php endif; ?>
+
 </div>

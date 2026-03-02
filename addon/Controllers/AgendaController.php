@@ -51,11 +51,16 @@ class AgendaController
       $pendingTasks = array_slice($pendingTasks, 0, 5);
     }
 
+    // 3. semua agenda dengan status approved
+    $approvedAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'approved');
+    usort($approvedAgendas, fn($a, $b) => strtotime($b['created_at'] ?? 'now') <=> strtotime($a['created_at'] ?? 'now'));
+
     // Render ke engine Mazu
     return $response->renderPage([
       'role'  => $role,
       'recentAgendas' => $recentAgendas,
-      'pendingTasks'  => $pendingTasks
+      'pendingTasks'  => $pendingTasks,
+      'approvedAgendas' => $approvedAgendas
     ], [
       'meta'  => ['title' => 'Dashboard | Mazu Calendar']
     ]);
@@ -93,12 +98,37 @@ class AgendaController
   // Halaman "Pengajuan Saya"
   public function myAgenda(Request $request, Response $response): View
   {
-    $user = $this->session->get('user');
-    $myAgendas = $this->model->getByRequester($user['email']);
+    $userEmail = $_SESSION['user']['email'] ?? '';
 
+    // 1. Ambil Parameter dari Query String URL (Contoh: /agenda?status=approved&page=2)
+    $status = $request->get('status');
+    $page = (int) ($request->get('page') ?? 1);
+    if ($page < 1) $page = 1;
+
+    // 2. Setup Limit dan Offset untuk Paginasi
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    // Validasi filter status
+    if (!in_array($status, ['pending', 'approved', 'rejected'])) {
+      $status = null;
+    }
+
+    // 3. Eksekusi Data dari Model
+    $agendas = $this->model->getByRequester($userEmail, $status, $limit, $offset);
+    $totalAgendas = $this->model->countByRequester($userEmail, $status);
+    $totalPages = ceil($totalAgendas / $limit);
+
+    // 4. Render ke Mazu View
     return $response->renderPage(
-      ['myAgendas' => $myAgendas],
-      ['meta' => ['title' => 'Pengajuan Saya']]
+      [
+        'agendas' => $agendas,
+        'currentStatus' => $status,
+        'currentPage' => $page,
+        'totalPages' => $totalPages,
+        'totalAgendas' => $totalAgendas
+      ],
+      ['meta' => ['title' => 'Agenda Saya | Mazu Calendar']]
     );
   }
 

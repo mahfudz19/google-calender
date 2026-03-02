@@ -130,8 +130,8 @@ class {{CLASS_NAME}} extends Model
         // Field opsional untuk progress tracking - BOLEH DIHAPUS jika tidak perlu
         'status' => ['type' => 'enum', 'values' => ['pending', 'processing', 'success', 'failed'], 'nullable' => false, 'default' => 'pending'],
         'progress' => ['type' => 'int', 'nullable' => false, 'default' => 0],
-        'current_step' => ['type' => 'string', 'nullable' => true],
-        'error_message' => ['type' => 'text', 'nullable' => true],
+        'current_step' => ['type' => 'longtext', 'nullable' => true],
+        'error_message' => ['type' => 'longtext', 'nullable' => true],
         'completed_at' => ['type' => 'bigint', 'nullable' => true],
 
         // Tambahkan custom fields untuk project Anda di sini

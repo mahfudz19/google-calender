@@ -128,11 +128,46 @@ class ApprovalModel extends Model
     }
 
 
-    public function getByRequester(string $email): array
+    // Ganti fungsi getByRequester lama dengan ini
+    public function getByRequester(string $email, ?string $status = null, int $limit = 10, int $offset = 0): array
     {
-        $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE requester_email = :email ORDER BY updated_at DESC");
-        $stmt->execute(['email' => $email]);
-        return $stmt->fetchAll();
+        $sql = "SELECT * FROM {$this->table} WHERE requester_email = :email";
+        $params = ['email' => $email];
+
+        if ($status && in_array($status, ['pending', 'approved', 'rejected'])) {
+            $sql .= " AND status = :status";
+            $params['status'] = $status;
+        }
+
+        $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->getDb()->prepare($sql);
+
+        // Bind parameters dengan tipe data yang ketat untuk PDO
+        foreach ($params as $key => $val) {
+            $stmt->bindValue(":$key", $val);
+        }
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll() ?: [];
+    }
+
+    // Tambahkan fungsi ini di bawahnya untuk menghitung total halaman
+    public function countByRequester(string $email, ?string $status = null): int
+    {
+        $sql = "SELECT COUNT(*) FROM {$this->table} WHERE requester_email = :email";
+        $params = ['email' => $email];
+
+        if ($status && in_array($status, ['pending', 'approved', 'rejected'])) {
+            $sql .= " AND status = :status";
+            $params['status'] = $status;
+        }
+
+        $stmt = $this->getDb()->prepare($sql);
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn();
     }
 
     public function checkTimeConflict(string $startTime, string $endTime, ?int $excludeId = null): array

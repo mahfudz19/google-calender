@@ -163,3 +163,20 @@
 
     .app-main { padding: 1rem; }
 }
+
+
+.btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; text-decoration: none; transition: 0.2s; box-shadow: 0 4px 6px rgba(0, 104, 116, 0.2); }
+.btn-primary:hover { background: #004d54; transform: translateY(-2px); }
+
+.badge { padding: 0.35rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+.badge-orange { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary); border: 1px solid var(--md-sys-color-secondary); }
+.badge-green { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary); border: 1px solid var(--md-sys-color-tertiary); }
+.badge-red { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); border: 1px solid var(--md-sys-color-error); }
+
+.page-title { font-size: 1.8rem; font-weight: 700; color: var(--md-sys-color-on-background); margin-bottom: 0.3rem; }
+.page-subtitle { color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--md-sys-color-on-surface-variant); }
+.empty-icon { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+.empty-state h3 { color: var(--md-sys-color-on-background); font-weight: 600; margin-bottom: 0.5rem; }
