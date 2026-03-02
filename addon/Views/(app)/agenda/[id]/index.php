@@ -24,9 +24,28 @@
       <?php if ($agenda['status'] === 'pending'): ?>
         <div class="detail-actions">
           <a href="/agenda/<?= $agenda['id'] ?>/edit" class="btn-outline-primary">✎ Edit</a>
-          <form action="/agenda/<?= $agenda['id'] ?>/cancel" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin membatalkan pengajuan ini?');">
-            <button type="submit" class="btn-outline-danger">Hapus</button>
-          </form>
+
+          <button type="button" class="btn-outline-danger" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.add('show')">Cancel</button>
+          <div id="modal-cancel-<?= $agenda['id'] ?>" class="css-modal">
+            <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title text-danger">Konfirmasi Pembatalan</h3>
+                <button type="button" class="modal-close" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">&times;</button>
+              </div>
+              <div class="modal-body">
+                <p>Apakah Anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
+                <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Agenda yang dibatalkan tidak dapat dipulihkan kembali.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">Batal</button>
+                <form action="/agenda/<?= $agenda['id'] ?>/cancel" method="post" data-spa style="margin:0;">
+                  <button type="submit" class="btn-confirm danger">Ya, Batalkan Agenda</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       <?php endif; ?>
     </div>

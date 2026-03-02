@@ -51,9 +51,6 @@
 /* Actions & Badges */
 .item-action { display: flex; align-items: center; gap: 1rem; }
 
-.btn-outline-small { text-decoration: none; border: 1px solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-background); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem; font-weight: 500; transition: 0.2s; }
-.btn-outline-small:hover { background: var(--md-sys-color-outline-variant); }
-
 /* Pagination Wrap */
 .pagination-wrap { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding: 0 1rem; }
 .page-info { color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
@@ -135,7 +132,7 @@
 
 .detail-actions { display: flex; gap: 0.8rem; }
 .btn-outline-primary, .btn-outline-danger {
-    padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; cursor: pointer; transition: 0.2s; border: 1px solid;
+    padding: 0.3rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; cursor: pointer; transition: 0.2s; border: 1px solid;
 }
 .btn-outline-primary { color: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary); background: transparent; }
 .btn-outline-primary:hover { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
