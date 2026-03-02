@@ -1,4 +1,5 @@
 <?php
+$user = $_SESSION['user'] ?? [];
 
 /**
  * Dashboard view default (Hybrid Layout)

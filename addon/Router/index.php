@@ -10,7 +10,7 @@ $router->get('/', [AuthController::class, 'index'], ['guest']);
 
 $router->get('/login', [AuthController::class, 'login']);
 $router->get('/auth/callback', [AuthController::class, 'callback']);
-$router->get('/logout', [AuthController::class, 'logout']);
+$router->post('/logout', [AuthController::class, 'logout']);
 
 $router->group(['middleware' => ['auth']], function ($router) {
 
