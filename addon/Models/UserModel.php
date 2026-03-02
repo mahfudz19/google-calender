@@ -145,4 +145,28 @@ class UserModel extends Model
 
     return $this->getDb()->query($sql, $insertData);
   }
+
+  public function findByEmails(array $emails): array
+  {
+    if (empty($emails)) {
+      return [];
+    }
+
+    $placeholders = implode(',', array_fill(0, count($emails), '?'));
+    $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE email IN ($placeholders)");
+    $stmt->execute($emails);
+    return $stmt->fetchAll();
+  }
+
+  public function getUsersMapByEmails(array $emails): array
+  {
+    $users = $this->findByEmails($emails);
+    $map = [];
+
+    foreach ($users as $user) {
+      $map[$user['email']] = $user;
+    }
+
+    return $map;
+  }
 }

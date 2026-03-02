@@ -12,7 +12,6 @@ use App\Services\SessionService;
 
 class UserController
 {
-
   public function __construct(
     private UserModel $model,
     private SessionService $session,
@@ -20,161 +19,109 @@ class UserController
     $this->model = $model;
   }
 
-  public function getInbitefAkun()
+  /**
+   * Mengambil daftar user dari Google Workspace via Service Account
+   */
+  private function getInbitefAkun(): array
   {
     try {
-      // 1. Inisialisasi Service
       $directory = new GoogleDirectoryService();
-
-      // 2. Impersonate sebagai SUPER ADMIN (Wajib!)
-      // Menggunakan email Pak Mahfudz (Super Admin)
+      // Impersonate sebagai Super Admin
       $adminEmail = 'mahfudz@inbitef.ac.id';
 
-      // 3. Ambil Semua User
-      $users = $directory->impersonate($adminEmail)->getAllUsers();
-
-      return $users;
+      return $directory->impersonate($adminEmail)->getAllUsers();
     } catch (\Exception $e) {
-      throw new \Exception($e->getMessage() ?? "Tidak ditemukan data user dari google", 1);
+      throw new \Exception($e->getMessage() ?? 'Gagal mengambil data user dari Google', 1);
     }
   }
 
-  public function index(Request $request, Response $response): View
-  {
-    $params = $this->getQueryParams($request);
-
-    // 1. Ambil Data dari Google Directory (Raw Array)
-    $googleUsers = [];
-    try {
-      $googleUsers = $this->getInbitefAkun();
-    } catch (\Throwable $th) {
-      $googleUsers = [];
-    }
-
-    // 2. Filtering (Search)
-    if (!empty($params['search'])) {
-      $googleUsers = $this->filterUsers($googleUsers, $params['search']);
-    }
-
-    // 3. Sorting
-    $googleUsers = $this->sortUsers($googleUsers, $params['sort'], $params['order']);
-
-    // 4. Pagination (Manual array_slice)
-    $total = count($googleUsers);
-    $totalPages = ceil($total / $params['limit']);
-    $offset = ($params['page'] - 1) * $params['limit'];
-
-    $paginatedUsers = array_slice($googleUsers, $offset, $params['limit']);
-
-    // 5. Enrichment (Gabungkan dengan Data DB Lokal)
-    $finalUsers = $this->enrichUsersWithLocalDb($paginatedUsers);
-
-    return $response->renderPage([
-      'users' => $finalUsers,
-      'user_loggin' => $this->session->get('user'),
-      'pagination' => [
-        'current_page' => $params['page'],
-        'per_page' => $params['limit'],
-        'total_items' => $total,
-        'total_pages' => $totalPages,
-        'has_next' => $params['page'] < $totalPages,
-        'has_prev' => $params['page'] > 1,
-        'search' => $params['search'],
-        'sort' => $params['sort'],
-        'order' => $params['order']
-      ]
-    ], ['meta' => ['title' => 'Manajemen User']]);
-  }
-
-  private function getQueryParams(Request $request): array
-  {
-    return [
-      'page' => max(1, (int)($request->query['page'] ?? 1)),
-      'limit' => max(1, (int)($request->query['limit'] ?? 10)),
-      'search' => strtolower(trim($request->query['search'] ?? '')),
-      'sort' => $request->query['sort'] ?? 'name',
-      'order' => $request->query['order'] ?? 'asc'
-    ];
-  }
-
-  private function filterUsers(array $users, string $search): array
-  {
-    return array_filter($users, function ($user) use ($search) {
-      return str_contains(strtolower($user['name'] ?? ''), $search) ||
-        str_contains(strtolower($user['email'] ?? ''), $search);
-    });
-  }
-
-  private function sortUsers(array $users, string $sort, string $order): array
-  {
-    usort($users, function ($a, $b) use ($sort, $order) {
-      $valA = strtolower($a[$sort] ?? '');
-      $valB = strtolower($b[$sort] ?? '');
-
-      if ($valA == $valB) return 0;
-
-      $result = ($valA < $valB) ? -1 : 1;
-      return ($order === 'desc') ? -$result : $result;
-    });
-    return $users;
-  }
-
+  /**
+   * Menggabungkan data dari Google API dengan data lokal (Database MySQL)
+   */
   private function enrichUsersWithLocalDb(array $googleUsers): array
   {
-    $emails = array_column($googleUsers, 'email');
-    $localUsersMap = [];
-
-    if (!empty($emails)) {
-      $placeholders = implode(',', array_fill(0, count($emails), '?'));
-      $stmt = $this->model->getDb()->prepare("SELECT * FROM users WHERE email IN ($placeholders)");
-      $stmt->execute($emails);
-      $localUsers = $stmt->fetchAll();
-
-      foreach ($localUsers as $local) {
-        $localUsersMap[$local['email']] = $local;
-      }
+    if (empty($googleUsers)) {
+      return [];
     }
+
+    $emails = array_column($googleUsers, 'email');
+    $localUsersMap = $this->model->getUsersMapByEmails($emails);
 
     return array_map(function ($gUser) use ($localUsersMap) {
       $email = $gUser['email'];
       $local = $localUsersMap[$email] ?? null;
 
       return [
-        'email' => $email,
-        'name' => $gUser['name'],
+        'email'           => $email,
+        'name'            => $gUser['name'] ?? 'Unknown',
         'google_org_unit' => $gUser['orgUnit'] ?? '/',
-        'is_registered' => !is_null($local),
-        'id' => $local['id'] ?? null,
-        'role' => $local['role'] ?? 'user',
-        'is_active' => $local['is_active'] ?? false,
-        'last_login_at' => $local['last_login_at'] ?? null,
-        'avatar' => $local['avatar'] ?? null
+        'is_registered'   => !is_null($local),
+        'id'              => $local['id'] ?? null,
+        'role'            => $local['role'] ?? 'user',
+        'is_active'       => $local['is_active'] ?? false,
+        'last_login_at'   => $local['last_login_at'] ?? null,
+        'avatar'          => $local['avatar'] ?? null
       ];
     }, $googleUsers);
   }
 
+  /**
+   * MENAMPILKAN HALAMAN UTAMA MANAJEMEN USER
+   */
+  public function index(Request $request, Response $response): View
+  {
+    // 1. Ambil seluruh data dari Google
+    $googleUsers = $this->getInbitefAkun();
+
+    // 2. Gabungkan dengan data dari DB Lokal
+    $finalUsers = $this->enrichUsersWithLocalDb($googleUsers);
+
+    $user_loggin = $this->session->get('user');
+
+    // 3. Render ke View Mazu Engine
+    return $response->renderPage(
+      ['users' => $finalUsers, 'user_loggin' => $user_loggin],
+      ['meta' => ['title' => 'Manajemen User | Mazu Calendar']]
+    );
+  }
+
+  /**
+   * Menampilkan Halaman Detail User
+   */
   public function show(Request $request, Response $response): View
   {
     $id = $request->param('id');
     $item = $this->model->find($id);
 
-    return $response->renderPage(['item' => $item], ['meta' => ['title' => 'Detail User']]);
+    return $response->renderPage(
+      ['item' => $item],
+      ['meta' => ['title' => 'Detail User']]
+    );
   }
 
+  /**
+   * Menampilkan Halaman Edit Role & Status User
+   */
   public function edit(Request $request, Response $response): View
   {
     $id = $request->param('id');
     $item = $this->model->find($id);
 
-    return $response->renderPage(['item' => $item], ['meta' => ['title' => 'Edit User']]);
+    return $response->renderPage(
+      ['item' => $item],
+      ['meta' => ['title' => 'Edit Akses User']]
+    );
   }
 
+  /**
+   * Proses Update Data User (Role / Status)
+   */
   public function update(Request $request, Response $response): RedirectResponse
   {
     $id = $request->param('id');
     $data = $request->getBody();
 
-    // Filter allowed fields
+    // Filter keamanan: Hanya role dan is_active yang boleh diedit
     $allowedFields = ['role', 'is_active'];
     $updateData = array_intersect_key($data, array_flip($allowedFields));
 
@@ -183,6 +130,9 @@ class UserController
     return $response->redirect('/users');
   }
 
+  /**
+   * Mendaftarkan User dari Google ke Database Lokal secara Manual/Otomatis
+   */
   public function registerFromGoogle(Request $request, Response $response): RedirectResponse
   {
     $data = $request->getBody();
@@ -194,25 +144,31 @@ class UserController
 
     $existing = $this->model->findByEmail($email);
 
+    // Jika user sudah ada di DB, kita hanya update hak aksesnya
     if ($existing) {
       $this->model->updateById($existing['id'], [
         'role' => 'approver',
         'is_active' => 1,
       ]);
-
       return $response->redirect('/users');
     }
 
+    // Jika user belum ada, insert ke DB lokal Mazu
     $this->model->createFromGoogle([
-      'email' => $email,
-      'name' => $data['name'] ?? null,
-      'avatar' => $data['avatar'] ?? null,
+      'email'     => $email,
+      'name'      => $data['name'] ?? 'User Sistem',
+      'avatar'    => $data['avatar'] ?? null,
       'google_id' => $data['google_id'] ?? null,
+      'role'      => 'approver',
+      'is_active' => 1
     ]);
 
     return $response->redirect('/users');
   }
 
+  /**
+   * Menghapus User dari Database Lokal
+   */
   public function destroy(Request $request, Response $response): RedirectResponse
   {
     $id = $request->param('id');
