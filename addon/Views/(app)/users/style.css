@@ -91,7 +91,7 @@
 
 /* Aksi Kanan */
 .action-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; }
-.btn-act { background: transparent; border: 1px solid var(--md-sys-color-outline-variant); padding: 0.4rem; border-radius: 8px; color: var(--md-sys-color-on-surface-variant); cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-act { white-space: nowrap; background: transparent; border: 1px solid var(--md-sys-color-outline-variant); padding: 0.4rem; border-radius: 8px; color: var(--md-sys-color-on-surface-variant); cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .btn-act:hover { background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-background); }
 .btn-act.danger:hover { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); border-color: var(--md-sys-color-error-container); }
 .btn-act.success { color: var(--md-sys-color-tertiary); border-color: var(--md-sys-color-tertiary-container); background: var(--md-sys-color-tertiary-container); padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 600; }
@@ -119,11 +119,10 @@
 }
 
 /* ====================================================
-   CSS-ONLY MODAL COMPONENT (MENGGUNAKAN :TARGET)
+   MODAL COMPONENT (SPA SAFE - PREMIUM DESIGN)
    ==================================================== */
 
 .css-modal {
-    /* Sembunyikan modal secara default */
     position: fixed;
     inset: 0;
     z-index: 9999;
@@ -132,110 +131,173 @@
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
-/* SIHIR UTAMA: Ketika ID modal ada di URL (#modal-xxx), tampilkan! */
-.css-modal:target {
+/* Tampilkan Modal */
+.css-modal.show {
     opacity: 1;
     visibility: visible;
 }
 
-/* Area gelap untuk Click-Away */
+/* Area gelap (Click-Away) dengan efek blur */
 .modal-overlay {
     position: absolute;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(3px);
-    cursor: default;
-    text-decoration: none; /* Reset gaya A tag */
+    background-color: rgba(15, 23, 42, 0.6); /* Warna overlay lebih gelap/elegan */
+    backdrop-filter: blur(4px);
+    cursor: pointer;
 }
 
-/* Boks Modal */
+/* Kontainer Utama Modal */
 .modal-content {
     position: relative;
     background-color: var(--md-sys-color-surface);
-    width: 90%;
-    max-width: 450px;
-    border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 92%;
+    max-width: 480px; /* Dibuat sedikit lebih lebar */
+    border-radius: 20px; /* Sudut lebih bulat ala Material 3 / iOS */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0,0,0,0.05); /* Bayangan dalam */
     z-index: 10000;
-    transform: translateY(20px) scale(0.95);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid var(--md-sys-color-outline-variant);
+    transform: translateY(30px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efek membal (bouncing) yang lebih natural */
+    overflow: hidden; /* Agar footer tidak keluar dari radius */
 }
 
 /* Animasi Boks masuk */
-.css-modal:target .modal-content {
+.css-modal.show .modal-content {
     transform: translateY(0) scale(1);
 }
 
-/* Layout Modal */
+/* --- HEADER MODAL --- */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding: 1.5rem 1.5rem 1rem; /* Padding atas lebih besar */
 }
-.modal-title { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--md-sys-color-on-background); }
-.text-danger { color: var(--md-sys-color-error); }
-.text-left { text-align: left; }
 
+.modal-title { 
+    margin: 0; 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    color: var(--md-sys-color-on-background); 
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.modal-title.text-danger { color: var(--md-sys-color-error); }
+
+/* Tombol X (Close) di Header */
 .modal-close {
+    background: var(--md-sys-color-surface-variant);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
     color: var(--md-sys-color-on-surface-variant);
-    font-size: 1.5rem;
-    text-decoration: none;
-    line-height: 1;
-    padding: 0.2rem;
-    transition: color 0.2s;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Tombol bulat */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
-.modal-close:hover { color: var(--md-sys-color-error); }
+.modal-close:hover { 
+    background: var(--md-sys-color-error-container); 
+    color: var(--md-sys-color-error); 
+    transform: rotate(90deg); /* Efek putar sedikit saat dihover */
+}
 
+/* --- BODY MODAL --- */
 .modal-body {
-    padding: 1.5rem;
-    color: var(--md-sys-color-on-background);
+    text-align: center;
+    padding: 0 1.5rem 1.5rem;
+    color: var(--md-sys-color-on-surface-variant); /* Warna text agak redup agar elegan */
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6;
 }
-.modal-body p { margin: 0; }
+.modal-body strong {
+    color: var(--md-sys-color-on-background); /* Highlight nama user */
+    font-weight: 700;
+}
+.modal-body p { margin: 0 0 0.5rem 0; }
+.modal-body p:last-child { margin-bottom: 0; }
 
+/* Tambahan Icon Peringatan Besar (Opsional, ditaruh lewat JS jika mau) */
+.modal-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.modal-icon-wrapper.danger { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); }
+.modal-icon-wrapper.success { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-tertiary); }
+
+/* --- FOOTER MODAL (Area Tombol) --- */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.75rem;
     padding: 1.25rem 1.5rem;
-    background-color: var(--md-sys-color-surface-variant);
+    background-color: var(--md-sys-color-surface-variant); /* Latar belakang footer abu-abu terang */
     border-top: 1px solid var(--md-sys-color-outline-variant);
-    border-radius: 0 0 16px 16px;
 }
 
-/* Tombol dalam Modal */
+/* Tombol Batal */
 .btn-cancel {
-    padding: 0.6rem 1.2rem;
-    text-decoration: none;
+    background: transparent;
+    border: 1px solid var(--md-sys-color-outline);
+    padding: 0.6rem 1.25rem;
     color: var(--md-sys-color-on-surface-variant);
     font-weight: 600;
-    border-radius: 8px;
-    transition: background 0.2s;
+    border-radius: 10px;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    cursor: pointer;
 }
-.btn-cancel:hover { background-color: var(--md-sys-color-outline-variant); }
+.btn-cancel:hover { 
+    background-color: var(--md-sys-color-outline-variant); 
+    color: var(--md-sys-color-on-background);
+}
 
+/* Tombol Aksi Utama (Ya, Hapus / Konfirmasi) */
 .btn-confirm {
-    padding: 0.6rem 1.2rem;
+    padding: 0.6rem 1.5rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     color: white;
-    transition: filter 0.2s;
+    transition: all 0.2s;
     font-family: inherit;
     font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.btn-confirm:hover { filter: brightness(0.9); }
+.btn-confirm:hover { 
+    transform: translateY(-2px); /* Efek terangkat saat dihover */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15); 
+}
+.btn-confirm:active {
+    transform: translateY(0);
+}
 
-.btn-confirm.danger { background-color: var(--md-sys-color-error); }
-.btn-confirm.success { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+/* Varian Warna Tombol Konfirmasi */
+.btn-confirm.danger { 
+    background-color: var(--md-sys-color-error); 
+}
+.btn-confirm.danger:hover {
+    background-color: #b91c1c; /* Warna merah lebih gelap */
+}
 
-/* Cegah modal merusak layout tabel */
-.action-buttons { position: relative; }
+.btn-confirm.success { 
+    background-color: var(--md-sys-color-primary); 
+    color: var(--md-sys-color-on-primary); 
+}
+.btn-confirm.success:hover {
+    background-color: #4338ca; /* Warna primary lebih gelap */
+}

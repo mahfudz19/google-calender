@@ -90,38 +90,36 @@
                 const statusBadge = user.is_registered 
                     ? `<span class="badge bg-green">Terdaftar</span>` 
                     : `<span class="badge bg-gray">G-Suite Saja</span>`;
-let actionHtml = '';
                 
-                // Buat ID unik berdasarkan email (replace karakter non-alfanumerik agar aman untuk ID CSS)
-                const safeId = user.email.replace(/[^a-zA-Z0-9]/g, '');
-
+                let actionHtml = '';
+                
                 if (user.email === currentUserEmail) {
                     actionHtml = `<span class="text-muted" style="font-style: italic;">(Anda)</span>`;
                 } else if (user.is_registered) {
-                    // Modal Hapus (CSS-Only)
-                    const modalDeleteId = `modal-delete-${safeId}`;
+                    // Modal Hapus (SPA-Safe)
                     actionHtml = `
                         <div class="action-buttons">
                             <a data-spa href="/users/${user.id}" class="btn-act" title="Lihat">👁️</a>
                             <a data-spa href="/users/${user.id}/edit" class="btn-act" title="Edit">✏️</a>
                             
-                            <a href="#${modalDeleteId}" class="btn-act danger" title="Hapus">🗑️</a>
+                            <button type="button" class="btn-act danger" title="Hapus" onclick="document.getElementById('modal-del-${user.id}').classList.add('show')">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
 
-                            <div id="${modalDeleteId}" class="css-modal">
-                                <a href="#" class="modal-overlay" aria-label="Close modal"></a>
-                                
+                            <div id="modal-del-${user.id}" class="css-modal">
+                                <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h3 class="modal-title text-danger">Konfirmasi Hapus</h3>
-                                        <a href="#" class="modal-close">&times;</a>
+                                        <button type="button" class="modal-close" onclick="document.getElementById('modal-del-${user.id}').classList.remove('show')">&times;</button>
                                     </div>
-                                    <div class="modal-body text-left">
+                                    <div class="modal-body">
                                         <p>Apakah Anda yakin ingin menghapus akses untuk <strong>${user.name}</strong> (${user.email})?</p>
                                         <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Data riwayat pengajuan tidak akan hilang, namun user tidak bisa login lagi.</p>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="#" class="btn-cancel">Batal</a>
-                                        <form action="/users/${user.id}/delete" method="POST" style="margin:0;">
+                                        <button type="button" class="btn-cancel" onclick="document.getElementById('modal-del-${user.id}').classList.remove('show')">Batal</button>
+                                        <form action="/users/${user.id}/delete" data-spa method="POST" style="margin:0;">
                                             <button type="submit" class="btn-confirm danger">Ya, Hapus Akses</button>
                                         </form>
                                     </div>
@@ -130,27 +128,27 @@ let actionHtml = '';
                         </div>
                     `;
                 } else {
-                    // Modal Beri Akses (CSS-Only)
-                    const modalGrantId = `modal-grant-${safeId}`;
+                    // Modal Beri Akses (SPA-Safe)
+                    // Hapus spasi dan karakter aneh pada email untuk ID
+                    const safeId = user.email.replace(/[^a-zA-Z0-9]/g, '');
                     actionHtml = `
                         <div class="action-buttons" style="justify-content: flex-end;">
-                            <a href="#${modalGrantId}" class="btn-act success" title="Beri Akses Mazu">+ Beri Akses</a>
+                            <button type="button" class="btn-act success" title="Beri Akses Mazu" onclick="document.getElementById('modal-grant-${safeId}').classList.add('show')">+ Beri Akses</button>
 
-                            <div id="${modalGrantId}" class="css-modal">
-                                <a href="#" class="modal-overlay" aria-label="Close modal"></a>
-                                
+                            <div id="modal-grant-${safeId}" class="css-modal">
+                                <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h3 class="modal-title">Beri Akses Sistem</h3>
-                                        <a href="#" class="modal-close">&times;</a>
+                                        <button type="button" class="modal-close" onclick="document.getElementById('modal-grant-${safeId}').classList.remove('show')">&times;</button>
                                     </div>
-                                    <div class="modal-body text-left">
+                                    <div class="modal-body">
                                         <p>Anda akan mendaftarkan <strong>${user.name}</strong> (${user.email}) ke dalam sistem Mazu Calendar.</p>
                                         <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Secara default, user akan diberikan role <strong>Approver</strong>.</p>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="#" class="btn-cancel">Batal</a>
-                                        <form action="/users/register-from-google" method="POST" style="margin:0;">
+                                        <button type="button" class="btn-cancel" onclick="document.getElementById('modal-grant-${safeId}').classList.remove('show')">Batal</button>
+                                        <form action="/users/register-from-google" method="POST" data-spa style="margin:0;">
                                             <input type="hidden" name="email" value="${user.email}">
                                             <input type="hidden" name="name" value="${user.name}">
                                             <button type="submit" class="btn-confirm success">Konfirmasi</button>
