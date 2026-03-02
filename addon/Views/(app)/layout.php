@@ -7,13 +7,10 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 ?>
 
 <div data-layout="layout.php" class="app-wrapper">
-
-  <link rel="stylesheet" href="/addon/Views/(app)/style.css">
-
   <header class="top-navbar">
     <div class="nav-container">
       <a data-spa href="/dashboard" class="nav-brand">
-        <img src="/logo_app/apple-touch-icon.png" alt="Mazu">
+        <img src="logo_app/apple-touch-icon.png" alt="Mazu">
       </a>
 
       <button class="mobile-menu-btn" id="mobileMenuBtn">

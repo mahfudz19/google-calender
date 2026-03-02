@@ -25,7 +25,9 @@ class GuestMiddleware implements MiddlewareInterface
   public function handle($request, Closure $next, array $params = [])
   {
     if ($this->session->get('is_logged_in') === true) {
-      throw new AuthorizationException('RedirectIfAuthenticated')->redirectTo('/dashboard');
+      $e = new AuthorizationException('RedirectIfAuthenticated');
+      $e->hardRedirect();
+      throw $e;
     }
 
     return $next($request);

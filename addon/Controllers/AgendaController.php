@@ -8,6 +8,7 @@ use App\Core\View\View;
 use App\Core\Http\RedirectResponse;
 use Addon\Models\ApprovalModel;
 use Addon\Services\GoogleCalendarService;
+use App\Core\Http\JsonResponse;
 use App\Services\SessionService;
 use Error;
 
@@ -26,11 +27,21 @@ class AgendaController
   // Dashboard Kalender Utama
   public function index(Request $request, Response $response): View
   {
-    // Nanti ambil data agenda yang approved saja
-    // $agendas = $this->model->getApproved(); 
-    return $response->renderPage([
-      // 'agendas' => $agendas
-    ], ['meta' => ['title' => 'Kalender Kegiatan']]);
+    // 1. Ambil data asli dari model
+    $allAgendas = $this->model->all() ?: [];
+
+    // 2. Hitung statistik untuk UI Card
+    $approvedAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'approved');
+    $pendingAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'pending');
+
+    $stats = [
+      'total' => count($allAgendas),
+      'approved' => count($approvedAgendas),
+      'pending' => count($pendingAgendas),
+    ];
+
+    // 3. Render ke layout dengan parameter
+    return $response->renderPage(['stats' => $stats], ['meta'  => ['title' => 'Dashboard | Mazu Calendar']]);
   }
 
   // Form Pengajuan Agenda Baru
@@ -159,6 +170,36 @@ class AgendaController
       return $response->redirect('/agenda');
     } catch (\Throwable $th) {
       return $response->redirect('/agenda?error=500&message=' . urlencode($th->getMessage()));
+    }
+  }
+
+  public function getCalendarEvents(Request $request, Response $response): JsonResponse
+  {
+    try {
+      $allAgendas = $this->model->all() ?: [];
+
+      $events = [];
+      foreach ($allAgendas as $agenda) {
+        // Hanya tampilkan agenda yang sudah "Approved" di kalender
+        if ($agenda['status'] === 'approved') {
+          $events[] = [
+            'id'    => $agenda['id'],
+            'title' => $agenda['title'],
+            // FullCalendar membutuhkan format kalender ISO8601
+            'start' => date('Y-m-d\TH:i:s', strtotime($agenda['start_time'])),
+            'end'   => date('Y-m-d\TH:i:s', strtotime($agenda['end_time'])),
+            'extendedProps' => [
+              'location' => $agenda['location'] ?? 'Virtual',
+              'requester' => $agenda['requester_name'] ?? 'Sistem'
+            ],
+            'className' => 'fc-event-custom' // Class khusus untuk modifikasi CSS
+          ];
+        }
+      }
+
+      return $response->json($events);
+    } catch (\Throwable $th) {
+      return $response->json(['error' => $th->getMessage()], 500);
     }
   }
 }
