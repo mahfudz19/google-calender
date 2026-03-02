@@ -120,8 +120,6 @@ class AgendaController
     $id = $request->param('id');
     $agenda = $this->model->find($id);
 
-    // TODO: Cek apakah status masih pending & milik user ini
-
     return $response->renderPage(
       ['agenda' => $agenda],
       ['meta' => ['title' => 'Edit Agenda']]
