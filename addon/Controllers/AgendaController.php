@@ -25,14 +25,40 @@ class AgendaController
   }
 
   // Dashboard Kalender Utama
-  public function index(Request $request, Response $response): View
+  public function index(Request $request, Response $response)
   {
-    $data = $this->model->getAllApproved() ?: [];
+    // Ambil sesi user saat ini
+    $userSession = $this->session->get('user') ?? [];
+    $role = $userSession['role'] ?? 'user';
+    $userEmail = $userSession['email'] ?? '';
 
-    return $response->renderPage(
-      ['total' => count($data), 'events' => $data],
-      ['meta'  => ['title' => 'Dashboard | Mazu Calendar']]
-    );
+    // Ambil seluruh data agenda
+    $allAgendas = $this->model->all() ?: [];
+
+    // 1. Data untuk Widget: Pengajuan Terakhir Saya (Max 5)
+    $userAgendas = array_filter($allAgendas, function ($a) use ($userEmail) {
+      return ($a['requester_email'] ?? '') === $userEmail;
+    });
+    // Sortir dari yang terbaru
+    usort($userAgendas, fn($a, $b) => strtotime($b['created_at'] ?? 'now') <=> strtotime($a['created_at'] ?? 'now'));
+    $recentAgendas = array_slice($userAgendas, 0, 5);
+
+    // 2. Data untuk Widget: Tugas Approval Tertunda (Hanya untuk Admin/Approver)
+    $pendingTasks = [];
+    if (in_array($role, ['admin', 'approver'])) {
+      $pendingTasks = array_filter($allAgendas, fn($a) => $a['status'] === 'pending');
+      usort($pendingTasks, fn($a, $b) => strtotime($b['created_at'] ?? 'now') <=> strtotime($a['created_at'] ?? 'now'));
+      $pendingTasks = array_slice($pendingTasks, 0, 5);
+    }
+
+    // Render ke engine Mazu
+    return $response->renderPage([
+      'role'  => $role,
+      'recentAgendas' => $recentAgendas,
+      'pendingTasks'  => $pendingTasks
+    ], [
+      'meta'  => ['title' => 'Dashboard | Mazu Calendar']
+    ]);
   }
 
   // Form Pengajuan Agenda Baru
