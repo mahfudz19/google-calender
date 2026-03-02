@@ -76,13 +76,6 @@
    TAMBAHAN UNTUK HALAMAN CREATE, EDIT, DAN DETAIL VIEW
    ======================================================= */
 
-/* Utilitas Navigasi */
-.btn-back {
-    display: inline-block; color: var(--md-sys-color-on-surface-variant); font-weight: 500; font-size: 0.95rem;
-    text-decoration: none; margin-bottom: 1.5rem; transition: color 0.2s;
-}
-.btn-back:hover { color: var(--md-sys-color-primary); }
-
 /* --- FORM CARD WRAPPER --- */
 .form-card-wrapper {
     background: var(--md-sys-color-surface); border-radius: 16px; border: 1px solid var(--md-sys-color-outline-variant);
