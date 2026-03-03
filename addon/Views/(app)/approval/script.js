@@ -2,7 +2,7 @@ function handleAction(action, id) {
   const card = document.querySelector(`.approval-card[data-id="${id}"]`);
 
   if (action === "approve") {
-    if (confirm("Apakah Anda yakin ingin menyetujui agenda ini?")) {
+    if (confirm("Apakah anda yakin ingin menyetujui agenda ini?")) {
       // Simulasi sukses
       card.style.transition = "all 0.5s";
       card.style.transform = "translateX(100px)";

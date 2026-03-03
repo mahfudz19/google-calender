@@ -143,7 +143,7 @@ if ($errorCode && $errorMessage) {
               </div>
 
               <div class="modal-body">
-                <p>Apakah Anda yakin ingin menolak pengajuan agenda ini?</p>
+                <p>Apakah anda yakin ingin menolak pengajuan agenda ini?</p>
                 <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
                   <strong><?= htmlspecialchars($item['title']) ?></strong>
                 </p>
@@ -192,7 +192,7 @@ if ($errorCode && $errorMessage) {
               </div>
 
               <div class="modal-body">
-                <p>Apakah Anda yakin ingin menyetujui pengajuan agenda ini?</p>
+                <p>Apakah anda yakin ingin menyetujui pengajuan agenda ini?</p>
                 <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
                   <strong><?= htmlspecialchars($item['title']) ?></strong>
                 </p>
@@ -270,7 +270,7 @@ if ($errorCode && $errorMessage) {
                 </div>
 
                 <div class="modal-body">
-                  <p>Apakah Anda yakin ingin menghapus agenda ini?</p>
+                  <p>Apakah anda yakin ingin menghapus agenda ini?</p>
                   <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
                     <strong><?= htmlspecialchars($item['title']) ?></strong>
                   </p>

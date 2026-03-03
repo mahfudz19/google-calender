@@ -38,7 +38,12 @@ class ApprovalModel extends Model
             'nullable' => false,
             'default' => 'pending',
         ],
-        'type' => ['type' => 'string', 'nullable' => true],
+        'message' => ['type' => 'string', 'nullable' => true],
+
+        'ruangan_id' => ['type' => 'int', 'nullable' => true],
+        'ruangan_name' => ['type' => 'string', 'nullable' => true],
+        'ruangan_location' => ['type' => 'string', 'nullable' => true],
+        'ruangan_capacity' => ['type' => 'int', 'nullable' => true],
     ];
 
     protected array $seed = []; // Data awal untuk seeder
@@ -76,7 +81,15 @@ class ApprovalModel extends Model
             $placeholders = array_map(fn($col) => ':' . $col, $columns);
 
             $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
-            return $this->getDb()->prepare($sql)->execute($data);
+
+            // Debug: Log SQL query
+            // logger()->log('SQL Query to Execute:', [
+            //     'sql' => $sql,
+            //     'columns' => $columns,
+            //     'placeholders' => $placeholders
+            // ]);
+
+            return $this->getDb()->query($sql, $data);
         } catch (\Throwable $th) {
             throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
         }
@@ -170,20 +183,25 @@ class ApprovalModel extends Model
         return (int) $stmt->fetchColumn();
     }
 
-    public function checkTimeConflict(string $startTime, string $endTime, ?int $excludeId = null): array
+    public function checkTimeConflict(string $startTime, string $endTime, ?int $ruanganId = null, ?int $excludeId = null): array
     {
         $sql = "SELECT * FROM {$this->table} 
-            WHERE status = 'approved' 
-            AND (
-                (start_time < :end_time AND end_time > :start_time)
-            )";
+        WHERE status = 'approved' 
+        AND (
+            (start_time < :end_time AND end_time > :start_time)
+        )";
 
         $params = [
             'start_time' => $startTime,
             'end_time' => $endTime
         ];
 
-        // Exclude current agenda dari pengecekan (untuk update)
+        // Jika ada ruangan_id, check conflict di ruangan yang sama
+        if ($ruanganId) {
+            $sql .= " AND ruangan_id = :ruangan_id";
+            $params['ruangan_id'] = $ruanganId;
+        }
+
         if ($excludeId) {
             $sql .= " AND id != :exclude_id";
             $params['exclude_id'] = $excludeId;
@@ -195,22 +213,12 @@ class ApprovalModel extends Model
         return $stmt->fetchAll();
     }
 
-    public function hasTimeConflict(string $startTime, string $endTime, ?int $excludeId = null): bool
-    {
-        $conflicts = $this->checkTimeConflict($startTime, $endTime, $excludeId);
-        return !empty($conflicts);
-    }
-
     public function updateStatus(string|int $id, string $status, ?string $comment = null, ?string $googleEventId = null): bool
     {
         $data = ['status' => $status];
-        if ($comment) $data['type'] = $comment;
+        if ($comment) $data['message'] = $comment;
         if ($googleEventId) $data['google_event_id'] = $googleEventId;
 
         return $this->updateById($id, $data);
-    }
-    public function getConflictingAgendas(string $startTime, string $endTime, ?int $excludeId = null): array
-    {
-        return $this->checkTimeConflict($startTime, $endTime, $excludeId);
     }
 }

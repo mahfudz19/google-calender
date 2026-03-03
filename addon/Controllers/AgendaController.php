@@ -14,14 +14,16 @@ use Error;
 
 class AgendaController
 {
-  private string $adminEmail = 'mahfudz@inbitef.ac.id';
+  private string $adminEmail;
 
   public function __construct(
     private ApprovalModel $model,
-    private SessionService $session
+    private SessionService $session,
+    private ApiController $apiController
   ) {
     $this->model = $model;
     $this->session = $session;
+    $this->adminEmail = env('GOOGLE_ADMIN', 'mahfudz@inbitef.ac.id');
   }
 
   // Dashboard Kalender Utama
@@ -69,7 +71,9 @@ class AgendaController
   // Form Pengajuan Agenda Baru
   public function create(Request $request, Response $response): View
   {
-    return $response->renderPage([], ['meta' => ['title' => 'Ajukan Agenda Baru']]);
+    $ruangan = $this->apiController->getRuanganApi(['perPage' => 9999]);
+
+    return $response->renderPage(['ruangan' => $ruangan['data']], ['meta' => ['title' => 'Ajukan Agenda Baru']]);
   }
 
   // Proses Simpan Pengajuan
@@ -80,13 +84,25 @@ class AgendaController
       $user = $this->session->get('user');
 
       // Tambahkan info requester otomatis
-      $data['requester_name'] = $user['name'] ?? 'Guest';
-      $data['requester_email'] = $user['email'] ?? null;
-      $data['requester_role'] = $user['role'] ?? 'user';
-      $data['requester_avatar'] = $user['avatar'] ?? null;
-      $data['status'] = 'pending'; // Default status
+      $body = [];
+      $body['title'] = $data['title'] ?? null;
+      $body['description'] = $data['description'] ?? null;
+      $body['start_time'] = $data['start_time'] ?? null;
+      $body['end_time'] = $data['end_time'] ?? null;
+      $body['location'] = $data['location'] ?? null;
+      $body['requester_name'] = $user['name'] ?? 'Guest';
+      $body['requester_email'] = $user['email'] ?? null;
+      $body['requester_role'] = $user['role'] ?? 'user';
+      $body['requester_avatar'] = $user['avatar'] ?? null;
+      $body['status'] = 'pending';
 
-      $this->model->create($data);
+      $body['ruangan_id'] = $data['ruangan_id'] ?? null;
+      $body['ruangan_name'] = $data['ruangan_name'] ?? null;
+      $body['ruangan_location'] = $data['ruangan_location'] ?? null;
+      $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+
+
+      $this->model->create($body);
 
 
       return $response->redirect('/agenda');
@@ -149,9 +165,10 @@ class AgendaController
   {
     $id = $request->param('id');
     $agenda = $this->model->find($id);
+    $ruangan = $this->apiController->getRuanganApi(['perPage' => 9999]);
 
     return $response->renderPage(
-      ['agenda' => $agenda],
+      ['agenda' => $agenda, 'ruangan' => $ruangan['data']],
       ['meta' => ['title' => 'Edit Agenda']]
     );
   }
@@ -164,11 +181,18 @@ class AgendaController
       $data = $request->getBody();
 
       $oldAgenda = $this->model->find($id);
+      if ($oldAgenda['status'] === 'approved') {
+        // 1. Cek Konflik Waktu (Menggunakan fungsi di Model)
+        $conflicts = $this->model->checkTimeConflict($data['start_time'], $data['end_time'], $data['ruangan_id'], $data['ruangan_id'], $id);
+        if (!empty($conflicts)) {
+          throw new \Exception("Conflict detected! Jadwal bertabrakan.");
+        }
+      }
 
-      // 1. Update ke Database
+      // 2. Update ke Database
       $this->model->updateById($id, $data);
 
-      // 2. Jika agenda sudah "approved", edit juga di Google Calendar
+      // 3. Jika agenda sudah "approved", edit juga di Google Calendar
       if ($oldAgenda['status'] === 'approved' && !empty($oldAgenda['google_event_id'])) {
         $gcal = new GoogleCalendarService();
 

@@ -8,7 +8,12 @@ use Addon\Services\GoogleCalendarService;
 
 class CalendarController
 {
-  private string $organizerEmail = 'mahfudz@inbitef.ac.id'; // Akun Pusat Pembuat Acara
+  private string $organizerEmail;
+
+  public function __construct()
+  {
+    $this->organizerEmail = env('GOOGLE_ADMIN', 'mahfudz@inbitef.ac.id');
+  }
 
   /**
    * CREATE: Broadcast Agenda ke banyak email sekaligus

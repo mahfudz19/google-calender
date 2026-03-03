@@ -164,3 +164,48 @@
     .btn-submit { text-align: center; }
     .btn-cancel { text-align: center; background: var(--md-sys-color-surface-variant); border-radius: 10px; }
 }
+
+/* Update specificity untuk override agenda styles */
+.mazu-form .autocomplete-wrapper .form-input {
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 10px;
+  padding: 0.85rem 1rem; /* Match dengan form-control */
+  font-size: 0.95rem;
+  background: var(--md-sys-color-surface-variant); /* Match dengan form-control */
+  color: var(--md-sys-color-on-background);
+  transition: all 0.2s;
+  width: 100%;
+  cursor: text;
+  box-sizing: border-box;
+}
+
+.mazu-form .autocomplete-wrapper .form-input:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-surface);
+  box-shadow: 0 0 0 4px var(--md-sys-color-primary-container); /* Match dengan form-control */
+}
+
+/* Override untuk dropdown */
+.mazu-form .autocomplete-list-wrapper {
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.mazu-form .autocomplete-option {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-background);
+}
+
+.mazu-form .autocomplete-option:hover,
+.mazu-form .autocomplete-option.is-focused {
+  background: var(--md-sys-color-surface-variant);
+}
+
+.mazu-form .autocomplete-option.is-selected {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
+}

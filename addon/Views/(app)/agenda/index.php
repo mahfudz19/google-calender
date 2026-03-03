@@ -11,7 +11,7 @@ $totalAgendas = $totalAgendas ?? 0;
   <div class="page-header">
     <div>
       <h2 class="page-title">Agenda Saya</h2>
-      <p class="page-subtitle">Kelola dan pantau status pengajuan agenda akademik Anda.</p>
+      <p class="page-subtitle">Kelola dan pantau status pengajuan agenda akademik anda.</p>
     </div>
     <a data-spa href="/agenda/create" class="btn-primary">+ Ajukan Agenda</a>
   </div>
@@ -68,7 +68,7 @@ $totalAgendas = $totalAgendas ?? 0;
                       <button type="button" class="modal-close" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">&times;</button>
                     </div>
                     <div class="modal-body">
-                      <p>Apakah Anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
+                      <p>Apakah anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
                       <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Agenda yang dibatalkan tidak dapat dipulihkan kembali.</p>
                     </div>
                     <div class="modal-footer">
@@ -79,6 +79,8 @@ $totalAgendas = $totalAgendas ?? 0;
                     </div>
                   </div>
                 </div>
+              <?php else: ?>
+                <a data-spa href="/agenda/<?= $agenda['id'] ?>" class="btn-outline-secondary">Detail</a>
               <?php endif; ?>
             </div>
           </div>
@@ -103,4 +105,5 @@ $totalAgendas = $totalAgendas ?? 0;
     </div>
   <?php endif; ?>
 
+</div>
 </div>

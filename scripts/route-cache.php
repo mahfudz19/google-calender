@@ -50,7 +50,7 @@ array_walk_recursive($routes, function ($value) use ($cacheFile) {
     echo "\n\033[31m[ERROR] Route Cache Failed!\033[0m\n";
     echo "Ditemukan 'Closure' (fungsi anonim) dalam definisi rute.\n";
     echo "Route Cache membutuhkan Controller Class, bukan function() { ... }.\n";
-    echo "Silakan refactor rute Anda ke Controller.\n\n";
+    echo "Silakan refactor rute anda ke Controller.\n\n";
     exit(1);
   }
 });

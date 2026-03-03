@@ -1,5 +1,5 @@
 <div class="agenda-container">
-  <a href="/agenda" class="btn-back">← Kembali ke Daftar</a>
+  <a data-spa href="/agenda" class="btn-back">← Kembali ke Daftar</a>
 
   <div class="form-card-wrapper">
     <div class="form-header">

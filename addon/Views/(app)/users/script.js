@@ -114,7 +114,7 @@
                                         <button type="button" class="modal-close" onclick="document.getElementById('modal-del-${user.id}').classList.remove('show')">&times;</button>
                                     </div>
                                     <div class="modal-body">
-                                        <p>Apakah Anda yakin ingin menghapus akses untuk <strong>${user.name}</strong> (${user.email})?</p>
+                                        <p>Apakah anda yakin ingin menghapus akses untuk <strong>${user.name}</strong> (${user.email})?</p>
                                         <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Data riwayat pengajuan tidak akan hilang, namun user tidak bisa login lagi.</p>
                                     </div>
                                     <div class="modal-footer">

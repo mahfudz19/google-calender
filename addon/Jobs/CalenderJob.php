@@ -14,12 +14,13 @@ class CalenderJob
 {
     private ?int $jobId = null;
     private $db;
-    private string $adminEmail = 'mahfudz@inbitef.ac.id';
+    private string $adminEmail;
 
 
     public function __construct(private Application $app, private ApprovalModel $model, DatabaseManager $dbManager)
     {
         $this->db = $dbManager->connection();
+        $this->adminEmail = env('GOOGLE_ADMIN', 'mahfudz@inbitef.ac.id');
     }
 
     /**

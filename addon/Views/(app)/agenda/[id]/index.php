@@ -1,7 +1,7 @@
 <?php $agenda = $agenda ?? []; ?>
 
 <div class="agenda-container">
-  <a href="/agenda" class="btn-back">← Kembali ke Daftar</a>
+  <a data-spa href="/agenda" class="btn-back">← Kembali ke Daftar</a>
 
   <div class="detail-card">
     <div class="detail-header">
@@ -35,7 +35,7 @@
                 <button type="button" class="modal-close" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">&times;</button>
               </div>
               <div class="modal-body">
-                <p>Apakah Anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
+                <p>Apakah anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
                 <p class="text-muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Agenda yang dibatalkan tidak dapat dipulihkan kembali.</p>
               </div>
               <div class="modal-footer">
@@ -72,6 +72,16 @@
           <?= nl2br(htmlspecialchars($agenda['description'] ?? 'Tidak ada deskripsi yang dilampirkan.')) ?>
         </p>
       </div>
+      <?php if (!empty($agenda['message'])): ?>
+        <div class="alert alert-error" style="margin-top: 1rem;">
+          <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: #dc2626;">Alasan Penolakan:</strong>
+          </div>
+          <div style="color: #7f1d1d; font-size: 0.875rem;">
+            <?= nl2br(htmlspecialchars($agenda['message'])) ?>
+          </div>
+        </div>
+      <?php endif; ?>
     </div>
 
   </div>

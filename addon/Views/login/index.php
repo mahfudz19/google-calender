@@ -19,7 +19,7 @@
     <div class="auth-card">
       <div class="auth-card-header">
         <h2 class="auth-card-title">Selamat Datang Kembali</h2>
-        <p class="auth-card-desc">Silakan masuk menggunakan akun perusahaan Anda.</p>
+        <p class="auth-card-desc">Silakan masuk menggunakan akun perusahaan anda.</p>
       </div>
 
       <a href="<?= getBaseUrl('/login') ?>" class="btn-google">

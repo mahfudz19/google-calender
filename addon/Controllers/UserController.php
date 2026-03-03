@@ -27,7 +27,7 @@ class UserController
     try {
       $directory = new GoogleDirectoryService();
       // Impersonate sebagai Super Admin
-      $adminEmail = 'mahfudz@inbitef.ac.id';
+      $adminEmail = env('GOOGLE_ADMIN', 'mahfudz@inbitef.ac.id');
 
       return $directory->impersonate($adminEmail)->getAllUsers();
     } catch (\Exception $e) {
@@ -76,11 +76,11 @@ class UserController
     // 2. Gabungkan dengan data dari DB Lokal
     $finalUsers = $this->enrichUsersWithLocalDb($googleUsers);
 
-    $user_loggin = $this->session->get('user');
+    $user_login = $this->session->get('user');
 
     // 3. Render ke View Mazu Engine
     return $response->renderPage(
-      ['users' => $finalUsers, 'user_loggin' => $user_loggin],
+      ['users' => $finalUsers, 'user_login' => $user_login],
       ['meta' => ['title' => 'Manajemen User | Mazu Calendar']]
     );
   }
