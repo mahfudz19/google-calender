@@ -1,72 +1,52 @@
 :root {
-  /* Material Design 3 - Light Theme Palette */
+  /* Material Design 3 - Academic Harmony Palette */
 
-  /* Primary: Deep Cyan (Readable on Light) */
-  --md-sys-color-primary: #006874;
+  /* Primary: Google Calendar Blue (Dominan untuk sistem) */
+  --md-sys-color-primary: #1a73e8;
   --md-sys-color-on-primary: #ffffff;
-  --md-sys-color-primary-container: #97f0ff;
-  --md-sys-color-on-primary-container: #001f24;
+  --md-sys-color-primary-container: #d2e3fc;
+  --md-sys-color-on-primary-container: #174ea6;
 
-  /* Secondary: Deep Green (Readable on Light) */
-  --md-sys-color-secondary: #006c4c;
+  /* Secondary: Soft Slate (Untuk elemen pendukung agar tidak terlalu ramai) */
+  --md-sys-color-secondary: #5f6368;
   --md-sys-color-on-secondary: #ffffff;
-  --md-sys-color-secondary-container: #89f8c7;
-  --md-sys-color-on-secondary-container: #002114;
+  --md-sys-color-secondary-container: #f1f3f4;
+  --md-sys-color-on-secondary-container: #202124;
 
-  /* Tertiary: Purple */
-  --md-sys-color-tertiary: #6f528a;
+  /* Tertiary: Kampus Red (Identitas & Aksen) */
+  --md-sys-color-tertiary: #b91c1c; /* Merah Marun/Kampus yang elegan */
   --md-sys-color-on-tertiary: #ffffff;
-  --md-sys-color-tertiary-container: #f0dbff;
-  --md-sys-color-on-tertiary-container: #290d42;
+  --md-sys-color-tertiary-container: #fee2e2;
+  --md-sys-color-on-tertiary-container: #7f1d1d;
 
-  /* Error */
+  /* Error: Vibrant Red */
   --md-sys-color-error: #ba1a1a;
   --md-sys-color-on-error: #ffffff;
   --md-sys-color-error-container: #ffdad6;
   --md-sys-color-on-error-container: #410002;
 
-  /* Surface & Background (Light) */
-  --md-sys-color-background: #f8fdff; /* Very faint blue-white */
-  --md-sys-color-on-background: #001f25; /* Very dark cyan-black */
+  /* Background & Surface: Ciri khas Google (Clean White) */
+  --md-sys-color-background: #f8f9fa; 
+  --md-sys-color-on-background: #1f1f1f;
 
-  --md-sys-color-surface: #f8fdff;
-  --md-sys-color-on-surface: #001f25;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-on-surface: #1f1f1f;
 
-  --md-sys-color-surface-variant: #dbe4e6;
-  --md-sys-color-on-surface-variant: #3f484a;
+  /* Surface Variant: Abu-abu kebiruan yang sangat soft */
+  --md-sys-color-surface-variant: #f1f3f4;
+  --md-sys-color-on-surface-variant: #444746;
 
-  --md-sys-color-outline: #6f797a;
-  --md-sys-color-outline-variant: #bfc8cc;
+  --md-sys-color-outline: #747775;
+  --md-sys-color-outline-variant: #c4c7c5;
 
-  /* Surfaces with Elevation Overlay (Light Mode) */
-  --md-surface-1: #f0fbfd; /* Surface 1 */
-  --md-surface-2: #ecfafc; /* Surface 2 */
-  --md-surface-3: #e7f8fb; /* Surface 3 */
-  --md-surface-4: #e5f8fa; /* Surface 4 */
-  --md-surface-5: #e2f7f9; /* Surface 5 */
-
-  /* Mapping to Mazu Variables for Compatibility */
-  --color-primary-50: var(--md-sys-color-primary-container);
-  --color-primary-100: var(--md-sys-color-primary-container);
-  --color-primary-600: var(--md-sys-color-primary);
-  --color-primary-700: var(--md-sys-color-on-primary-container);
-  --color-primary-900: var(--md-sys-color-on-primary);
-
-  --color-accent: var(--md-sys-color-secondary);
-  --color-border-light: var(--md-sys-color-outline-variant);
-
-  /* Native CSS Colors Mapped */
-  --text-primary: var(--md-sys-color-on-background);
-  --text-secondary: var(--md-sys-color-on-surface-variant);
-
-  --neutral-50: var(--md-sys-color-background);
-  --neutral-100: #ffffff; /* Cards are pure white on light theme */
-  --neutral-200: #e0e0e0; /* Light borders */
-  --neutral-300: #bdbdbd;
-
-  --primary-500: var(--md-sys-color-primary);
-  --primary-600: var(--md-sys-color-primary);
-  --primary-700: var(--md-sys-color-primary-container);
+  /* Mazu Compatibility Mapping */
+  --primary: var(--md-sys-color-primary);
+  --primary-light: var(--md-sys-color-primary-container);
+  --danger: var(--md-sys-color-tertiary); /* Gunakan Merah Kampus untuk tombol hapus/penting */
+  --app-bg: var(--md-sys-color-background);
+  --border-light: var(--md-sys-color-outline-variant);
+  --text-main: var(--md-sys-color-on-surface);
+  --text-muted: var(--md-sys-color-on-surface-variant);
 }
 
 /* Base Styles */
