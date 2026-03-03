@@ -2,6 +2,7 @@
 
 namespace Addon\Controllers;
 
+use Addon\Middleware\RoleMiddleware;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
 use App\Core\View\View;
@@ -9,6 +10,8 @@ use App\Core\Http\RedirectResponse;
 use Addon\Models\ApprovalModel;
 use Addon\Services\GoogleCalendarService;
 use App\Core\Http\JsonResponse;
+use App\Core\Queue\JobDispatcher;
+use App\Exceptions\AuthorizationException;
 use App\Services\SessionService;
 use Error;
 
@@ -19,7 +22,9 @@ class AgendaController
   public function __construct(
     private ApprovalModel $model,
     private SessionService $session,
-    private ApiController $apiController
+    private ApiController $apiController,
+    private JobDispatcher $dispatcher,
+    private RoleMiddleware $roleMiddleware
   ) {
     $this->model = $model;
     $this->session = $session;
@@ -100,8 +105,6 @@ class AgendaController
       $body['ruangan_name'] = $data['ruangan_name'] ?? null;
       $body['ruangan_location'] = $data['ruangan_location'] ?? null;
       $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
-
-
       $this->model->create($body);
 
 
@@ -160,12 +163,16 @@ class AgendaController
     );
   }
 
+
   // Form Edit Agenda
   public function edit(Request $request, Response $response): View
   {
     $id = $request->param('id');
     $agenda = $this->model->find($id);
     $ruangan = $this->apiController->getRuanganApi(['perPage' => 9999]);
+    if ($agenda['status'] !== 'pending') {
+      $this->roleMiddleware->isCanAccess(['admin']);
+    }
 
     return $response->renderPage(
       ['agenda' => $agenda, 'ruangan' => $ruangan['data']],
@@ -180,41 +187,67 @@ class AgendaController
       $id = $request->param('id');
       $data = $request->getBody();
 
+      $body = [];
+      $body['title'] = $data['title'] ?? null;
+      $body['description'] = $data['description'] ?? null;
+      $body['start_time'] = $data['start_time'] ?? null;
+      $body['end_time'] = $data['end_time'] ?? null;
+      $body['location'] = $data['location'] ?? null;
+
+      $body['ruangan_id'] = $data['ruangan_id'] ?? null;
+      $body['ruangan_name'] = $data['ruangan_name'] ?? null;
+      $body['ruangan_location'] = $data['ruangan_location'] ?? null;
+      $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+
       $oldAgenda = $this->model->find($id);
+      // 1. Cek Konflik Waktu (Menggunakan fungsi di Model)
       if ($oldAgenda['status'] === 'approved') {
-        // 1. Cek Konflik Waktu (Menggunakan fungsi di Model)
-        $conflicts = $this->model->checkTimeConflict($data['start_time'], $data['end_time'], $data['ruangan_id'], $data['ruangan_id'], $id);
+        $this->roleMiddleware->isCanAccess(['admin']);
+
+        $conflicts = $this->model->checkTimeConflict($body['start_time'], $body['end_time'], $body['ruangan_id'],  $id);
         if (!empty($conflicts)) {
           throw new \Exception("Conflict detected! Jadwal bertabrakan.");
         }
       }
 
       // 2. Update ke Database
-      $this->model->updateById($id, $data);
+      logger()->log('2. Update ke Database');
+      $this->model->updateById($id, $body);
 
       // 3. Jika agenda sudah "approved", edit juga di Google Calendar
+      logger()->log('3.1 Jika agenda sudah "approved", edit juga di Google Calendar');
       if ($oldAgenda['status'] === 'approved' && !empty($oldAgenda['google_event_id'])) {
+        $timezone = new \DateTimeZone('Asia/Makassar');
+        $start = new \DateTime($body['start_time'], $timezone);
+        $end = new \DateTime($body['end_time'], $timezone);
+
         $gcal = new GoogleCalendarService();
 
         $updatedEventData = [
-          'title'       => $data['title'] ?? $oldAgenda['title'],
-          'description' => $data['description'] ?? $oldAgenda['description'],
-          'location'    => $data['location'] ?? $oldAgenda['location'],
-          'start_time'  => isset($data['start_time']) ? date('c', strtotime($data['start_time'])) : null,
-          'end_time'    => isset($data['end_time']) ? date('c', strtotime($data['end_time'])) : null,
+          'title'       => $body['title'] ?? $oldAgenda['title'],
+          'description' => $body['description'] ?? $oldAgenda['description'],
+          'location'    => $body['location'] ?? $oldAgenda['location'],
+          'start_time'  => $start->format('c'),
+          'end_time'    => $end->format('c'),
         ];
 
         // Hilangkan field yang null agar method patch GCal tidak error
         $updatedEventData = array_filter($updatedEventData);
 
         // Update via Google API
+        logger()->log('3.2 Update via Google API');
         $gcal->impersonate($this->adminEmail)
           ->updateEvent($oldAgenda['google_event_id'], $updatedEventData, ['sendUpdates' => 'all']);
       }
 
+      if ($oldAgenda['status'] === 'approved') {
+        logger()->log('4 redirect /approval/history');
+        return $response->redirect('/approval/history');
+      }
+      logger()->log('4 redirect /agenda');
       return $response->redirect('/agenda');
     } catch (\Throwable $th) {
-      return $response->redirect('/agenda/edit?error=500&message=' . urlencode($th->getMessage()));
+      return $response->redirect('/agenda/' . $id . '/edit?error=500&message=' . urlencode($th->getMessage()));
     }
   }
 

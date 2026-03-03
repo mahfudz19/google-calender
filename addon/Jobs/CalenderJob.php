@@ -130,32 +130,35 @@ class CalenderJob
      */
     private function getProcessData(array $agenda): array
     {
+        $timezone = new \DateTimeZone('Asia/Makassar');
+        $start = new \DateTime($agenda['start_time'], $timezone);
+        $end = new \DateTime($agenda['end_time'], $timezone);
 
-        // 2. Ambil Semua User dari Google Directory
-        $directory = new GoogleDirectoryService();
-        $users = $directory->impersonate($this->adminEmail)->getAllUsers();
+        // // 2. Ambil Semua User dari Google Directory
+        // $directory = new GoogleDirectoryService();
+        // $users = $directory->impersonate($this->adminEmail)->getAllUsers();
 
-        // Mapping user ke format array attendees
-        $attendees = [];
-        foreach ($users as $u) {
-            if (!empty($u['email'])) {
-                $attendees[] = ['email' => $u['email']];
-            }
-        }
+        // // Mapping user ke format array attendees
+        // $attendees = [];
+        // foreach ($users as $u) {
+        //     if (!empty($u['email'])) {
+        //         $attendees[] = ['email' => $u['email']];
+        //     }
+        // }
 
-        // // example attendees
-        // $attendees = [
-        //     ['email' => 'sultan@student.univeral.ac.id'],
-        //     ['email' => 'mahfudz@inbitef.ac.id'],
-        // ];
+        // example attendees
+        $attendees = [
+            ['email' => 'sultan@student.univeral.ac.id'],
+            ['email' => 'mahfudz@inbitef.ac.id'],
+        ];
 
         // 3. Insert ke Google Calendar (1x Call untuk semua user)
         return [
             'title'       => $agenda['title'],
             'description' => $agenda['description'],
             'location'    => $agenda['location'],
-            'start_time'  => date('c', strtotime($agenda['start_time'])),
-            'end_time'    => date('c', strtotime($agenda['end_time'])),
+            'start_time'  => $start->format('c'),
+            'end_time'    => $end->format('c'),
             'attendees'   => $attendees
         ];
     }

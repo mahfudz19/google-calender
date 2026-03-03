@@ -19,6 +19,13 @@ class RoleMiddleware implements MiddlewareInterface
       throw $e;
     }
 
+    $this->isCanAccess($params);
+
+    return $next($request);
+  }
+
+  public function isCanAccess(array $params = [])
+  {
     $user = $this->session->get('user', []);
     $role = is_array($user) ? ($user['role'] ?? null) : null;
 
@@ -27,7 +34,5 @@ class RoleMiddleware implements MiddlewareInterface
         throw new AuthorizationException('Forbidden');
       }
     }
-
-    return $next($request);
   }
 }

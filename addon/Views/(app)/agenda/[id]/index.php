@@ -32,7 +32,7 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h3 class="modal-title text-danger">Konfirmasi Pembatalan</h3>
-                <button type="button" class="modal-close" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">&times;</button>
+                <button type="button" class="modal-close" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">&​times;</button>
               </div>
               <div class="modal-body">
                 <p>Apakah anda yakin ingin membatalkan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
@@ -60,10 +60,30 @@
           <span class="info-label">Waktu Selesai</span>
           <span class="info-value"><?= date('d F Y • H:i', strtotime($agenda['end_time'])) ?></span>
         </div>
-        <div class="info-box full-width">
-          <span class="info-label">Lokasi / Tempat</span>
-          <span class="info-value">📍 <?= htmlspecialchars($agenda['location'] ?? 'Tidak ditentukan') ?></span>
-        </div>
+
+        <!-- Ruangan Information -->
+        <?php if (!empty($agenda['ruangan_name'])): ?>
+          <div class="info-box full-width">
+            <span class="info-label">Ruangan</span>
+            <span class="info-value">
+              🏢 <?= htmlspecialchars($agenda['ruangan_name']) ?>
+              <?php if (!empty($agenda['ruangan_capacity'])): ?>
+                (<?= htmlspecialchars($agenda['ruangan_capacity']) ?> orang)
+              <?php endif; ?>
+              <?php if (!empty($agenda['ruangan_location'])): ?>
+                - 📍 <?= htmlspecialchars($agenda['ruangan_location']) ?>
+              <?php endif; ?>
+            </span>
+          </div>
+        <?php endif; ?>
+
+        <!-- Lokasi Tambahan (jika ada) -->
+        <?php if (!empty($agenda['location'])): ?>
+          <div class="info-box full-width">
+            <span class="info-label">Lokasi Tambahan</span>
+            <span class="info-value">📍 <?= htmlspecialchars($agenda['location']) ?></span>
+          </div>
+        <?php endif; ?>
       </div>
 
       <div class="detail-description">

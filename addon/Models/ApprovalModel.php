@@ -82,13 +82,6 @@ class ApprovalModel extends Model
 
             $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
 
-            // Debug: Log SQL query
-            // logger()->log('SQL Query to Execute:', [
-            //     'sql' => $sql,
-            //     'columns' => $columns,
-            //     'placeholders' => $placeholders
-            // ]);
-
             return $this->getDb()->query($sql, $data);
         } catch (\Throwable $th) {
             throw new Exception($th->getMessage() ?? "Error Processing Request", 1);
@@ -187,14 +180,9 @@ class ApprovalModel extends Model
     {
         $sql = "SELECT * FROM {$this->table} 
         WHERE status = 'approved' 
-        AND (
-            (start_time < :end_time AND end_time > :start_time)
-        )";
+        AND ((start_time < :end_time AND end_time > :start_time))";
 
-        $params = [
-            'start_time' => $startTime,
-            'end_time' => $endTime
-        ];
+        $params = ['start_time' => $startTime, 'end_time' => $endTime];
 
         // Jika ada ruangan_id, check conflict di ruangan yang sama
         if ($ruanganId) {

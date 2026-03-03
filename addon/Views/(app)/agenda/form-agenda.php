@@ -130,9 +130,31 @@ if ($error && $message) {
       <input type="datetime-local" id="end_time" name="end_time" class="form-control"
         value="<?= isset($agenda['end_time']) ? date('Y-m-d\TH:i', strtotime($agenda['end_time'])) : '' ?>" required>
     </div>
+    <script>
+      (function initAgendaForm() {
+        const startInput = document.getElementById('start_time');
+        const endInput = document.getElementById('end_time');
+        if (!startInput || !endInput) return;
 
+        function updateMinEndTime() {
+          if (startInput.value) {
+            endInput.min = startInput.value;
+            if (endInput.value && endInput.value < startInput.value) {
+              let startDate = new Date(startInput.value);
+              startDate.setHours(startDate.getHours() + 1);
+              let tzOffset = startDate.getTimezoneOffset() * 60000; // offset dalam milidetik
+              let localISOTime = (new Date(startDate - tzOffset)).toISOString().slice(0, 16);
+              endInput.value = localISOTime;
+            }
+          }
+        }
+
+        startInput.addEventListener('change', updateMinEndTime);
+        updateMinEndTime();
+      })();
+    </script>
     <!-- Tambahkan field ruangan dengan autocomplete -->
-    <!-- <div class="form-group full-width">
+    <div class="form-group full-width">
       <label for="ruangan_id">Ruangan <span class="text-red">*</span></label>
 
       <div class="autocomplete-container" data-placeholder="Pilih ruangan..." data-required="true">
@@ -145,20 +167,14 @@ if ($error && $message) {
                 data-location="<?= htmlspecialchars($item['lokasi'] ?? '') ?>"
                 data-capacity="<?= htmlspecialchars($item['capacity'] ?? '') ?>"
                 <?= ($agenda['ruangan_id'] ?? '') == $item['ID_ruangan'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($item['name']) ?> (<?= htmlspecialchars($item['capacity'] ?? 0) ?> orang) - <?= htmlspecialchars($item['lokasi'] ?? 'Tidak ada lokasi') ?>
+                ID - <?= htmlspecialchars($item['ID_ruangan']) ?> - <?= htmlspecialchars($item['name']) ?> (<?= htmlspecialchars($item['capacity'] ?? 0) ?> orang) - <?= htmlspecialchars($item['lokasi'] ?? 'Tidak ada lokasi') ?>
               </option>
             <?php endforeach; ?>
           <?php endif; ?>
         </select>
       </div>
-
-      <input type="hidden" name="ruangan_id" id="ruangan_id" value="<?= htmlspecialchars($agenda['ruangan_id'] ?? '') ?>" required>
-      <input type="hidden" name="ruangan_name" id="ruangan_name" value="<?= htmlspecialchars($agenda['ruangan_name'] ?? '') ?>">
-      <input type="hidden" name="ruangan_location" id="ruangan_location" value="<?= htmlspecialchars($agenda['ruangan_location'] ?? '') ?>">
-      <input type="hidden" name="ruangan_capacity" id="ruangan_capacity" value="<?= htmlspecialchars($agenda['ruangan_capacity'] ?? '') ?>">
-
       <small class="form-hint">Pilih ruangan yang tersedia untuk agenda anda</small>
-    </div> -->
+    </div>
 
     <div class="form-group full-width">
       <label for="location">Lokasi Tambahan / Tautan Rapat</label>
@@ -183,236 +199,172 @@ if ($error && $message) {
 </form>
 
 <!-- Include autocomplete component JS -->
-<!-- <script type="module">
+<script type="module">
   import Autocomplete from '/components-js/autocomplete/index.2586e72a.min.js';
 
-  // Configuration
-  const CONFIG = {
-    autocomplete: {
-      container: '.autocomplete-container',
-      wrapper: '.autocomplete-wrapper',
-      select: 'select',
-      input: '.autocomplete-input',
-      error: '.autocomplete-error'
-    },
-    form: {
-      selector: 'form',
-      submit: '.btn-submit'
-    },
-    fields: {
-      ruanganId: 'ruangan_id',
-      startTime: 'start_time',
-      endTime: 'end_time'
-    },
-    messages: {
-      ruanganRequired: 'Silakan pilih ruangan terlebih dahulu'
-    },
-    timing: {
-      minDuration: 15, // minutes
-      debounceMs: 300
-    }
-  };
-
-  // State management
-  const state = {
-    initialized: false,
-    autocompleteInstance: null
-  };
-
-  // Utility functions
-  const utils = {
-    getById: (id) => document.getElementById(id),
-    createElement: (tag, className, textContent = '') => {
-      const el = document.createElement(tag);
-      if (className) el.className = className;
-      if (textContent) el.textContent = textContent;
-      return el;
-    },
-    debounce: (func, wait) => {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-  };
-
-  // Autocomplete management
-  const autocompleteManager = {
-    init() {
-      const container = document.querySelector(CONFIG.autocomplete.container);
-      if (!container || state.initialized) return;
-
-      this.cleanup(container);
-      this.createInstance(container);
-      this.setupListeners(container);
-      state.initialized = true;
-    },
-
-    cleanup(container) {
-      const wrapper = container.querySelector(CONFIG.autocomplete.wrapper);
-      if (wrapper) wrapper.remove();
-
-      const select = container.querySelector(CONFIG.autocomplete.select);
-      if (select?.style.display === 'none') {
-        select.style.display = '';
-      }
-    },
-
-    createInstance(container) {
-      state.autocompleteInstance = new Autocomplete(container);
-    },
-
-    setupListeners(container) {
-      const select = container.querySelector(CONFIG.autocomplete.select);
-      if (!select) return;
-
-      const newSelect = select.cloneNode(true);
-      select.parentNode.replaceChild(newSelect, select);
-
-      newSelect.addEventListener('change', (e) => {
-        this.updateHiddenFields(e.target);
-      });
-
-      // Initialize edit mode
-      if (newSelect.value) {
-        this.updateHiddenFields(newSelect);
-      }
-    },
-
-    updateHiddenFields(select) {
-      const option = select.options[select.selectedIndex];
-      const fields = {
-        id: utils.getById(CONFIG.fields.ruanganId),
-        name: utils.getById('ruangan_name'),
-        location: utils.getById('ruangan_location'),
-        capacity: utils.getById('ruangan_capacity')
-      };
-
-      if (option.value) {
-        fields.id.value = option.value;
-        fields.name.value = option.dataset.name || '';
-        fields.location.value = option.dataset.location || '';
-        fields.capacity.value = option.dataset.capacity || '';
-      } else {
-        Object.values(fields).forEach(field => field.value = '');
-      }
-    }
-  };
-
-  // Form validation
-  const formValidator = {
-    init() {
-      const form = document.querySelector(CONFIG.form.selector);
-      if (!form) return;
-
-      form.addEventListener('submit', this.handleSubmit.bind(this));
-    },
-
-    handleSubmit(e) {
-      const ruanganId = utils.getById(CONFIG.fields.ruanganId)?.value;
-
-      if (!ruanganId) {
-        e.preventDefault();
-        this.showError(CONFIG.messages.ruanganRequired);
-        return false;
+  // Function untuk initialize autocomplete
+  function initializeAutocomplete() {
+    const ruanganContainer = document.querySelector('.autocomplete-container');
+    if (ruanganContainer) {
+      // Cleanup existing instance
+      const existingWrapper = ruanganContainer.querySelector('.autocomplete-wrapper');
+      if (existingWrapper) {
+        existingWrapper.remove();
       }
 
-      this.clearErrors();
-      return true;
-    },
-
-    showError(message) {
-      this.clearErrors();
-
-      const container = document.querySelector(CONFIG.autocomplete.container);
-      const error = utils.createElement('div', 'autocomplete-error', message);
-      error.style.cssText = `
-        color: var(--md-sys-color-error);
-        font-size: 0.8rem;
-        margin-top: 4px;
-        display: block;
-      `;
-
-      container.parentNode.insertBefore(error, container.nextSibling);
-      setTimeout(() => error.remove?.(), 3000);
-    },
-
-    clearErrors() {
-      const existing = document.querySelector(CONFIG.autocomplete.error);
-      existing?.remove();
-    }
-  };
-
-  // Time validation
-  const timeValidator = {
-    init() {
-      const startTime = utils.getById(CONFIG.fields.startTime);
-      const endTime = utils.getById(CONFIG.fields.endTime);
-
-      if (!startTime || !endTime) return;
-
-      // Debounced validation for better performance
-      const validateEnd = utils.debounce(() => {
-        this.validateEndTime(startTime, endTime);
-      }, CONFIG.timing.debounceMs);
-
-      startTime.addEventListener('change', () => {
-        this.updateEndTimeMin(startTime, endTime);
-        validateEnd();
-      });
-
-      endTime.addEventListener('change', validateEnd);
-
-      // Initialize edit mode
-      if (startTime.value) {
-        this.updateEndTimeMin(startTime, endTime);
+      // Restore original select
+      const originalSelect = ruanganContainer.querySelector('select');
+      if (originalSelect && originalSelect.style.display === 'none') {
+        originalSelect.style.display = '';
       }
-    },
 
-    updateEndTimeMin(startTime, endTime) {
-      const startDate = new Date(startTime.value);
-      startDate.setMinutes(startDate.getMinutes() + CONFIG.timing.minDuration);
-      endTime.min = startDate.toISOString().slice(0, 16);
-    },
+      // Initialize new instance
+      new Autocomplete(ruanganContainer);
 
-    validateEndTime(startTime, endTime) {
-      const start = new Date(startTime.value);
-      const end = new Date(endTime.value);
-
-      if (end <= start) {
-        endTime.setCustomValidity('End time must be after start time');
-        endTime.reportValidity();
-      } else {
-        endTime.setCustomValidity('');
-      }
+      // Setup form submission handler
+      setupFormSubmissionHandler(ruanganContainer);
     }
-  };
-
-  // Main application
-  const app = {
-    init() {
-      autocompleteManager.init();
-      formValidator.init();
-      timeValidator.init();
-    },
-
-    reinit() {
-      state.initialized = false;
-      this.init();
-    }
-  };
-
-  // Event listeners
-  document.addEventListener('DOMContentLoaded', app.init);
-  document.addEventListener('spa:navigated', app.reinit);
-
-  // Immediate initialization for non-SPA navigation
-  if (document.readyState !== 'loading') {
-    setTimeout(app.init, 1);
   }
-</script> -->
+
+  // Function untuk handle form submission dengan dynamic hidden fields
+  function setupFormSubmissionHandler(container) {
+    const form = container.closest('form');
+    const select = container.querySelector('select');
+
+    if (form && select) {
+      form.addEventListener('submit', function(e) {
+        // Validasi ruangan
+        const selectedOption = select.options[select.selectedIndex];
+
+        if (!selectedOption.value) {
+          e.preventDefault();
+          showValidationError(container, 'Silakan pilih ruangan terlebih dahulu');
+          return false;
+        }
+
+        // Tambah hidden fields secara dinamis
+        addDynamicHiddenFields(form, selectedOption);
+
+        return true;
+      });
+    }
+  }
+
+  // Function untuk menambah hidden fields secara dinamis
+  function addDynamicHiddenFields(form, option) {
+    // Hapus hidden fields lama jika ada
+    const oldFields = form.querySelectorAll('[data-dynamic-field="ruangan"]');
+    oldFields.forEach(field => field.remove());
+
+    // Tambah hidden fields baru
+    const fields = [{
+        name: 'ruangan_id',
+        value: option.value
+      },
+      {
+        name: 'ruangan_name',
+        value: option.dataset.name || ''
+      },
+      {
+        name: 'ruangan_location',
+        value: option.dataset.location || ''
+      },
+      {
+        name: 'ruangan_capacity',
+        value: option.dataset.capacity || ''
+      }
+    ];
+
+    fields.forEach(field => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = field.name;
+      input.value = field.value;
+      input.setAttribute('data-dynamic-field', 'ruangan');
+      form.appendChild(input);
+    });
+  }
+
+  // Function untuk show validation error
+  function showValidationError(container, message) {
+    // Remove existing error
+    const existingError = container.querySelector('.autocomplete-error');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // Create error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'autocomplete-error';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = `
+      color: var(--md-sys-color-error);
+      font-size: 0.8rem;
+      margin-top: 4px;
+      display: block;
+    `;
+
+    // Insert after container
+    container.parentNode.insertBefore(errorDiv, container.nextSibling);
+
+    // Auto remove setelah 3 detik
+    setTimeout(() => {
+      if (errorDiv.parentNode) {
+        errorDiv.remove();
+      }
+    }, 3000);
+  }
+
+  // Time validation (tetap dipertahankan)
+  document.addEventListener('DOMContentLoaded', function() {
+    const startTime = document.getElementById('start_time');
+    const endTime = document.getElementById('end_time');
+
+    if (startTime && endTime) {
+      startTime.addEventListener('change', function() {
+        const startDate = new Date(this.value);
+        startDate.setMinutes(startDate.getMinutes() + 15);
+        endTime.min = startDate.toISOString().slice(0, 16);
+      });
+
+      endTime.addEventListener('change', function() {
+        const start = new Date(startTime.value);
+        const end = new Date(this.value);
+
+        if (end <= start) {
+          this.setCustomValidity('End time must be after start time');
+          this.reportValidity();
+        } else {
+          this.setCustomValidity('');
+        }
+      });
+
+      document.querySelector('form').addEventListener('submit', function(e) {
+        const start = new Date(startTime.value);
+        const end = new Date(endTime.value);
+
+        if (end <= start) {
+          e.preventDefault();
+          endTime.setCustomValidity('End time must be after start time');
+          endTime.reportValidity();
+        } else {
+          endTime.setCustomValidity('');
+        }
+      });
+
+      if (startTime.value) {
+        startTime.dispatchEvent(new Event('change'));
+      }
+    }
+  });
+
+  // Initialize autocomplete
+  document.addEventListener('DOMContentLoaded', initializeAutocomplete);
+  document.addEventListener('spa:navigated', initializeAutocomplete);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAutocomplete);
+  } else {
+    setTimeout(initializeAutocomplete, 1);
+  }
+</script>

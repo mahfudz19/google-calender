@@ -21,9 +21,10 @@ class ApprovalController
   {
     $approvals = $this->model->getPending();
 
-    return $response->renderPage([
-      'approvals' => $approvals,
-    ], ['meta' => ['title' => 'Persetujuan Agenda']]);
+    return $response->renderPage(
+      ['approvals' => $approvals],
+      ['meta' => ['title' => 'Persetujuan Agenda']]
+    );
   }
 
   public function history(Request $request, Response $response): View
