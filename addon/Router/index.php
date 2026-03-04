@@ -53,9 +53,9 @@ $router->group(['middleware' => ['auth']], function ($router) {
     $router->post('/users/:id/delete', [UserController::class, 'destroy']);
     $router->post('/users/register-from-google', [UserController::class, 'registerFromGoogle']);
 
-    // test job
-    $router->get('/queue-monitor', [QueueController::class, 'monitor']);
-    $router->get('/queue-monitor/:id', [QueueController::class, 'show']);
-    $router->get('/test-job', [QueueController::class, 'testJob']);
+    // Antrian
+    $router->get('/queue', [QueueController::class, 'index']);
+    $router->post('/queue/:id/retry', [QueueController::class, 'retry']);
+    $router->post('/queue/:id/delete', [QueueController::class, 'destroy']);
   });
 });

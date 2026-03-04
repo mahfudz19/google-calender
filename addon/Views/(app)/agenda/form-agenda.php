@@ -103,7 +103,7 @@ if ($error && $message) {
 <?php endif; ?>
 
 <!-- Include autocomplete component CSS -->
-<link rel="stylesheet" href="/components-js/autocomplete/style.32ecab46.min.css">
+<link rel="stylesheet" href="<?= getBaseUrl('/components-js/autocomplete/style.32ecab46.min.css') ?>">
 
 <form action="<?= $action ?>" method="POST" data-spa class="mazu-form">
 
@@ -199,7 +199,7 @@ if ($error && $message) {
 </form>
 
 <script type="module">
-  import Autocomplete from '/components-js/autocomplete/index.2586e72a.min.js';
+  import Autocomplete from "<?= getBaseUrl('/components-js/autocomplete/index.2586e72a.min.js') ?>";
 
   function initAgendaForm() {
     document.querySelectorAll('body > .autocomplete-list-wrapper').forEach(el => el.remove());

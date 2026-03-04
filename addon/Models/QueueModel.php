@@ -121,4 +121,18 @@ class QueueModel extends Model
         $sql = "DELETE FROM {$this->table} WHERE id = :id";
         return $this->getDb()->query($sql, ['id' => $id]);
     }
+
+    // Tambahkan method ini di dalam class QueueModel
+    public function retryJob(string|int $id): bool
+    {
+        // Hanya job dengan status 'failed' yang bisa di-retry
+        $sql = "UPDATE {$this->table} 
+            SET status = 'pending', 
+                attempts = 0, 
+                error_message = NULL, 
+                reserved_at = NULL 
+            WHERE id = :id AND status = 'failed'";
+
+        return $this->getDb()->query($sql, ['id' => $id]);
+    }
 }

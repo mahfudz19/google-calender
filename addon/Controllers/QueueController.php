@@ -2,50 +2,75 @@
 
 namespace Addon\Controllers;
 
-use Addon\Jobs\CalenderJob;
 use App\Core\Http\Request;
 use App\Core\Http\Response;
-use App\Core\View\View;
-use App\Core\Http\RedirectResponse;
 use Addon\Models\QueueModel;
 use App\Core\Http\JsonResponse;
-use App\Core\Queue\JobDispatcher;
 
 class QueueController
 {
-  public function __construct(private QueueModel $model, private JobDispatcher $dispatcher) {}
+  public function __construct(private QueueModel $model) {}
 
-  // Controller hanya TRIGGER job
-  public function testJob(Request $request, Response $response): JsonResponse
-  {
-    // 1. Data dari user (form, API, dll)
-    $data = ['user_id' => 1, 'agenda_id' => 123, 'action' => 'send_notification'];
-
-    // 2. Kirim ke queue (tidak ada logic di sini)
-    $this->dispatcher->dispatch(CalenderJob::class, $data);
-
-    return $response->json(['message' => 'Job di-dispatch']);
-  }
-
-  // Di QueueController
-  public function monitor(Request $request, Response $response): JsonResponse
+  // 1. Tampilkan semua antrian + status worker
+  public function index(Request $request, Response $response): JsonResponse
   {
     return $response->json([
-      'failed_job' => $this->model->getFailedJobs(),
-      'pending_count' => $this->model->getPendingJobsCount(),
-      'queue_stats' => $this->model->getQueueStats()
+      'worker_active' => $this->isWorkerActive(),
+      'stats'         => $this->model->getQueueStats(),
+      'jobs'          => $this->model->all()
     ]);
   }
 
-  public function show(Request $request, Response $response): JsonResponse
+  // 2. Ubah status failed -> pending
+  public function retry(Request $request, Response $response): JsonResponse
   {
-    $jobId = $request->param('id');
-    $job = $this->model->find($jobId);
+    $id = $request->param('id');
+    $success = $this->model->retryJob($id);
 
-    if (!$job) {
-      return $response->json(['error' => 'Job not found'], 404);
+    if ($success) {
+      return $response->json(['message' => "Job #{$id} berhasil dikembalikan ke antrian (pending)."]);
     }
 
-    return $response->json($job);
+    return $response->json(['error' => 'Gagal retry job. Pastikan job ada dan berstatus failed.'], 400);
+  }
+
+  // 3. Delete job
+  public function destroy(Request $request, Response $response): JsonResponse
+  {
+    $id = $request->param('id');
+    $success = $this->model->deleteById($id);
+
+    if ($success) {
+      return $response->json(['message' => "Job #{$id} berhasil dihapus."]);
+    }
+
+    return $response->json(['error' => 'Gagal menghapus job.'], 400);
+  }
+
+  /**
+   * Cek apakah worker sedang berjalan
+   */
+  private function isWorkerActive(): bool
+  {
+    // Opsi 1: Mengecek file heartbeat dari worker
+    $heartbeatFile = __DIR__ . '/../../../storage/logs/worker_heartbeat.json';
+    if (file_exists($heartbeatFile)) {
+      $data = json_decode(file_get_contents($heartbeatFile), true);
+
+      // Jika worker mengirim sinyal kurang dari 5 menit yang lalu (300 detik), anggap aktif
+      if (isset($data['last_seen_at']) && (time() - $data['last_seen_at'] < 300)) {
+        return true;
+      }
+    }
+
+    // Opsi 2 (Fallback): Cek langsung menggunakan process list di OS (Cocok untuk Mac/Linux)
+    if (function_exists('exec')) {
+      exec('pgrep -f "mazu queue:work"', $output);
+      if (!empty($output)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
