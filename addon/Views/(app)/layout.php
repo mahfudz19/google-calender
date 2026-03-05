@@ -35,7 +35,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
             <img src="<?= $avatar ?>" alt="Avatar" class="avatar">
             <span><?= $name ?></span>
           </div>
-          <form action="/logout" data-spa method="post">
+          <form action="<?= getBaseUrl('/logout') ?>" data-spa method="post">
             <button type="submit" class="btn-logout">Logout</button>
           </form>
         </div>
@@ -47,7 +47,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
           <span class="user-name"><?= $name ?></span>
           <span class="user-role"><?= ucfirst($role) ?></span>
         </div>
-        <form action="/logout" data-spa method="post">
+        <form action="<?= getBaseUrl('/logout') ?>" data-spa method="post">
           <button type="submit" class="btn-logout-icon">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

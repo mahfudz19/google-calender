@@ -80,27 +80,6 @@ class QueueModel extends Model
         return $stmt->fetchAll();
     }
 
-    public function find(string|int $id): ?array
-    {
-        $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE id = :id LIMIT 1");
-        $stmt->execute(['id' => $id]);
-        $row = $stmt->fetch();
-        return $row === false ? null : $row;
-    }
-
-    public function create(array $data): bool
-    {
-        if (empty($data)) return false;
-
-        $columns = array_keys($data);
-        $placeholders = array_map(fn($col) => ':' . $col, $columns);
-
-        $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ")
-                VALUES (" . implode(', ', $placeholders) . ")";
-
-        return $this->getDb()->query($sql, $data);
-    }
-
     public function updateById(string|int $id, array $data): bool
     {
         if (empty($data)) return false;

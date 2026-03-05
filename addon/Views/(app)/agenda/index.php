@@ -51,6 +51,9 @@ $totalAgendas = $totalAgendas ?? 0;
               } elseif ($agenda['status'] === 'rejected') {
                 $badge = 'badge-red';
                 $label = 'Rejected';
+              } elseif ($agenda['status'] === 'processing') {
+                $badge = 'badge-gray';
+                $label = 'Processing';
               }
               ?>
               <span class="badge <?= $badge ?>"><?= $label ?></span>

@@ -135,8 +135,8 @@ class CalenderJob
         $end = new \DateTime($agenda['end_time'], $timezone);
 
         // // 2. Ambil Semua User dari Google Directory
-        // $directory = new GoogleDirectoryService();
-        // $users = $directory->impersonate($this->adminEmail)->getAllUsers();
+        $directory = new GoogleDirectoryService();
+        $users = $directory->impersonate($this->adminEmail)->getAllUsers();
 
         // // Mapping user ke format array attendees
         // $attendees = [];
@@ -145,6 +145,7 @@ class CalenderJob
         //         $attendees[] = ['email' => $u['email']];
         //     }
         // }
+        throw new \Exception("Error Processing Request", 1);
 
         // example attendees
         $attendees = [
