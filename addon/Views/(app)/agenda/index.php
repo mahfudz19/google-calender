@@ -13,14 +13,14 @@ $totalAgendas = $totalAgendas ?? 0;
       <h2 class="page-title">Agenda Saya</h2>
       <p class="page-subtitle">Kelola dan pantau status pengajuan agenda akademik anda.</p>
     </div>
-    <a data-spa href="/agenda/create" class="btn-primary">+ Ajukan Agenda</a>
+    <a data-spa href="<?= getBaseUrl('/agenda/create') ?>" class="btn-primary">+ Ajukan Agenda</a>
   </div>
 
   <div class="filter-tabs">
-    <a data-spa href="/agenda" class="tab-item <?= $currentStatus === null ? 'active' : '' ?>">Semua</a>
-    <a data-spa href="/agenda?status=pending" class="tab-item <?= $currentStatus === 'pending' ? 'active' : '' ?>">⏳ Menunggu</a>
-    <a data-spa href="/agenda?status=approved" class="tab-item <?= $currentStatus === 'approved' ? 'active' : '' ?>">✅ Disetujui</a>
-    <a data-spa href="/agenda?status=rejected" class="tab-item <?= $currentStatus === 'rejected' ? 'active' : '' ?>">❌ Ditolak</a>
+    <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="tab-item <?= $currentStatus === null ? 'active' : '' ?>">Semua</a>
+    <a data-spa href="<?= getBaseUrl('/agenda?status=pending') ?>" class="tab-item <?= $currentStatus === 'pending' ? 'active' : '' ?>">⏳ Menunggu</a>
+    <a data-spa href="<?= getBaseUrl('/agenda?status=approved') ?>" class="tab-item <?= $currentStatus === 'approved' ? 'active' : '' ?>">✅ Disetujui</a>
+    <a data-spa href="<?= getBaseUrl('/agenda?status=rejected') ?>" class="tab-item <?= $currentStatus === 'rejected' ? 'active' : '' ?>">❌ Ditolak</a>
   </div>
 
   <div class="agenda-card">
@@ -59,7 +59,7 @@ $totalAgendas = $totalAgendas ?? 0;
               <span class="badge <?= $badge ?>"><?= $label ?></span>
 
               <?php if ($agenda['status'] === 'pending'): ?>
-                <a data-spa href="/agenda/<?= $agenda['id'] ?>/edit" class="btn-outline-primary">Edit</a>
+                <a data-spa href="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/edit') ?>" class="btn-outline-primary">Edit</a>
 
                 <button type="button" class="btn-outline-danger" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.add('show')">Cancel</button>
                 <div id="modal-cancel-<?= $agenda['id'] ?>" class="css-modal">
@@ -76,14 +76,14 @@ $totalAgendas = $totalAgendas ?? 0;
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn-cancel" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">Batal</button>
-                      <form action="/agenda/<?= $agenda['id'] ?>/cancel" method="post" data-spa style="margin:0;">
+                      <form action="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/cancel') ?>" method="post" data-spa style="margin:0;">
                         <button type="submit" class="btn-confirm danger">Ya, Batalkan Agenda</button>
                       </form>
                     </div>
                   </div>
                 </div>
               <?php else: ?>
-                <a data-spa href="/agenda/<?= $agenda['id'] ?>" class="btn-outline-secondary">Detail</a>
+                <a data-spa href="<?= getBaseUrl('/agenda/' . $agenda['id']) ?>" class="btn-outline-secondary">Detail</a>
               <?php endif; ?>
             </div>
           </div>
@@ -101,9 +101,9 @@ $totalAgendas = $totalAgendas ?? 0;
         $nextDisabled = $currentPage >= $totalPages ? 'disabled' : '';
         $statusQuery = $currentStatus ? "&status={$currentStatus}" : "";
         ?>
-        <a data-spa href="/agenda?page=<?= $currentPage - 1 ?><?= $statusQuery ?>" class="btn-page <?= $prevDisabled ?>">« Prev</a>
+        <a data-spa href="<?= getBaseUrl('/agenda?page=' . ($currentPage - 1) . $statusQuery) ?>" class="btn-page <?= $prevDisabled ?>">« Prev</a>
         <span class="page-current">Hal <?= $currentPage ?> / <?= $totalPages ?></span>
-        <a data-spa href="/agenda?page=<?= $currentPage + 1 ?><?= $statusQuery ?>" class="btn-page <?= $nextDisabled ?>">Next »</a>
+        <a data-spa href="<?= getBaseUrl('/agenda?page=' . ($currentPage + 1) . $statusQuery) ?>" class="btn-page <?= $nextDisabled ?>">Next »</a>
       </div>
     </div>
   <?php endif; ?>

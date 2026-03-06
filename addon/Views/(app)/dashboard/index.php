@@ -18,7 +18,7 @@ $recentAgendas = $recentAgendas ?? [];
 
   <div class="dash-sidebar">
 
-    <a data-spa href="/agenda/create" class="btn-create-agenda">
+    <a data-spa href="<?= getBaseUrl('/agenda/create') ?>" class="btn-create-agenda">
       <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -39,7 +39,7 @@ $recentAgendas = $recentAgendas ?? [];
             <div class="empty-state">Semua tugas sudah diproses! ☕</div>
           <?php else: ?>
             <?php foreach ($pendingTasks as $task): ?>
-              <a href="/approval" class="widget-item">
+              <a data-spa href="<?= getBaseUrl('/approval') ?>" class="widget-item">
                 <div class="item-icon bg-orange">⏳</div>
                 <div class="item-info">
                   <strong><?= htmlspecialchars($task['title']) ?></strong>
@@ -70,7 +70,7 @@ $recentAgendas = $recentAgendas ?? [];
               $icon = '❌';
             }
             ?>
-            <a data-spa href="/agenda/<?= $agenda['id'] ?? '' ?>" class="widget-item">
+            <a data-spa href="<?= getBaseUrl('/agenda/' . $agenda['id'] ?? '') ?>" class="widget-item">
               <div class="item-icon <?= $bgClass ?>"><?= $icon ?></div>
               <div class="item-info">
                 <strong><?= htmlspecialchars($agenda['title']) ?></strong>

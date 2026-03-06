@@ -26,7 +26,7 @@
   --md-sys-color-on-error-container: #410002;
 
   /* Background & Surface: Ciri khas Google (Clean White) */
-  --md-sys-color-background: #f8f9fa; 
+  --md-sys-color-background: #f8f9fa;
   --md-sys-color-on-background: #1f1f1f;
 
   --md-sys-color-surface: #ffffff;
@@ -42,7 +42,9 @@
   /* Mazu Compatibility Mapping */
   --primary: var(--md-sys-color-primary);
   --primary-light: var(--md-sys-color-primary-container);
-  --danger: var(--md-sys-color-tertiary); /* Gunakan Merah Kampus untuk tombol hapus/penting */
+  --danger: var(
+    --md-sys-color-tertiary
+  ); /* Gunakan Merah Kampus untuk tombol hapus/penting */
   --app-bg: var(--md-sys-color-background);
   --border-light: var(--md-sys-color-outline-variant);
   --text-main: var(--md-sys-color-on-surface);
@@ -130,4 +132,3 @@ a:hover {
     opacity 0.3s;
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
 }
-

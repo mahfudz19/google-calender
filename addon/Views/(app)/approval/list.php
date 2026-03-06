@@ -100,7 +100,7 @@ if ($errorCode && $errorMessage) {
 
               <?php if ($item['status'] === 'approved'): ?>
                 <div class="action-buttons">
-                  <a data-spa href="/agenda/<?= $item['id'] ?>/edit" class="btn-icon outline" title="Edit Agenda">✏️</a>
+                  <a data-spa href="<?= getBaseUrl('/agenda/' . $item['id'] . '/edit') ?>" class="btn-icon outline" title="Edit Agenda">✏️</a>
                   <button type="button" onclick="openModal('deleteModal_<?= $item['id'] ?>')" class="btn-icon danger outline" title="Hapus Agenda">🗑️</button>
                 </div>
               <?php endif; ?>

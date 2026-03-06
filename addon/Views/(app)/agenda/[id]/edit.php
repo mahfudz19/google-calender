@@ -1,6 +1,6 @@
 <?php $agenda = $agenda ?? [] ?>
 <div class="agenda-container">
-  <a href="/agenda" class="btn-back">← Batal Edit</a>
+  <a href="<?= getBaseUrl('/agenda') ?>" class="btn-back">← Batal Edit</a>
 
   <div class="form-card-wrapper">
     <div class="form-header">

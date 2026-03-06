@@ -101,7 +101,7 @@
 .tab-item.active {
   background: var(--md-sys-color-surface, #ffffff);
   color: var(--md-sys-color-primary, #2563eb);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .tab-badge {
@@ -156,11 +156,15 @@
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .req-avatar.fallback {
-  background: linear-gradient(135deg, var(--md-sys-color-primary-container, #dbeafe), var(--md-sys-color-secondary-container, #e0e7ff));
+  background: linear-gradient(
+    135deg,
+    var(--md-sys-color-primary-container, #dbeafe),
+    var(--md-sys-color-secondary-container, #e0e7ff)
+  );
   color: var(--md-sys-color-primary, #1e40af);
   display: flex;
   align-items: center;
@@ -256,9 +260,18 @@
   text-transform: capitalize;
 }
 
-.status-pill.approved { background: var(--md-sys-color-tertiary-container, #dcfce7); color: var(--md-sys-color-on-tertiary-container, #166534); }
-.status-pill.rejected { background: var(--md-sys-color-error-container, #fee2e2); color: var(--md-sys-color-on-error-container, #991b1b); }
-.status-pill.processing { background: var(--md-sys-color-secondary-container, #fef3c7); color: var(--md-sys-color-on-secondary-container, #92400e); }
+.status-pill.approved {
+  background: var(--md-sys-color-tertiary-container, #dcfce7);
+  color: var(--md-sys-color-on-tertiary-container, #166534);
+}
+.status-pill.rejected {
+  background: var(--md-sys-color-error-container, #fee2e2);
+  color: var(--md-sys-color-on-error-container, #991b1b);
+}
+.status-pill.processing {
+  background: var(--md-sys-color-secondary-container, #fef3c7);
+  color: var(--md-sys-color-on-secondary-container, #92400e);
+}
 
 .spinner-mini {
   width: 14px;
@@ -269,7 +282,11 @@
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 /* Tombol Aksi */
 .action-buttons {
@@ -300,15 +317,23 @@
   color: white;
   box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
 }
-.btn-approve-solid:hover { background: #1d4ed8; transform: translateY(-2px); }
-.btn-approve-solid.processing { opacity: 0.7; pointer-events: none; }
+.btn-approve-solid:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+.btn-approve-solid.processing {
+  opacity: 0.7;
+  pointer-events: none;
+}
 
 .btn-reject-outline {
   background: transparent;
   color: var(--md-sys-color-error, #dc2626);
   border: 1px solid var(--md-sys-color-error, #dc2626);
 }
-.btn-reject-outline:hover { background: var(--md-sys-color-error-container, #fef2f2); }
+.btn-reject-outline:hover {
+  background: var(--md-sys-color-error-container, #fef2f2);
+}
 
 .btn-icon {
   display: inline-flex;
@@ -324,9 +349,17 @@
   text-decoration: none;
   transition: all 0.2s;
 }
-.btn-icon:hover { background: var(--md-sys-color-surface-variant, #f1f5f9); color: var(--md-sys-color-on-background, #0f172a); }
-.btn-icon.danger { border-color: var(--md-sys-color-error, #ef4444); color: var(--md-sys-color-error, #ef4444); }
-.btn-icon.danger:hover { background: var(--md-sys-color-error-container, #fef2f2); }
+.btn-icon:hover {
+  background: var(--md-sys-color-surface-variant, #f1f5f9);
+  color: var(--md-sys-color-on-background, #0f172a);
+}
+.btn-icon.danger {
+  border-color: var(--md-sys-color-error, #ef4444);
+  color: var(--md-sys-color-error, #ef4444);
+}
+.btn-icon.danger:hover {
+  background: var(--md-sys-color-error-container, #fef2f2);
+}
 
 /* --- EMPTY STATE --- */
 .modern-empty-state {
@@ -346,9 +379,11 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
-.empty-icon { font-size: 2.5rem; }
+.empty-icon {
+  font-size: 2.5rem;
+}
 
 .empty-title {
   font-size: 1.5rem;
@@ -378,26 +413,71 @@
   border: 1px solid #fecaca;
 }
 
-.alert-icon { font-size: 1.5rem; line-height: 1; }
-.alert-body { flex-grow: 1; }
-.alert-title { margin: 0 0 0.25rem 0; font-weight: 700; color: var(--md-sys-color-error, #b91c1c); font-size: 1rem; }
-.alert-text { margin: 0; color: #7f1d1d; font-size: 0.9rem; line-height: 1.5; }
+.alert-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.alert-body {
+  flex-grow: 1;
+}
+.alert-title {
+  margin: 0 0 0.25rem 0;
+  font-weight: 700;
+  color: var(--md-sys-color-error, #b91c1c);
+  font-size: 1rem;
+}
+.alert-text {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
 .alert-close {
-  background: transparent; border: none; font-size: 1.5rem; line-height: 1;
-  color: var(--md-sys-color-error, #b91c1c); cursor: pointer; padding: 0 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--md-sys-color-error, #b91c1c);
+  cursor: pointer;
+  padding: 0 0.5rem;
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Form Styles untuk Textarea dalam Modal */
-.form-group { margin-bottom: 1rem; }
-.form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--md-sys-color-on-background, #334155); font-size: 0.9rem; }
-.form-control {
-  width: 100%; padding: 0.75rem; border: 1px solid var(--md-sys-color-outline, #cbd5e1);
-  border-radius: 8px; font-size: 0.95rem; font-family: inherit; resize: vertical; transition: all 0.2s;
-  background: var(--md-sys-color-surface, #ffffff); color: var(--md-sys-color-on-background, #0f172a);
+.form-group {
+  margin-bottom: 1rem;
 }
-.form-control:focus { outline: none; border-color: var(--md-sys-color-primary, #3b82f6); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--md-sys-color-on-background, #334155);
+  font-size: 0.9rem;
+}
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--md-sys-color-outline, #cbd5e1);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s;
+  background: var(--md-sys-color-surface, #ffffff);
+  color: var(--md-sys-color-on-background, #0f172a);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}

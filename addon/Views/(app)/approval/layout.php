@@ -8,6 +8,7 @@
         interval: 10000,
         cacheKey: 'mazu_qw_cache',
         apiEndpoint: '<?= getBaseUrl('/queue') ?>',
+        getBaseUrl: '<?= getBaseUrl() ?>',
       };
     </script>
     <script src="<?= getBaseUrl('/components-js/queue-widget/index.js') ?>"></script>

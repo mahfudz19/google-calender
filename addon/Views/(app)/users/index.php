@@ -4,7 +4,7 @@ $jsonUsers = htmlspecialchars(json_encode($users ?? []), ENT_QUOTES, 'UTF-8');
 $loggedInEmail = htmlspecialchars($user_login['email'] ?? '', ENT_QUOTES, 'UTF-8');
 ?>
 
-<div class="users-container" id="usersApp" data-users="<?= $jsonUsers ?>" data-email="<?= $loggedInEmail ?>">
+<div class="users-container" id="usersApp" data-base-url="<?= getBaseUrl() ?>" data-users="<?= $jsonUsers ?>" data-email="<?= $loggedInEmail ?>">
   <div class="page-header">
     <div>
       <h2 class="page-title">Manajemen Pengguna</h2>

@@ -1,7 +1,7 @@
 <div class="users-container" style="max-width: 800px; margin: 0 auto;">
 
   <div class="page-header" style="margin-bottom: 1.5rem;">
-    <a data-spa href="/users" class="btn-back">← Kembali ke Daftar User</a>
+    <a data-spa href="<?= getBaseUrl('/users') ?>" class="btn-back">← Kembali ke Daftar User</a>
   </div>
 
   <?php if ($item): ?>
@@ -54,7 +54,7 @@
       </div>
 
       <div class="profile-footer">
-        <a data-spa href="/users/<?= $item['id'] ?>/edit" class="btn-confirm success" style="text-decoration: none;">✎ Edit Hak Akses</a>
+        <a data-spa href="<?= getBaseUrl('/users/' . $item['id'] . '/edit') ?>" class="btn-confirm success" style="text-decoration: none;">✎ Edit Hak Akses</a>
       </div>
     </div>
   <?php else: ?>

@@ -1,7 +1,7 @@
   <div class="users-container" style="max-width: 600px; margin: 0 auto;">
 
     <div class="page-header" style="margin-bottom: 1.5rem;">
-      <a data-spa href="/users" class="btn-back">← Batal Edit</a>
+      <a data-spa href="<?= getBaseUrl('/users') ?>" class="btn-back">← Batal Edit</a>
     </div>
 
     <?php if ($item): ?>
@@ -20,7 +20,7 @@
           </div>
         </div>
 
-        <form action="/users/<?= $item['id'] ?>/update" method="POST" data-spa class="mazu-edit-form">
+        <form action="<?= getBaseUrl() ?>/users/<?= $item['id'] ?>/update" method="POST" data-spa class="mazu-edit-form">
 
           <div class="form-section">
             <label class="form-label">Tentukan Hak Akses <span class="text-danger">*</span></label>

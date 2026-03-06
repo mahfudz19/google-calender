@@ -198,7 +198,7 @@ if ($error && $message) {
   </div>
 
   <div class="form-actions">
-    <a data-spa href="/agenda" class="btn-cancel">Batal</a>
+    <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="btn-cancel">Batal</a>
     <button type="submit" class="btn-submit">
       <?= $isEdit ? 'Simpan Perubahan' : 'Ajukan Agenda' ?>
     </button>

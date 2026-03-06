@@ -1,7 +1,7 @@
 <?php $agenda = $agenda ?? []; ?>
 
 <div class="agenda-container">
-  <a data-spa href="/agenda" class="btn-back">← Kembali ke Daftar</a>
+  <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="btn-back">← Kembali ke Daftar</a>
 
   <div class="detail-card">
     <div class="detail-header">
@@ -23,7 +23,7 @@
 
       <?php if ($agenda['status'] === 'pending'): ?>
         <div class="detail-actions">
-          <a href="/agenda/<?= $agenda['id'] ?>/edit" class="btn-outline-primary">✎ Edit</a>
+          <a href="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/edit') ?>" class="btn-outline-primary">✎ Edit</a>
 
           <button type="button" class="btn-outline-danger" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.add('show')">Cancel</button>
           <div id="modal-cancel-<?= $agenda['id'] ?>" class="css-modal">
@@ -40,7 +40,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="document.getElementById('modal-cancel-<?= $agenda['id'] ?>').classList.remove('show')">Batal</button>
-                <form action="/agenda/<?= $agenda['id'] ?>/cancel" method="post" data-spa style="margin:0;">
+                <form action="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/cancel') ?>" method="post" data-spa style="margin:0;">
                   <button type="submit" class="btn-confirm danger">Ya, Batalkan Agenda</button>
                 </form>
               </div>
