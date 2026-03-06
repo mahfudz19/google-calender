@@ -77,7 +77,7 @@ if ($error && $message) {
 
     .alert-header {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 0.5rem;
     }
@@ -102,7 +102,6 @@ if ($error && $message) {
   </style>
 <?php endif; ?>
 
-<!-- Include autocomplete component CSS -->
 <link rel="stylesheet" href="<?= getBaseUrl('/components-js/autocomplete/style.32ecab46.min.css') ?>">
 
 <form action="<?= $action ?>" method="POST" data-spa class="mazu-form">
@@ -130,6 +129,7 @@ if ($error && $message) {
       <input type="datetime-local" id="end_time" name="end_time" class="form-control"
         value="<?= isset($agenda['end_time']) ? date('Y-m-d\TH:i', strtotime($agenda['end_time'])) : '' ?>" required>
     </div>
+
     <script>
       (function initAgendaForm() {
         const startInput = document.getElementById('start_time');
@@ -142,7 +142,7 @@ if ($error && $message) {
             if (endInput.value && endInput.value < startInput.value) {
               let startDate = new Date(startInput.value);
               startDate.setHours(startDate.getHours() + 1);
-              let tzOffset = startDate.getTimezoneOffset() * 60000; // offset dalam milidetik
+              let tzOffset = startDate.getTimezoneOffset() * 60000;
               let localISOTime = (new Date(startDate - tzOffset)).toISOString().slice(0, 16);
               endInput.value = localISOTime;
             }
@@ -153,20 +153,27 @@ if ($error && $message) {
         updateMinEndTime();
       })();
     </script>
-    <!-- Tambahkan field ruangan dengan autocomplete -->
+
     <div class="form-group full-width">
-      <label for="ruangan_id">Ruangan <span class="text-red">*</span></label>
+      <label for="ruangan_select">Ruangan <span class="text-red">*</span></label>
+
+      <?php $dbRuanganId = $agenda['ruangan_id'] ?? $agenda['ID_ruangan'] ?? ''; ?>
+      <input type="hidden" id="input_ruangan_id" name="ruangan_id" value="<?= htmlspecialchars($dbRuanganId) ?>">
+      <input type="hidden" id="input_ruangan_name" name="ruangan_name" value="<?= htmlspecialchars($agenda['ruangan_name'] ?? '') ?>">
+      <input type="hidden" id="input_ruangan_location" name="ruangan_location" value="<?= htmlspecialchars($agenda['ruangan_location'] ?? '') ?>">
+      <input type="hidden" id="input_ruangan_capacity" name="ruangan_capacity" value="<?= htmlspecialchars($agenda['ruangan_capacity'] ?? '') ?>">
 
       <div class="autocomplete-container" data-placeholder="Pilih ruangan..." data-required="true">
-        <select id="ruangan_select" name="ruangan_select" class="form-select">
+        <select id="ruangan_select" class="form-select">
           <option value="">Pilih ruangan...</option>
           <?php if (!empty($ruangan['data'])): ?>
             <?php foreach ($ruangan['data'] as $item): ?>
+              <?php $isSelected = (strval($dbRuanganId) === strval($item['ID_ruangan'])) ? 'selected' : ''; ?>
               <option value="<?= htmlspecialchars($item['ID_ruangan']) ?>"
                 data-name="<?= htmlspecialchars($item['name']) ?>"
                 data-location="<?= htmlspecialchars($item['lokasi'] ?? '') ?>"
                 data-capacity="<?= htmlspecialchars($item['capacity'] ?? '') ?>"
-                <?= ($agenda['ruangan_id'] ?? '') == $item['ID_ruangan'] ? 'selected' : '' ?>>
+                <?= $isSelected ?>>
                 ID - <?= htmlspecialchars($item['ID_ruangan']) ?> - <?= htmlspecialchars($item['name']) ?> (<?= htmlspecialchars($item['capacity'] ?? 0) ?> orang) - <?= htmlspecialchars($item['lokasi'] ?? 'Tidak ada lokasi') ?>
               </option>
             <?php endforeach; ?>
@@ -203,7 +210,7 @@ if ($error && $message) {
 
   function initAgendaForm() {
     document.querySelectorAll('body > .autocomplete-list-wrapper').forEach(el => el.remove());
-    const form = document.querySelector('form');
+    const form = document.querySelector('form.mazu-form');
     if (!form) return;
     initAutocomplete(form);
     initTimeValidation(form);
@@ -217,45 +224,55 @@ if ($error && $message) {
 
     const select = container.querySelector('select');
     if (select) select.style.display = '';
+
     new Autocomplete(container);
+
+    // Perbarui teks input custom dari Autocomplete jika ada default value
+    if (select && select.value) {
+      const selectedOption = select.options[select.selectedIndex];
+      const customInput = container.querySelector('input[type="text"]');
+      if (customInput && selectedOption && selectedOption.value !== "") {
+        customInput.value = selectedOption.text;
+      }
+    }
+
+    // Fungsi untuk memperbarui DOM elemen Static Hidden Input
+    const updateHiddenFields = () => {
+      if (!select) return;
+      const selected = select.options[select.selectedIndex];
+
+      const inId = document.getElementById('input_ruangan_id');
+      const inName = document.getElementById('input_ruangan_name');
+      const inLoc = document.getElementById('input_ruangan_location');
+      const inCap = document.getElementById('input_ruangan_capacity');
+
+      if (selected && selected.value) {
+        if (inId) inId.value = selected.value;
+        if (inName) inName.value = selected.dataset.name || '';
+        if (inLoc) inLoc.value = selected.dataset.location || '';
+        if (inCap) inCap.value = selected.dataset.capacity || '';
+      } else {
+        // Reset jika user memilih ulang opsi kosong ("Pilih ruangan...")
+        if (inId) inId.value = '';
+        if (inName) inName.value = '';
+        if (inLoc) inLoc.value = '';
+        if (inCap) inCap.value = '';
+      }
+    };
+
     if (!form.dataset.autocompleteHandled) {
+      // Dengarkan perubahan pada select
+      select.addEventListener('change', updateHiddenFields);
+
+      // Validasi pencegahan submit berdasarkan static hidden input
       form.addEventListener('submit', (e) => {
-        const selected = select.options[select.selectedIndex];
-        if (!selected.value) {
+        const inId = document.getElementById('input_ruangan_id');
+        if (!inId || !inId.value) {
           e.preventDefault();
           showError(container, 'Silakan pilih ruangan terlebih dahulu');
-          return;
         }
-        form.querySelectorAll('[data-dynamic-field="ruangan"]').forEach(el => el.remove());
-        const fields = [{
-            name: 'ruangan_id',
-            value: selected.value
-          },
-          {
-            name: 'ruangan_name',
-            value: selected.dataset.name || ''
-          },
-          {
-            name: 'ruangan_location',
-            value: selected.dataset.location || ''
-          },
-          {
-            name: 'ruangan_capacity',
-            value: selected.dataset.capacity || ''
-          }
-        ];
-
-        fields.forEach(f => {
-          const input = document.createElement('input');
-          Object.assign(input, {
-            type: 'hidden',
-            name: f.name,
-            value: f.value
-          });
-          input.setAttribute('data-dynamic-field', 'ruangan');
-          form.appendChild(input);
-        });
       });
+
       form.dataset.autocompleteHandled = 'true';
     }
   }
@@ -275,6 +292,7 @@ if ($error && $message) {
     const startInput = document.getElementById('start_time');
     const endInput = document.getElementById('end_time');
     if (!startInput || !endInput) return;
+
     const updateMinTime = () => {
       if (!startInput.value) return;
       endInput.min = startInput.value;
@@ -305,8 +323,6 @@ if ($error && $message) {
       form.addEventListener('submit', validateTimeSubmit);
       form.dataset.timeHandled = 'true';
     }
-
-    updateMinTime();
   }
 
   setTimeout(initAgendaForm, 50);
