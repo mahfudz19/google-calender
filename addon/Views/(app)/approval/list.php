@@ -1,30 +1,22 @@
 <?php
-// Handle error message dari query string
 $errorCode = $_GET['error'] ?? null;
 $errorMessage = $_GET['message'] ?? null;
 $displayError = null;
 
 if ($errorCode && $errorMessage) {
-  // Decode URL-encoded message
   $decodedMessage = urldecode($errorMessage);
-
-  // Custom error messages
   switch ($errorCode) {
     case '500':
-      if (strpos($decodedMessage, 'Conflict detected') !== false) {
-        $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
-      } elseif (strpos($decodedMessage, 'user_controller') !== false) {
-        $displayError = "Terjadi kesalahan sistem: Tidak dapat mengakses data pengguna Google. Silakan coba lagi atau hubungi administrator.";
-      } else {
-        $displayError = "Terjadi kesalahan server: " . $decodedMessage;
-      }
+      $displayError = strpos($decodedMessage, 'Conflict detected') !== false
+        ? "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain."
+        : (strpos($decodedMessage, 'user_controller') !== false
+          ? "Terjadi kesalahan sistem: Tidak dapat mengakses data pengguna Google."
+          : "Terjadi kesalahan server: " . $decodedMessage);
       break;
     case 'conflict':
-      if (strpos($decodedMessage, 'Conflict detected') !== false) {
-        $displayError = "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain yang sudah disetujui.";
-      } else {
-        $displayError = $decodedMessage;
-      }
+      $displayError = strpos($decodedMessage, 'Conflict detected') !== false
+        ? "Conflict detected! Agenda yang ingin disetujui bertabrakan dengan agenda lain."
+        : $decodedMessage;
       break;
     case '400':
       $displayError = "Data yang dikirim tidak valid: " . $decodedMessage;
@@ -35,274 +27,167 @@ if ($errorCode && $errorMessage) {
 }
 ?>
 
-<!-- Error Alert -->
-<?php if ($displayError): ?>
-  <div class="error-alert" style="margin-bottom: 2rem;">
-    <div class="error-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="15" y1="9" x2="9" y2="15"></line>
-        <line x1="9" y1="9" x2="15" y2="15"></line>
-      </svg>
-    </div>
-    <div class="error-content">
-      <div class="error-title">Terjadi Kesalahan</div>
-      <div class="error-message"><?= htmlspecialchars($displayError) ?></div>
-    </div>
-    <button class="error-close" onclick="this.parentElement.remove()" title="Tutup">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-  </div>
-<?php endif; ?>
+<div id="mazu-approval-inner">
 
-<?php if (empty($approvals)): ?>
-  <div class="empty-state">
-    <div class="empty-icon">🎉</div>
-    <h3>Semua bersih!</h3>
-    <p>Tidak ada permintaan agenda yang perlu persetujuan saat ini.</p>
-  </div>
-<?php else: ?>
-  <?php foreach ($approvals as $item):
-    $startDate = new DateTime($item['start_time']);
-    $endDate = new DateTime($item['end_time']);
-    $dateStr = $startDate->format('d M Y');
-    $timeStr = $startDate->format('H:i') . ' - ' . $endDate->format('H:i');
-    $isHistory = $item['status'] !== 'pending';
-  ?>
-    <div class="approval-card" data-id="<?= $item['id'] ?>">
-      <!-- Kolom Waktu (Kiri) -->
-      <div class="card-time">
-        <span class="date-day"><?= $startDate->format('d') ?></span>
-        <span class="date-month"><?= $startDate->format('M') ?></span>
-        <span class="date-year"><?= $startDate->format('Y') ?></span>
+  <?php if ($displayError): ?>
+    <div class="modern-alert error" id="globalErrorAlert">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <h4 class="alert-title">Terjadi Kesalahan</h4>
+        <p class="alert-text"><?= htmlspecialchars($displayError) ?></p>
       </div>
+      <button class="alert-close" onclick="this.closest('.modern-alert').remove()">&times;</button>
+    </div>
+  <?php endif; ?>
 
-      <!-- Kolom Detail (Tengah) -->
-      <div class="card-details">
-        <div class="detail-header">
-          <span class="time-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            <?= $timeStr ?>
-          </span>
-          <?php if ($item['location']): ?>
-            <span class="location-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              <?= htmlspecialchars($item['location']) ?>
-            </span>
-          <?php endif; ?>
+  <?php if (empty($approvals)): ?>
+    <div class="modern-empty-state">
+      <div class="empty-icon-wrapper">
+        <span class="empty-icon">✨</span>
+      </div>
+      <h3 class="empty-title">Semua Bersih!</h3>
+      <p class="empty-desc">Tidak ada permintaan agenda yang memerlukan persetujuan saat ini.</p>
+    </div>
+  <?php else: ?>
+    <div class="modern-list-group">
+      <?php foreach ($approvals as $item):
+        $startDate = new DateTime($item['start_time']);
+        $endDate = new DateTime($item['end_time']);
+        $dateStr = $startDate->format('d M Y');
+        $timeStr = $startDate->format('H:i') . ' - ' . $endDate->format('H:i');
+        $isHistory = $item['status'] !== 'pending';
+      ?>
 
-          <?php if ($isHistory): ?>
-            <span class="status-badge status-<?= $item['status'] ?>">
-              <?php if ($item['status'] === 'processing'): ?>
-                <span class="processing-spinner"></span>
-                Processing
-              <?php else: ?>
-                <?= ucfirst($item['status']) ?>
+        <div class="modern-list-item" data-id="<?= $item['id'] ?>">
+
+          <div class="item-requester">
+            <?php if ($item['requester_avatar']): ?>
+              <img src="<?= $item['requester_avatar'] ?>" alt="Avatar" class="req-avatar">
+            <?php else: ?>
+              <div class="req-avatar fallback"><?= strtoupper(substr($item['requester_name'] ?? 'U', 0, 1)) ?></div>
+            <?php endif; ?>
+            <div class="req-info">
+              <span class="req-name"><?= htmlspecialchars($item['requester_name'] ?? 'Unknown User') ?></span>
+              <span class="req-role"><?= htmlspecialchars($item['requester_role'] ?? 'User') ?></span>
+            </div>
+          </div>
+
+          <div class="item-details">
+            <h3 class="event-title"><?= htmlspecialchars($item['title']) ?></h3>
+            <p class="event-desc"><?= htmlspecialchars($item['description'] ?? 'Tidak ada deskripsi tambahan.') ?></p>
+
+            <div class="event-meta">
+              <span class="meta-badge date-time">
+                🕒 <?= $dateStr ?> • <?= $timeStr ?>
+              </span>
+              <?php if ($item['location']): ?>
+                <span class="meta-badge location">
+                  📍 <?= htmlspecialchars($item['location']) ?>
+                </span>
               <?php endif; ?>
-            </span>
-          <?php endif; ?>
-        </div>
+            </div>
+          </div>
 
-        <h3 class="event-title"><?= htmlspecialchars($item['title']) ?></h3>
-        <p class="event-desc"><?= htmlspecialchars($item['description'] ?? '') ?></p>
+          <div class="item-actions-panel">
+            <?php if ($isHistory): ?>
+              <div class="status-pill <?= $item['status'] ?>">
+                <?php if ($item['status'] === 'processing'): ?>
+                  <span class="spinner-mini"></span> Memproses...
+                <?php else: ?>
+                  <?= ucfirst($item['status']) ?>
+                <?php endif; ?>
+              </div>
 
-        <div class="requester-info">
-          <?php if ($item['requester_avatar']): ?>
-            <img src="<?= $item['requester_avatar'] ?>" alt="Avatar" class="avatar">
-          <?php endif; ?>
-          <div class="requester-text">
-            <span class="name"><?= htmlspecialchars($item['requester_name'] ?? 'Unknown') ?></span>
-            <span class="role"><?= htmlspecialchars($item['requester_role'] ?? 'User') ?></span>
+              <?php if ($item['status'] === 'approved'): ?>
+                <div class="action-buttons">
+                  <a data-spa href="/agenda/<?= $item['id'] ?>/edit" class="btn-icon outline" title="Edit Agenda">✏️</a>
+                  <button type="button" onclick="openModal('deleteModal_<?= $item['id'] ?>')" class="btn-icon danger outline" title="Hapus Agenda">🗑️</button>
+                </div>
+              <?php endif; ?>
+
+            <?php else: ?>
+              <div class="action-buttons full-width">
+                <button type="button" onclick="openModal('rejectModal_<?= $item['id'] ?>')" class="btn-modern btn-reject-outline">Tolak</button>
+                <button type="button" onclick="handleApprove(<?= $item['id'] ?>)" class="btn-modern btn-approve-solid" id="approveBtn_<?= $item['id'] ?>">
+                  <span id="approveBtnText_<?= $item['id'] ?>">Setujui</span>
+                </button>
+              </div>
+            <?php endif; ?>
           </div>
         </div>
-      </div>
 
-      <!-- Kolom Aksi (Kanan) -->
-      <?php if (!$isHistory): ?>
-        <div class="card-actions">
-          <!-- Reject Modal Dialog -->
-          <dialog id="rejectModal_<?= $item['id'] ?>" class="confirm-modal">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3>Konfirmasi Penolakan</h3>
-                <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-
-              <div class="modal-body">
-                <p>Apakah anda yakin ingin menolak pengajuan agenda ini?</p>
-                <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
-                  <strong><?= htmlspecialchars($item['title']) ?></strong>
-                </p>
-
-                <!-- Form untuk comment -->
-                <form id="rejectCommentForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa style="margin-top: 1rem;">
-                  <div class="form-group">
-                    <label for="comment_<?= $item['id'] ?>" class="form-label">Alasan Penolakan <span style="color:red">*</span></label>
-                    <textarea
-                      id="comment_<?= $item['id'] ?>"
-                      name="comment"
-                      class="form-control"
-                      rows="3"
-                      placeholder="Jelaskan alasan penolakan agenda ini..."
-                      required></textarea>
-                  </div>
-
-                  <div class="modal-actions" style="margin-top: 1rem;">
-                    <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
-                      Batal
-                    </button>
-                    <button type="submit" class="btn-confirm btn-reject">
-                      Ya, Tolak Agenda
-                    </button>
-                  </div>
-                </form>
-
-                <p style="font-size: 0.85rem; color: #dc2626; margin-top: 1rem;">
-                  ⚠️ Tindakan ini tidak dapat dibatalkan.
-                </p>
-              </div>
-            </div>
-          </dialog>
-
-          <!-- Approve Modal Dialog -->
-          <dialog id="approveModal_<?= $item['id'] ?>" class="confirm-modal">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3>Konfirmasi Persetujuan</h3>
-                <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-
-              <div class="modal-body">
-                <p>Apakah anda yakin ingin menyetujui pengajuan agenda ini?</p>
-                <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
-                  <strong><?= htmlspecialchars($item['title']) ?></strong>
-                </p>
-                <p style="font-size: 0.85rem; color: #059669; margin-top: 0.5rem;">
-                  ✅ Agenda akan disetujui dan ditampilkan di kalender.
-                </p>
-              </div>
-
-              <form method="dialog" class="modal-actions">
-                <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
-                  Batal
-                </button>
-                <button type="button"
-                  onclick="submitApprove(<?= $item['id'] ?>)"
-                  class="btn-confirm btn-approve">
-                  Ya, Setujui Agenda
-                </button>
-              </form>
-            </div>
-          </dialog>
-
-          <!-- Hidden Forms -->
-          <form id="approveForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/approve" method="POST" style="display: none;"></form>
-
-          <!-- Trigger Buttons -->
-          <button type="button" onclick="document.getElementById('rejectModal_<?= $item['id'] ?>').showModal()" class="btn-action btn-reject">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            Tolak
-          </button>
-
-          <button type="button"
-            onclick="handleApprove(<?= $item['id'] ?>)"
-            class="btn-action btn-approve"
-            id="approveBtn_<?= $item['id'] ?>">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span id="approveBtnText_<?= $item['id'] ?>">Setujui</span>
-          </button>
-        </div>
-      <?php else: ?>
-        <style>
-          .btn-confirm.btn-delete {
-            background: #dc2626;
-          }
-
-          .btn-confirm.btn-delete:hover {
-            background: #b91c1c;
-          }
-        </style>
-        <?php if ($item['status'] === 'approved'): ?>
-          <div class="card-actions">
-            <!-- Edit Button -->
-            <a data-spa href="/agenda/<?= $item['id'] ?>/edit" class="btn-icon" title="Edit Agenda">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </a>
-
-            <!-- Delete Modal -->
-            <dialog id="deleteModal_<?= $item['id'] ?>" class="confirm-modal">
+        <?php if ($isHistory): ?>
+          <?php if ($item['status'] === 'approved'): ?>
+            <div id="deleteModal_<?= $item['id'] ?>" class="css-modal">
+              <div class="modal-overlay" onclick="closeModal('deleteModal_<?= $item['id'] ?>')"></div>
               <div class="modal-content">
                 <div class="modal-header">
-                  <h3>Konfirmasi Hapus</h3>
-                  <button type="button" onclick="this.closest('dialog').close()" class="close-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
+                  <h3 class="modal-title text-danger">⚠️ Konfirmasi Hapus</h3>
+                  <button type="button" class="modal-close" onclick="closeModal('deleteModal_<?= $item['id'] ?>')">&times;</button>
                 </div>
-
                 <div class="modal-body">
                   <p>Apakah anda yakin ingin menghapus agenda ini?</p>
-                  <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
-                    <strong><?= htmlspecialchars($item['title']) ?></strong>
-                  </p>
-                  <p style="font-size: 0.85rem; color: #dc2626; margin-top: 0.5rem;">
-                    ⚠️ Agenda akan dihapus dari kalender semua peserta.
-                  </p>
+                  <p><strong><?= htmlspecialchars($item['title']) ?></strong></p>
+                  <p style="color: var(--md-sys-color-error); font-size: 0.85rem; margin-top: 1rem;">Agenda akan dihapus dari kalender semua peserta.</p>
                 </div>
+                <div class="modal-footer">
+                  <form id="deleteForm_<?= $item['id'] ?>" action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa>
+                    <button type="button" class="btn-cancel" onclick="closeModal('deleteModal_<?= $item['id'] ?>')">Batal</button>
+                    <button type="submit" class="btn-confirm danger">Ya, Hapus Agenda</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <?php endif; ?>
 
-                <form method="dialog" class="modal-actions">
-                  <button type="button" onclick="this.closest('dialog').close()" class="btn-cancel">
-                    Tidak, Batal
-                  </button>
-                  <button type="submit" form="deleteForm_<?= $item['id'] ?>" class="btn-confirm btn-delete">
-                    Ya, Hapus Agenda
-                  </button>
+        <?php else: ?>
+          <div id="rejectModal_<?= $item['id'] ?>" class="css-modal">
+            <div class="modal-overlay" onclick="closeModal('rejectModal_<?= $item['id'] ?>')"></div>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title">Konfirmasi Penolakan</h3>
+                <button type="button" class="modal-close" onclick="closeModal('rejectModal_<?= $item['id'] ?>')">&times;</button>
+              </div>
+              <div class="modal-body" style="text-align: left;">
+                <p>Apakah anda yakin ingin menolak pengajuan agenda ini?</p>
+                <p class="text-center" style="margin: 1rem 0;"><strong><?= htmlspecialchars($item['title']) ?></strong></p>
+                <form id="rejectCommentForm_<?= $item['id'] ?>" action="/approval/<?= $item['id'] ?>/reject" method="POST" data-spa>
+                  <div class="form-group">
+                    <label class="form-label">Alasan Penolakan <span style="color:red">*</span></label>
+                    <textarea name="comment" class="form-control" rows="3" placeholder="Berikan alasan yang jelas..." required></textarea>
+                  </div>
                 </form>
               </div>
-            </dialog>
+              <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('rejectModal_<?= $item['id'] ?>')">Batal</button>
+                <button type="submit" form="rejectCommentForm_<?= $item['id'] ?>" class="btn-confirm danger">Ya, Tolak</button>
+              </div>
+            </div>
+          </div>
 
-            <!-- Hidden Delete Form -->
-            <form id="deleteForm_<?= $item['id'] ?>" action="/agenda/<?= $item['id'] ?>/cancel" method="POST" data-spa style="display: none;"></form>
-
-            <!-- Delete Trigger Button -->
-            <button type="button" onclick="document.getElementById('deleteModal_<?= $item['id'] ?>').showModal()" class="btn-icon delete" title="Hapus Agenda">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
+          <div id="approveModal_<?= $item['id'] ?>" class="css-modal">
+            <div class="modal-overlay" onclick="closeModal('approveModal_<?= $item['id'] ?>')"></div>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title">Konfirmasi Persetujuan</h3>
+                <button type="button" class="modal-close" onclick="closeModal('approveModal_<?= $item['id'] ?>')">&times;</button>
+              </div>
+              <div class="modal-body">
+                <div class="modal-icon-wrapper success" style="margin: 0 auto 1rem;">✨</div>
+                <p>Apakah anda yakin ingin menyetujui pengajuan agenda ini?</p>
+                <p><strong><?= htmlspecialchars($item['title']) ?></strong></p>
+                <p style="color: var(--md-sys-color-primary); font-size: 0.85rem; margin-top: 1rem;">Agenda akan disetujui dan otomatis masuk ke kalender.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('approveModal_<?= $item['id'] ?>')">Batal</button>
+                <button type="button" onclick="submitApprove(<?= $item['id'] ?>)" class="btn-confirm success">Ya, Setujui</button>
+              </div>
+            </div>
           </div>
         <?php endif; ?>
-      <?php endif; ?>
+
+      <?php endforeach; ?>
     </div>
-  <?php endforeach; ?>
-<?php endif; ?>
+  <?php endif; ?>
+
+</div>

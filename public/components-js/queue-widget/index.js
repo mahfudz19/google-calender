@@ -5,44 +5,40 @@
     if (!window.mazuQueueSWRInit) {
         window.mazuQueueSWRInit = true;
 
-        // SPA Route Change - Bersihkan timer usang sebelum transisi pindah halaman
         window.addEventListener('spa:before-navigate', () => {
             document.getElementById('qw-toast-msg')?.remove();
+            document.getElementById('qw-detail-modal')?.remove(); // Bersihkan modal saat pindah
             if (window.mazuQueueTimer) {
                 clearTimeout(window.mazuQueueTimer);
                 window.mazuQueueTimer = null;
             }
+            if (typeof window.mazuQueueDisableUI === 'function') window.mazuQueueDisableUI();
         });
 
-        // SPA Route Change - Halaman baru selesai dimuat
         window.addEventListener('spa:navigated', () => {
             const widget = document.getElementById('queue-widget');
             if (widget) {
                 widget.dataset.initialized = "false";
-                // Panggil fetch dari closure yang paling baru
                 if (typeof window.mazuQueueTriggerFetch === 'function') {
                     window.mazuQueueTriggerFetch();
                 }
             }
         });
 
-        // Visibility Change - Tab Pindah dalam 1 Browser
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && typeof window.mazuQueueVisibilityTrigger === 'function') {
-                window.mazuQueueVisibilityTrigger();
-            } else if (document.hidden && window.mazuQueueTimer) {
-                clearTimeout(window.mazuQueueTimer); 
+            if (document.hidden) {
+                if (window.mazuQueueTimer) clearTimeout(window.mazuQueueTimer); 
+                if (typeof window.mazuQueueDisableUI === 'function') window.mazuQueueDisableUI();
+            } else {
+                if (typeof window.mazuQueueVisibilityTrigger === 'function') window.mazuQueueVisibilityTrigger();
             }
         });
 
-        // Window Kehilangan Fokus (Pindah Virtual Desktop, Minimize, atau Buka App OS lain)
         window.addEventListener('blur', () => {
-            if (window.mazuQueueTimer) {
-                clearTimeout(window.mazuQueueTimer);
-            }
+            if (window.mazuQueueTimer) clearTimeout(window.mazuQueueTimer);
+            if (typeof window.mazuQueueDisableUI === 'function') window.mazuQueueDisableUI();
         });
 
-        // Window Kembali Fokus
         window.addEventListener('focus', () => {
             if (!document.hidden && typeof window.mazuQueueVisibilityTrigger === 'function') {
                 window.mazuQueueVisibilityTrigger();
@@ -51,7 +47,7 @@
     }
 
     // ==========================================
-    // 1. INISIALISASI WIDGET
+    // 1. INISIALISASI WIDGET & CACHE STATE
     // ==========================================
     const container = document.getElementById('queue-widget');
     if (!container) return;
@@ -63,13 +59,29 @@
         clearTimeout(window.mazuQueueTimer);
     }
 
+    const CONFIG = typeof SWR_CONFIG !== 'undefined' ? SWR_CONFIG : {
+        interval: 10000,      
+        cacheKey: 'mazu_qw_cache',
+        apiEndpoint: '/queue',
+    };
+
+    let hasCache = localStorage.getItem(CONFIG.cacheKey) !== null;
+    let queueData = hasCache ? JSON.parse(localStorage.getItem(CONFIG.cacheKey)) : [];
+
     let isWorkerActive = false;
     let isFetching = false;
-    let queueData = JSON.parse(localStorage.getItem(SWR_CONFIG.cacheKey)) || [];
+    let isInitialRender = true; 
 
-    // --- VARIABEL DEDUPLIKASI FETCH ---
     let lastFetchTime = 0;
-    const DEDUPE_TIME = 2000; // Cooldown 2 detik untuk mencegah spam request
+    const DEDUPE_TIME = 2000;
+
+    window.mazuQueueDisableUI = () => {
+        const listBody = document.getElementById('qw-list-body');
+        if (listBody) {
+            listBody.style.opacity = '0.5';
+            listBody.style.pointerEvents = 'none';
+        }
+    };
 
     // ==========================================
     // 2. RENDER KERANGKA UTAMA
@@ -89,7 +101,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
             </button>
         </div>
-        <div class="widget-body" id="qw-list-body"></div>
+        <div class="widget-body" id="qw-list-body" style="transition: opacity 0.3s ease;"></div>
     `;
 
     const listBody = document.getElementById('qw-list-body');
@@ -99,7 +111,7 @@
     // 3. FUNGSI RENDER DOM LIST
     // ==========================================
     function renderListItems(showSkeleton = false) {
-        if (showSkeleton && queueData.length === 0) {
+        if (showSkeleton) {
             listBody.innerHTML = Array(3).fill(0).map(() => `
                 <div class="queue-item">
                     <div class="skel skel-icon"></div>
@@ -121,58 +133,70 @@
             let statusColor = 'var(--md-sys-color-outline)';
             let icon = '📄';
             let iconClass = 'icon-blue';
-            let retryHtml = '';
+            let actionHtml = '';
 
             const currentUnixTime = Math.floor(Date.now() / 1000);
-            const isZombie = item.status === 'Processing' && 
-                             item.reserved_at && 
-                             (currentUnixTime - item.reserved_at > 3600);
+            const isZombie = item.status === 'Processing' && item.reserved_at && (currentUnixTime - item.reserved_at > 3600);
 
+            // LOGIKA TOMBOL & STATUS
             if (item.status === 'Processing' || item.status === 'Optimistic') {
                 statusColor = 'var(--md-sys-color-primary)';
                 icon = '⚙️';
                 
+                // Jika Processing (terutama yang zombie), munculkan tombol Detail
+                actionHtml += `
+                    <button type="button" class="btn-detail" data-id="${item.id}" title="Lihat Detail Antrean" style="color: var(--md-sys-color-primary); background: transparent; border: 1px solid var(--md-sys-color-primary); border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-right: 8px;">
+                        ℹ️ Detail
+                    </button>
+                `;
+
                 if (isZombie) {
                     statusColor = 'var(--md-sys-color-error)';
-                    retryHtml = `
+                    actionHtml += `
                         <button type="button" class="btn-retry" data-id="${item.id}" title="Paksa proses ulang (Macet > 1 Jam)" style="color: var(--md-sys-color-error); background: transparent; border: 1px dashed var(--md-sys-color-error); border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer;">
                             ⚠️ Paksa Ulangi
                         </button>
                     `;
                 }
+
+                // Tombol Hapus TIDAK DIMUNCULKAN di sini (Hanya bisa dihapus dari Modal Detail jika terpaksa)
+
             } else if (item.status === 'Failed') {
                 statusColor = 'var(--md-sys-color-error)';
                 icon = '❌';
                 iconClass = 'icon-red';
-                retryHtml = `
-                    <button type="button" class="btn-retry" data-id="${item.id}" title="Coba proses ulang" style="cursor:pointer;">
+                
+                // Failed: Munculkan Retry dan Hapus (Sesuai kesepakatan baru: Hapus boleh di Failed & Pending)
+                actionHtml += `
+                    <button type="button" class="btn-retry" data-id="${item.id}" title="Coba proses ulang" style="cursor:pointer; margin-right: 8px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                         Ulangi
+                    </button>
+                    <button type="button" class="btn-detail" data-id="${item.id}" title="Lihat Detail Antrean" ...>
+                        ℹ️ Detail
+                    </button>
+                `;
+            } else {
+                // Status Pending biasa: Boleh dihapus
+                actionHtml += `
+                    <button type="button" class="btn-delete" data-id="${item.id}" title="Hapus antrean" style="color: var(--md-sys-color-error); background: transparent; border: 1px solid var(--md-sys-color-error); border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer;">
+                        🗑️ Hapus
                     </button>
                 `;
             }
 
-            let deleteHtml = `
-                <button type="button" class="btn-delete" data-id="${item.id}" title="Hapus antrean" style="color: var(--md-sys-color-error); background: transparent; border: 1px solid var(--md-sys-color-error); border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; margin-left: 8px;">
-                    🗑️ Hapus
-                </button>
-            `;
-
-            const opacity = item.status === 'Optimistic' ? '0.6' : '1';
-
             return `
-                <div class="queue-item ${item.status === 'Failed' ? 'failed' : ''}" style="opacity: ${opacity};">
+                <div class="queue-item ${item.status === 'Failed' ? 'failed' : ''}">
                     <div class="queue-icon ${iconClass}">${icon}</div>
                     <div class="queue-content">
                         <h4 class="queue-title">${item.title}</h4>
                         <p class="queue-meta">
                             <span>${item.requester}</span>
-                            <span style="color: ${statusColor}; font-weight: 700;">${item.status === 'Optimistic' ? 'Pending' : item.status}</span>
+                            <span style="color: ${statusColor}; font-weight: 700;">${item.status}</span>
                         </p>
                         <div class="queue-action-row" style="display: flex; align-items: center; margin-top: 4px;">
                             <small style="color: var(--md-sys-color-outline-variant); flex-grow: 1;">${item.time}</small>
-                            ${retryHtml}
-                            ${deleteHtml}
+                            ${actionHtml}
                         </div>
                     </div>
                 </div>
@@ -181,10 +205,9 @@
     }
 
     // ==========================================
-    // 4. LOGIKA SWR POLLING & DEDUPLIKASI
+    // 4. LOGIKA SWR POLLING & ETAG
     // ==========================================
     async function mutateAndRevalidate(forceRefreshUi = false) {
-        // Rem Darurat 1: Cek eksistensi elemen, tab tersembunyi, ATAU window kehilangan fokus OS
         if (!document.getElementById('queue-widget') || document.hidden || !document.hasFocus()) {
             if (window.mazuQueueTimer) clearTimeout(window.mazuQueueTimer);
             return; 
@@ -192,16 +215,25 @@
 
         const now = Date.now();
         
-        // Rem Darurat 2 (Deduplikasi): Mencegah multiple request beruntun dari event SPA / Focus OS
         if (isFetching || (!forceRefreshUi && (now - lastFetchTime < DEDUPE_TIME))) {
+            if (!isFetching && document.getElementById('qw-list-body')) {
+                document.getElementById('qw-list-body').style.opacity = '1';
+                document.getElementById('qw-list-body').style.pointerEvents = 'auto';
+            }
             return;
         }
         
         isFetching = true;
         if (forceRefreshUi) btnRefresh.classList.add('spin');
 
+        if (!hasCache && isInitialRender) {
+            renderListItems(true); 
+        } else {
+            window.mazuQueueDisableUI();
+        }
+
         try {
-            const res = await fetch(SWR_CONFIG.apiEndpoint, { headers: { 'Accept': 'application/json' } });
+            const res = await fetch(CONFIG.apiEndpoint, { headers: { 'Accept': 'application/json' } });
             
             if (res.ok) {
                 const data = await res.json();
@@ -229,33 +261,173 @@
                     };
                 });
                 
-                queueData = newData;
-                localStorage.setItem(SWR_CONFIG.cacheKey, JSON.stringify(newData));
-                renderListItems();
+                const newDataStr = JSON.stringify(newData);
+                const oldDataStr = JSON.stringify(queueData);
+
+                if (newDataStr !== oldDataStr || isInitialRender) {
+                    queueData = newData;
+                    localStorage.setItem(CONFIG.cacheKey, newDataStr);
+                    hasCache = true; 
+                    renderListItems(false); 
+                    window.dispatchEvent(new CustomEvent('mazu:queue-synced'));
+                }
             }
         } catch (error) {
             console.error("Queue Fetch Error:", error);
         } finally {
             isFetching = false;
-            lastFetchTime = Date.now(); // Catat waktu kapan request selesai
+            isInitialRender = false; 
+            lastFetchTime = Date.now();
             btnRefresh.classList.remove('spin');
+            
+            const listBodyFinal = document.getElementById('qw-list-body');
+            if (listBodyFinal) {
+                listBodyFinal.style.opacity = '1';
+                listBodyFinal.style.pointerEvents = 'auto';
+            }
+            
             schedulePolling();
         }
     }
 
     function schedulePolling() {
         if (window.mazuQueueTimer) clearTimeout(window.mazuQueueTimer);
-        // Daftarkan ulang timer HANYA JIKA window punya fokus dan elemen masih ada
         if (!document.hidden && document.hasFocus() && document.getElementById('queue-widget')) {
-            window.mazuQueueTimer = setTimeout(() => mutateAndRevalidate(false), SWR_CONFIG.interval);
+            window.mazuQueueTimer = setTimeout(() => mutateAndRevalidate(false), CONFIG.interval);
         }
     }
 
     window.mazuQueueTriggerFetch = () => mutateAndRevalidate(true);
     window.mazuQueueVisibilityTrigger = () => { setTimeout(() => mutateAndRevalidate(false), 500); };
 
+
     // ==========================================
-    // 5. EKSEKUSI API: RETRY & DELETE
+    // 5. DETAIL MODAL LOGIC (FITUR BARU)
+    // ==========================================
+    
+    // Injeksi Kerangka Modal ke Body (Hanya 1 kali)
+    function injectDetailModal() {
+        if (document.getElementById('qw-detail-modal')) return;
+        
+        const modalHtml = `
+            <div id="qw-detail-modal" class="css-modal">
+                <div class="modal-overlay" onclick="closeQueueDetailModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">🔍 Detail Antrean</h3>
+                        <button type="button" class="modal-close" onclick="closeQueueDetailModal()">&times;</button>
+                    </div>
+                    <div class="modal-body" style="text-align: left; max-height: 400px; overflow-y: auto;">
+                        <div id="qw-detail-loading" style="text-align: center; padding: 2rem;">
+                            <span class="spinner-mini"></span> Mengambil data...
+                        </div>
+                        <div id="qw-detail-content" style="display: none;">
+                            </div>
+                    </div>
+                    <div class="modal-footer" style="justify-content: space-between;">
+                        <button type="button" id="btn-modal-refresh" class="btn-cancel" style="border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary);">🔄 Refresh Status</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn-cancel" onclick="closeQueueDetailModal()">Tutup</button>
+                            <button type="button" id="btn-modal-delete" class="btn-confirm danger" style="display: none;">Hapus Paksa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    window.closeQueueDetailModal = () => {
+        const m = document.getElementById('qw-detail-modal');
+        if (m) m.classList.remove('show');
+    };
+
+    async function loadQueueDetail(id) {
+        injectDetailModal();
+        const modal = document.getElementById('qw-detail-modal');
+        const loading = document.getElementById('qw-detail-loading');
+        const content = document.getElementById('qw-detail-content');
+        const btnDelete = document.getElementById('btn-modal-delete');
+        const btnRefresh = document.getElementById('btn-modal-refresh');
+
+        modal.classList.add('show');
+        loading.style.display = 'block';
+        content.style.display = 'none';
+        btnDelete.style.display = 'none';
+
+        try {
+            const res = await fetch(`/queue/${id}`, { headers: { 'Accept': 'application/json' } });
+            
+            if (res.ok) {
+                const data = await res.json();
+                
+                // Format waktu
+                const createdTime = new Date(data.created_at).toLocaleString('id-ID');
+                const reservedTime = data.reserved_at ? new Date(data.reserved_at * 1000).toLocaleString('id-ID') : 'Belum diambil';
+                
+                // Format error log (Jika ada)
+                const errorLog = data.error_message 
+                    ? `<div style="background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.85rem; font-family: monospace; overflow-x: auto;">${data.error_message}</div>`
+                    : '<span style="color: var(--md-sys-color-primary);">Aman (Tidak ada error)</span>';
+
+                content.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant);">
+                            <td style="padding: 8px 0; font-weight: 600; width: 40%;">ID Antrean</td>
+                            <td style="padding: 8px 0;">#${data.id}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant);">
+                            <td style="padding: 8px 0; font-weight: 600;">Status</td>
+                            <td style="padding: 8px 0; font-weight: 700; text-transform: uppercase;">${data.status}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant);">
+                            <td style="padding: 8px 0; font-weight: 600;">Percobaan (Attempts)</td>
+                            <td style="padding: 8px 0;">${data.attempts}x</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant);">
+                            <td style="padding: 8px 0; font-weight: 600;">Waktu Dibuat</td>
+                            <td style="padding: 8px 0;">${createdTime}</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--md-sys-color-outline-variant);">
+                            <td style="padding: 8px 0; font-weight: 600;">Mulai Diproses</td>
+                            <td style="padding: 8px 0;">${reservedTime}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 8px 0;">
+                                <div style="font-weight: 600; margin-bottom: 4px;">Catatan Sistem / Error Log:</div>
+                                ${errorLog}
+                            </td>
+                        </tr>
+                    </table>
+                `;
+
+                // Update aksi tombol Modal
+                btnRefresh.onclick = () => loadQueueDetail(id);
+                
+                // Tombol Hapus Paksa di dalam modal jika admin yakin mau kill job
+                btnDelete.style.display = 'block';
+                btnDelete.onclick = () => {
+                    closeQueueDetailModal();
+                    executeItemDelete(id, document.createElement('button')); 
+                };
+
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            } else {
+                content.innerHTML = `<div style="color: red; text-align: center;">Antrean tidak ditemukan. Mungkin sudah selesai atau terhapus.</div>`;
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            }
+        } catch (err) {
+            content.innerHTML = `<div style="text-align: center;">Gagal mengambil data jaringan.</div>`;
+            loading.style.display = 'none';
+            content.style.display = 'block';
+        }
+    }
+
+
+    // ==========================================
+    // 6. EKSEKUSI API: RETRY & DELETE
     // ==========================================
     async function executeItemRetry(itemId, btnEl) {
         btnEl.disabled = true;
@@ -297,7 +469,7 @@
     }
 
     // ==========================================
-    // 6. EVENT LISTENERS LOKAL
+    // 7. EVENT LISTENERS LOKAL
     // ==========================================
     btnRefresh.addEventListener('click', () => {
         showToast("⏳ Sinkronisasi antrean manual...");
@@ -307,16 +479,19 @@
     listBody.addEventListener('click', function(e) {
         const btnRetry = e.target.closest('.btn-retry');
         const btnDelete = e.target.closest('.btn-delete');
+        const btnDetail = e.target.closest('.btn-detail'); // Listener baru
         
         if (btnRetry) {
             executeItemRetry(btnRetry.getAttribute('data-id'), btnRetry);
         } else if (btnDelete) {
             executeItemDelete(btnDelete.getAttribute('data-id'), btnDelete);
+        } else if (btnDetail) {
+            loadQueueDetail(btnDetail.getAttribute('data-id'));
         }
     });
 
     // ==========================================
-    // 7. TOAST NOTIFICATION SYSTEM
+    // 8. TOAST NOTIFICATION SYSTEM
     // ==========================================
     let toastTimeout;
     function showToast(message) {
@@ -336,9 +511,11 @@
     }
 
     // ==========================================
-    // 8. EKSEKUSI PERTAMA
+    // 9. EKSEKUSI PERTAMA
     // ==========================================
-    renderListItems(queueData.length === 0);
+    if (hasCache) {
+        renderListItems(false); 
+    }
     mutateAndRevalidate(false);
 
 })();

@@ -111,16 +111,22 @@ class CalenderJob
         if (!$agenda) {
             throw new \Exception("Agenda tidak ditemukan");
         }
-        if ($agenda['status'] !== 'pending') {
-            throw new \Exception("Status agenda tidak valid");
+        $allowedStatuses = ['pending', 'processing'];
+        if (!in_array($agenda['status'], $allowedStatuses)) {
+            throw new \Exception("Job dibatalkan: Agenda ini tidak valid untuk diproses karena berstatus '{$agenda['status']}'.");
         }
-        $this->model->updateStatus($agenda['id'], 'processing');
+
+        if (!empty($agenda['google_event_id'])) {
+            throw new \Exception("Job dibatalkan: Agenda sudah memiliki Google Event ID.");
+        }
 
         // 1. Cek Konflik Waktu (Menggunakan fungsi di Model)
         $conflicts = $this->model->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $agenda['id']);
         if (!empty($conflicts)) {
             throw new \Exception("Conflict detected! Jadwal bertabrakan.");
         }
+
+        $this->model->updateStatus($agenda['id'], 'processing');
 
         return $agenda;
     }
@@ -146,6 +152,7 @@ class CalenderJob
         //     }
         // }
         throw new \Exception("Error Processing Request", 1);
+
 
         // example attendees
         $attendees = [

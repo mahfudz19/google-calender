@@ -106,12 +106,16 @@ class QueueModel extends Model
     {
         // Hanya job dengan status 'failed' yang bisa di-retry
         $sql = "UPDATE {$this->table} 
-            SET status = 'pending', 
-                attempts = 0, 
-                error_message = NULL, 
-                reserved_at = NULL 
+            SET status = 'pending'
             WHERE id = :id AND status = 'failed'";
 
         return $this->getDb()->query($sql, ['id' => $id]);
+    }
+
+    public function find(string|int $id): ?array
+    {
+        $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
     }
 }

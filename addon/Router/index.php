@@ -55,6 +55,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
     // Antrian
     $router->get('/queue', [QueueController::class, 'index']);
+    $router->get('/queue/:id', [QueueController::class, 'show']);
     $router->post('/queue/:id/retry', [QueueController::class, 'retry']);
     $router->post('/queue/:id/delete', [QueueController::class, 'destroy']);
   });
