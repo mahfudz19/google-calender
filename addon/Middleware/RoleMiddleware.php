@@ -14,6 +14,8 @@ class RoleMiddleware implements MiddlewareInterface
   public function handle($request, \Closure $next, array $params = [])
   {
     if ($this->session->get('is_logged_in') !== true) {
+      $requestUri = removeBaseUrl($_SERVER['REQUEST_URI']);
+      $this->session->set('redirect_url', $requestUri);
       $e = new AuthenticationException('Unauthenticated');
       $e->hardRedirect();
       throw $e;

@@ -76,7 +76,11 @@ class AuthController
       ]);
       $this->session->set('is_logged_in', true);
 
-      return $response->redirect('/dashboard');
+      $redirect_url = $this->session->get('redirect_url', '/dashboard');
+
+      $this->session->remove('redirect_url');
+
+      return $response->redirect($redirect_url);
     } catch (Exception $e) {
       throw new HttpException($errorCode, 'Login Failed: ' . $e->getMessage());
     }

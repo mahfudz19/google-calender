@@ -154,6 +154,19 @@ function getBaseUrl($path = '/')
   return empty($baseUrl) ? '/' : $baseUrl;
 }
 
+function removeBaseUrl($requestUri)
+{
+  $baseUrl = getBaseUrl();
+  if ($baseUrl !== '/' && str_starts_with($requestUri, $baseUrl)) {
+    $requestUri = substr($requestUri, strlen($baseUrl));
+    if (empty($requestUri)) {
+      $requestUri = '/';
+    }
+  }
+  return $requestUri;
+}
+
+
 if (!isset($GLOBALS['dump_config'])) {
   $GLOBALS['dump_config'] = [
     'mode' => 'auto',
