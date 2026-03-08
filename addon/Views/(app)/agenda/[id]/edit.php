@@ -9,7 +9,7 @@
     </div>
 
     <?php
-    // Set action url ke route update Mazu
+    // Set action url ke route update 
     $action = getBaseUrl("/agenda/{$agenda['id']}/update");
     include dirname(__DIR__) . '/form-agenda.php';
     ?>

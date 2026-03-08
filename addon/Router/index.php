@@ -3,6 +3,7 @@
 use Addon\Controllers\AgendaController;
 use Addon\Controllers\ApprovalController;
 use Addon\Controllers\AuthController;
+use Addon\Controllers\InputManyController;
 use Addon\Controllers\QueueController;
 use Addon\Controllers\UserController;
 
@@ -40,6 +41,9 @@ $router->group(['middleware' => ['auth']], function ($router) {
     $router->post('/approval/:id/approve', [ApprovalController::class, 'approve']);
     $router->get('/approval/:id/status', [ApprovalController::class, 'checkStatus']);
     $router->post('/approval/:id/reject', [ApprovalController::class, 'reject']);
+
+    // input-many
+    $router->get('/input-many', [InputManyController::class, 'index']);
   });
 
   // --- Role: Admin Only (User Management) ---
@@ -48,7 +52,6 @@ $router->group(['middleware' => ['auth']], function ($router) {
     // Manajemen User
     $router->get('/users', [UserController::class, 'index']);
     $router->get('/users/:id', [UserController::class, 'show']);
-    $router->get('/users/:id/edit', [UserController::class, 'edit']);
     $router->get('/users/:id/edit', [UserController::class, 'edit']);
     $router->post('/users/:id/update', [UserController::class, 'update']);
     $router->post('/users/:id/delete', [UserController::class, 'destroy']);

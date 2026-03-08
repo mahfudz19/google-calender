@@ -78,10 +78,9 @@ class UserController
 
     $user_login = $this->session->get('user');
 
-    // 3. Render ke View Mazu Engine
     return $response->renderPage(
       ['users' => $finalUsers, 'user_login' => $user_login],
-      ['meta' => ['title' => 'Manajemen User | Mazu Calendar']]
+      ['meta' => ['title' => 'Manajemen User | ' . env('APP_NAME')]]
     );
   }
 
@@ -94,7 +93,7 @@ class UserController
 
     return $response->renderPage(
       ['user_login' => $user_login, 'user' => $user ?? null],
-      ['meta' => ['title' => 'Profile | Mazu Calendar']]
+      ['meta' => ['title' => 'Profile | ' . env('APP_NAME')]]
     );
   }
 
@@ -122,7 +121,7 @@ class UserController
 
     return $response->renderPage(
       ['item' => $item],
-      ['meta' => ['title' => 'Edit Akses User']]
+      ['meta' => ['title' => 'Edit Akses User | ' . env('APP_NAME')]]
     );
   }
 
@@ -166,7 +165,7 @@ class UserController
       return $response->redirect('/users');
     }
 
-    // Jika user belum ada, insert ke DB lokal Mazu
+    // Jika user belum ada, insert ke DB lokal
     $this->model->createFromGoogle([
       'email'     => $email,
       'name'      => $data['name'] ?? 'User Sistem',

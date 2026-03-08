@@ -4,7 +4,7 @@
   <div class="form-card-wrapper">
     <div class="form-header">
       <h2>Buat Agenda Baru</h2>
-      <p>Isi formulir di bawah ini untuk mengajukan jadwal ke sistem Mazu Calendar.</p>
+      <p>Isi formulir di bawah ini untuk mengajukan jadwal ke sistem <?= env('APP_NAME') ?>.</p>
     </div>
 
     <?php

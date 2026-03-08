@@ -22,7 +22,7 @@ class AuthController
 
   public function index(Request $request, Response $response)
   {
-    return $response->renderPage([], ['path' => '/login']);
+    return $response->renderPage([], ['path' => '/login', 'meta' => ['title' => 'Login | ' . env('APP_NAME')]]);
   }
 
   public function login(Request $request, Response $response)

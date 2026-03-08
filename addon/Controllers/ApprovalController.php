@@ -23,7 +23,7 @@ class ApprovalController
 
     return $response->renderPage(
       ['approvals' => $approvals],
-      ['meta' => ['title' => 'Persetujuan Agenda']]
+      ['meta' => ['title' => 'Persetujuan Agenda | ' . env('APP_NAME')]]
     );
   }
 
@@ -33,7 +33,7 @@ class ApprovalController
 
     return $response->renderPage([
       'approvals' => $approvals,
-    ], ['meta' => ['title' => 'Riwayat Persetujuan']]);
+    ], ['meta' => ['title' => 'Riwayat Persetujuan | ' . env('APP_NAME')]]);
   }
 
   public function approve(Request $request, Response $response): JsonResponse

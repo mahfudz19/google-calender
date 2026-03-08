@@ -25,8 +25,11 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
         <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="nav-item <?= str_contains($currentUri, getBaseUrl('/dashboard')) ? 'active' : '' ?>">Dashboard</a>
         <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="nav-item <?= str_contains($currentUri, getBaseUrl('/agenda')) ? 'active' : '' ?>">Agenda Saya</a>
 
-        <?php if ($role === 'admin'): ?>
+        <?php if ($role === 'admin' || $role === 'approver'): ?>
           <a data-spa href="<?= getBaseUrl('/approval') ?>" class="nav-item <?= str_contains($currentUri, getBaseUrl('/approval')) ? 'active' : '' ?>">Persetujuan</a>
+          <a data-spa href="<?= getBaseUrl('/input-many') ?>" class="nav-item <?= str_contains($currentUri, getBaseUrl('/input-many')) ? 'active' : '' ?>">Input Banyak</a>
+        <?php endif; ?>
+        <?php if ($role === 'admin'): ?>
           <a data-spa href="<?= getBaseUrl('/users') ?>" class="nav-item <?= str_contains($currentUri, getBaseUrl('/users')) ? 'active' : '' ?>">Manajemen User</a>
         <?php endif; ?>
 

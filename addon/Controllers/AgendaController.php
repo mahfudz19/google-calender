@@ -62,14 +62,13 @@ class AgendaController
     $approvedAgendas = array_filter($allAgendas, fn($a) => $a['status'] === 'approved');
     usort($approvedAgendas, fn($a, $b) => strtotime($b['created_at'] ?? 'now') <=> strtotime($a['created_at'] ?? 'now'));
 
-    // Render ke engine Mazu
     return $response->renderPage([
       'role'  => $role,
       'recentAgendas' => $recentAgendas,
       'pendingTasks'  => $pendingTasks,
       'approvedAgendas' => $approvedAgendas
     ], [
-      'meta'  => ['title' => 'Dashboard | Mazu Calendar']
+      'meta'  => ['title' => 'Dashboard | ' . env('APP_NAME')]
     ]);
   }
 
@@ -78,7 +77,7 @@ class AgendaController
   {
     $ruangan = $this->apiController->getRuanganApi(['perPage' => 9999]);
 
-    return $response->renderPage(['ruangan' => $ruangan['data']], ['meta' => ['title' => 'Ajukan Agenda Baru']]);
+    return $response->renderPage(['ruangan' => $ruangan['data']], ['meta' => ['title' => 'Ajukan Agenda Baru | ' . env('APP_NAME')]]);
   }
 
   // Proses Simpan Pengajuan
@@ -138,7 +137,6 @@ class AgendaController
     $totalAgendas = $this->model->countByRequester($userEmail, $status);
     $totalPages = ceil($totalAgendas / $limit);
 
-    // 4. Render ke Mazu View
     return $response->renderPage(
       [
         'agendas' => $agendas,
@@ -147,7 +145,7 @@ class AgendaController
         'totalPages' => $totalPages,
         'totalAgendas' => $totalAgendas
       ],
-      ['meta' => ['title' => 'Agenda Saya | Mazu Calendar']]
+      ['meta' => ['title' => 'Agenda Saya | ' . env('APP_NAME')]]
     );
   }
 
@@ -159,7 +157,7 @@ class AgendaController
 
     return $response->renderPage(
       ['agenda' => $agenda],
-      ['meta' => ['title' => 'Detail Agenda']]
+      ['meta' => ['title' => 'Detail Agenda | ' . env('APP_NAME')]]
     );
   }
 
@@ -176,7 +174,7 @@ class AgendaController
 
     return $response->renderPage(
       ['agenda' => $agenda, 'ruangan' => $ruangan['data']],
-      ['meta' => ['title' => 'Edit Agenda']]
+      ['meta' => ['title' => 'Edit Agenda | ' . env('APP_NAME')]]
     );
   }
 

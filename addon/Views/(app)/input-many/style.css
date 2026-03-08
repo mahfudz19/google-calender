@@ -1,0 +1,103 @@
+/* Input Many Layout Styles */
+.input-many-layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: var(--md-sys-color-background);
+}
+
+/* Sidebar Styles */
+.input-many-sidebar {
+  width: 320px;
+  background: var(--md-sys-color-surface);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Main Content Area */
+.input-many-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: var(--md-sys-color-background);
+}
+
+/* Queue Widget Integration */
+.input-many-sidebar .queue-widget {
+  margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .input-many-layout-wrapper {
+    flex-direction: column;
+  }
+  
+  .input-many-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding: 1rem;
+  }
+  
+  .input-many-main {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .input-many-sidebar {
+    padding: 0.75rem;
+  }
+  
+  .input-many-main {
+    padding: 1rem;
+  }
+}
+
+/* Content Container */
+.input-many-main > * {
+  max-width: 100%;
+}
+
+/* Loading States */
+.input-many-main.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Animation */
+.input-many-layout-wrapper {
+  transition: all 0.3s ease;
+}
+
+.input-many-sidebar {
+  transition: all 0.3s ease;
+}
+
+.input-many-main {
+  transition: all 0.3s ease;
+}
+
+/* Scrollbar Styling */
+.input-many-sidebar::-webkit-scrollbar,
+.input-many-main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.input-many-sidebar::-webkit-scrollbar-track,
+.input-many-main::-webkit-scrollbar-track {
+  background: var(--md-sys-color-surface-variant);
+}
+
+.input-many-sidebar::-webkit-scrollbar-thumb,
+.input-many-main::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline);
+  border-radius: 3px;
+}
+
+.input-many-sidebar::-webkit-scrollbar-thumb:hover,
+.input-many-main::-webkit-scrollbar-thumb:hover {
+  background: var(--md-sys-color-on-surface-variant);
+}
