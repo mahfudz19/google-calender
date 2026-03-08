@@ -206,7 +206,6 @@ class View implements RenderableInterface
     ];
     $html .= '<script>window.mazuConfig = ' . json_encode($appConfig) . ';</script>' . PHP_EOL;
     $html .= '<script src="' . asset('js/spa.js') . '"></script>' . PHP_EOL;
-    $html .= '<script src="' . asset('js/base-url.js') . '"></script>' . PHP_EOL;
     return $html;
   }
 

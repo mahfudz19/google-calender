@@ -83,34 +83,22 @@ class QueueController
   {
     $basePath = dirname(__DIR__, 2);
 
-    // Opsi 1: Cek langsung menggunakan process list di OS (Real-time & Akurat)
-    if (function_exists('exec')) {
-      // Trik Regex: Menggunakan [m]azu agar pgrep tidak mendeteksi perintahnya sendiri (sh -c)
-      $command = 'pgrep -f "' . $basePath . '/[m]azu queue:work"';
-      exec($command, $output, $status);
-
-      // Status 0 artinya OS menemukan process yang cocok
-      if ($status === 0 && !empty($output)) {
-        return true;
+    if (isProduction()) {
+      if (function_exists('exec')) {
+        $command = 'pgrep -f "' . $basePath . '/[m]azu queue:work"';
+        exec($command, $output, $status);
+        if ($status === 0 && !empty($output)) return true;
+        if ($status === 1) return false;
       }
-
-      // Status 1 artinya OS tidak menemukan process. 
-      // Jika begini, HENTIKAN PENGECEKAN, worker dipastikan MATI secara fisik.
-      if ($status === 1) {
-        return false;
+    } else {
+      if (function_exists('exec')) {
+        exec('pgrep -f "mazu queue:work"', $output);
+        if (!empty($output)) {
+          return true;
+        }
       }
     }
 
-    // Opsi 2 (Fallback): Cek Heartbeat
-    // Hanya dijalankan JIKA fungsi 'exec' diblokir oleh konfigurasi keamanan server (php.ini)
-    $heartbeatFile = $basePath . '/storage/logs/worker_heartbeat.json';
-    if (file_exists($heartbeatFile)) {
-      $data = json_decode(file_get_contents($heartbeatFile), true);
-      // Toleransi 5 menit
-      if (isset($data['last_seen_at']) && (time() - $data['last_seen_at'] < 300)) {
-        return true;
-      }
-    }
 
     return false;
   }

@@ -93,29 +93,6 @@ class AuthController
     return $response->redirect('/');
   }
 
-  public function updateProfile(Request $request, Response $response): JsonResponse
-  {
-    try {
-      $user = $this->session->get('user', []);
-
-      if ($user['role'] !== 'user') {
-        // update in UserModel
-      }
-
-      // $this->session->set('user', []);
-
-      return $response->json([
-        'status' => 'success',
-        'message' => 'Profile updated successfully'
-      ]);
-    } catch (\Throwable $th) {
-      return $response->json([
-        'status' => 'error',
-        'error' => $th->getMessage()
-      ], 500);
-    }
-  }
-
   public function dashboard(Request $request, Response $response): View
   {
     $user = $this->session->get('user', []);
