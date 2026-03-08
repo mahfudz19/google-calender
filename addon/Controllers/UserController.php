@@ -85,6 +85,19 @@ class UserController
     );
   }
 
+  public function profile(Request $request, Response $response): View
+  {
+    $user_login = $this->session->get('user');
+    if (!$user_login['role'] !== 'user') {
+      $user = $this->model->find((int)$user_login['id']);
+    }
+
+    return $response->renderPage(
+      ['user_login' => $user_login, 'user' => $user ?? null],
+      ['meta' => ['title' => 'Profile | Mazu Calendar']]
+    );
+  }
+
   /**
    * Menampilkan Halaman Detail User
    */

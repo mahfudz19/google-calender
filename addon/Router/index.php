@@ -16,6 +16,8 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
   // 1. Dashboard (Kalender Utama) - Bisa diakses semua role
   $router->get('/dashboard', [AgendaController::class, 'index']);
+  $router->get('/profile', [UserController::class, 'profile']);
+  $router->post('/profile/update', [AuthController::class, 'updateProfile']);
 
   // 2. Pengajuan Agenda (User Biasa pun bisa akses)
   $router->get('/agenda/create', [AgendaController::class, 'create']);

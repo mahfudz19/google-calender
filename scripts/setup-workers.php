@@ -63,12 +63,12 @@ if ($action !== 'help') {
   echo "Action: " . color(strtoupper($action), 'yellow') . "\n\n";
 }
 
+$projectName = basename($projectRoot);
 switch ($action) {
   case 'setup':
     if (!$isRoot) exit(color("Error: Aksi 'setup' membutuhkan akses root (sudo).\n", 'red'));
 
     foreach ($selectedQueues as $queue) {
-      $projectName = basename($projectRoot);
       $serviceName = "mazu-worker-{$projectName}-{$queue}";
       $serviceFile = "/etc/systemd/system/{$serviceName}.service";
 
@@ -110,7 +110,7 @@ EOT;
     if (!$isRoot) exit(color("Error: Aksi 'delete' membutuhkan akses root (sudo).\n", 'red'));
 
     foreach ($selectedQueues as $queue) {
-      $serviceName = "mazu-worker-{$queue}";
+      $serviceName = "mazu-worker-{$projectName}-{$queue}";
       $serviceFile = "/etc/systemd/system/{$serviceName}.service";
 
       echo "Menghapus {$serviceName}...\n";
@@ -134,7 +134,7 @@ EOT;
     if (!$isRoot) exit(color("Error: Aksi '{$action}' membutuhkan akses root (sudo).\n", 'red'));
 
     foreach ($selectedQueues as $queue) {
-      $serviceName = "mazu-worker-{$queue}";
+      $serviceName = "mazu-worker-{$projectName}-{$queue}";
       echo ucfirst($action) . "ing {$serviceName}...\n";
       system("systemctl {$action} {$serviceName}");
     }
@@ -143,7 +143,7 @@ EOT;
 
   case 'status':
     foreach ($selectedQueues as $queue) {
-      $serviceName = "mazu-worker-{$queue}";
+      $serviceName = "mazu-worker-{$projectName}-{$queue}";
       echo color("=== Status {$serviceName} ===\n", 'yellow');
       system("systemctl status {$serviceName} --no-pager");
       echo "\n";
@@ -155,7 +155,7 @@ EOT;
       // Jika all, kita ambil yang pertama saja atau default
       $targetQueue = 'default';
     }
-    $serviceName = "mazu-worker-{$targetQueue}";
+    $serviceName = "mazu-worker-{$projectName}-{$targetQueue}";
     echo color("Menampilkan log untuk {$serviceName} (Ctrl+C untuk keluar)...\n", 'green');
     system("journalctl -u {$serviceName} -f");
     break;

@@ -32,30 +32,66 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 
         <div class="nav-profile mobile-only">
           <div class="profile-info">
-            <img src="<?= $avatar ?>" alt="Avatar" class="avatar">
-            <span><?= $name ?></span>
+            <img id="profile-avatar" src="<?= $avatar ?>" alt="Avatar" class="avatar">
+            <div class="profile-text">
+              <span id="profile-name" class="user-name"><?= $name ?></span>
+              <span id="profile-role" class="user-role"><?= ucfirst($role) ?></span>
+            </div>
           </div>
           <form action="<?= getBaseUrl('/logout') ?>" data-spa method="post">
-            <button type="submit" class="btn-logout">Logout</button>
+            <button type="submit" class="btn-logout">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Logout
+            </button>
           </form>
         </div>
       </nav>
 
       <div class="nav-profile desktop-only">
-        <img src="<?= $avatar ?>" alt="Avatar" class="avatar">
-        <div class="profile-text">
-          <span class="user-name"><?= $name ?></span>
-          <span class="user-role"><?= ucfirst($role) ?></span>
-        </div>
-        <form action="<?= getBaseUrl('/logout') ?>" data-spa method="post">
-          <button type="submit" class="btn-logout-icon">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
+        <input type="checkbox" id="profile-dropdown" class="dropdown-toggle">
+        <label for="profile-dropdown" class="profile-trigger">
+          <img id="profile-avatar" src="<?= $avatar ?>" alt="Avatar" class="avatar">
+          <div class="profile-text">
+            <span id="profile-name" class="user-name"><?= $name ?></span>
+            <span id="profile-role" class="user-role"><?= ucfirst($role) ?></span>
+          </div>
+          <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </label>
+        <label for="profile-dropdown" class="dropdown-overlay"></label>
+        <div class="dropdown-menu">
+          <div class="dropdown-header">
+            <img id="profile-avatar" src="<?= $avatar ?>" alt="Avatar" class="dropdown-avatar">
+            <div class="dropdown-info">
+              <div id="profile-name" class="dropdown-name"><?= $name ?></div>
+              <div id="profile-role" class="dropdown-role"><?= ucfirst($role) ?></div>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <!-- profile page -->
+          <a data-spa href="/profile" class="dropdown-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
-          </button>
-        </form>
+            Profile
+          </a>
+          <form action="<?= getBaseUrl('/logout') ?>" data-spa method="post">
+            <button type="submit" class="dropdown-item logout">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Logout
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </header>

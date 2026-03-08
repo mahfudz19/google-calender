@@ -197,13 +197,23 @@ class ViewService
         return $style;
       }, View::getStyles());
 
+      // Resolusi hash untuk scripts agar cache busting bekerja di SPA
+      $scripts = array_map(function ($script) use ($manifest) {
+        $key = 'assets/' . $script;
+        if (isset($manifest[$key])) {
+          return substr($manifest[$key], 7);
+        }
+        return $script;
+      }, View::getScripts());
+
       return json_encode([
         'html' => $html,
         'meta' => [
           'title' => $view->meta->title,
           'csrf_token' => csrf_token(),
           'layout' => $layoutHierarchy, // Mengirim ARRAY layout [child, parent, root]
-          'styles' => $styles
+          'styles' => $styles,
+          'scripts' => $scripts
         ]
       ]);
     }
@@ -279,7 +289,7 @@ class ViewService
     // Suntikkan skrip (urutan terbalik agar parent di-load lebih dulu)
     foreach (array_reverse(array_unique($foundScripts)) as $jsFullPath) {
       $relativePath = ltrim(str_replace($rootViewsPath, '', $jsFullPath), '/');
-      
+
       // Gunakan tracking di View agar tidak terjadi duplikasi suntikan dalam satu request
       if (View::addScript($relativePath)) {
         $url = asset('assets/' . $relativePath);

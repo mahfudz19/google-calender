@@ -42,6 +42,10 @@ class View implements RenderableInterface
 
     $this->props = $props;
     $this->meta = $meta ?? new PageMeta('Untitled Page');
+
+    // Reset static assets on new request to prevent leaks
+    self::$styles = [];
+    self::$scripts = [];
   }
 
   /**
@@ -75,6 +79,15 @@ class View implements RenderableInterface
   public static function getStyles(): array
   {
     return self::$styles;
+  }
+
+  /**
+   * Mengambil semua script yang terdaftar.
+   * @return array<string>
+   */
+  public static function getScripts(): array
+  {
+    return self::$scripts;
   }
 
   /**
@@ -193,6 +206,7 @@ class View implements RenderableInterface
     ];
     $html .= '<script>window.mazuConfig = ' . json_encode($appConfig) . ';</script>' . PHP_EOL;
     $html .= '<script src="' . asset('js/spa.js') . '"></script>' . PHP_EOL;
+    $html .= '<script src="' . asset('js/base-url.js') . '"></script>' . PHP_EOL;
     return $html;
   }
 

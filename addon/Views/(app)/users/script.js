@@ -1,7 +1,7 @@
 (function initMazuUsersTable() {
   // Cari kontainer utama yang membawa data JSON
   const appContainer = document.getElementById("usersApp");
-  const baseUrl = appContainer.dataset.baseUrl || "";
+  const baseUrl = appContainer?.dataset?.baseUrl || "";
 
   // Jika elemen tidak ada (mungkin user pindah halaman), batalkan eksekusi
   if (!appContainer) return;

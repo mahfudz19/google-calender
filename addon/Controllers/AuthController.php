@@ -7,6 +7,7 @@ use App\Core\Http\Response;
 use App\Core\View\View;
 use Addon\Services\GoogleAuthService;
 use Addon\Models\UserModel;
+use App\Core\Http\JsonResponse;
 use App\Exceptions\HttpException;
 use App\Services\SessionService;
 use Exception;
@@ -90,6 +91,29 @@ class AuthController
   {
     $this->session->destroy();
     return $response->redirect('/');
+  }
+
+  public function updateProfile(Request $request, Response $response): JsonResponse
+  {
+    try {
+      $user = $this->session->get('user', []);
+
+      if ($user['role'] !== 'user') {
+        // update in UserModel
+      }
+
+      // $this->session->set('user', []);
+
+      return $response->json([
+        'status' => 'success',
+        'message' => 'Profile updated successfully'
+      ]);
+    } catch (\Throwable $th) {
+      return $response->json([
+        'status' => 'error',
+        'error' => $th->getMessage()
+      ], 500);
+    }
   }
 
   public function dashboard(Request $request, Response $response): View
