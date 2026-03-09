@@ -1,6 +1,7 @@
 <?php
 
 use Addon\Controllers\AgendaController;
+use Addon\Controllers\ApiController;
 use Addon\Controllers\ApprovalController;
 use Addon\Controllers\AuthController;
 use Addon\Controllers\InputManyController;
@@ -44,6 +45,11 @@ $router->group(['middleware' => ['auth']], function ($router) {
 
     // input-many
     $router->get('/input-many', [InputManyController::class, 'index']);
+    $router->post('/input-many/check-database', [InputManyController::class, 'checkDatabaseConflict']);
+    $router->post('/input-many/upload', [InputManyController::class, 'upload']);
+
+    // api ruangan siakad
+    $router->get('/api/ruangan', [ApiController::class, 'getRuangan']);
   });
 
   // --- Role: Admin Only (User Management) ---

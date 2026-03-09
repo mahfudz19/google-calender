@@ -1,0 +1,6 @@
+title,description,start_time,end_time,location,ruangan_id,ruangan_name
+"Rapat Koordinasi IT","Membahas arsitektur Mazu SPA dan migrasi server","2026-05-12 09:00:00","2026-05-12 11:00:00","Lantai 2 Gedung A",,"Wahana"
+"Kuliah Umum AI","Pengenalan Machine Learning, Neural Network, dan LLM","2026-05-12 09:00:00","2026-05-12 11:00:00","Gedung Utama",99,"Aula Utama"
+"Workshop Frontend","Belajar React, NextJS, dan integrasi API","2026-05-15 10:00:00","2026-05-15 12:00:00","Lab Komputer 1",5,"Lab Komputer"
+"Seminar Skripsi","Ujian mahasiswa tingkat akhir gelombang 1","2026-05-15 09:30:00","2026-05-15 11:30:00","",5,"Lab Komputer"
+"Briefing Tim BEM","Persiapan acara ospek mahasiswa baru","2026-05-20 08:00:00","2026-05-20 10:00:00","Lapangan Basket",2,"Ruang BEM"

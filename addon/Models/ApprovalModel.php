@@ -209,4 +209,46 @@ class ApprovalModel extends Model
 
         return $this->updateById($id, $data);
     }
+
+    /**
+     * Melakukan pengecekan bentrok jadwal secara bulk dari data CSV
+     * Mengembalikan array dengan key berupa _rowId dari frontend
+     */
+    public function checkBulkTimeConflicts(array $agendas): array
+    {
+        $conflicts = [];
+
+        foreach ($agendas as $agenda) {
+            // Validasi data minimal harus ada
+            if (empty($agenda['start_time']) || empty($agenda['end_time']) || empty($agenda['ruangan_id'])) {
+                continue;
+            }
+
+            $rowId = $agenda['_rowId'] ?? null;
+            if (!$rowId) continue;
+
+            // Gunakan fungsi checkTimeConflict yang sudah Anda buat sebelumnya
+            $dbConflicts = $this->checkTimeConflict(
+                $agenda['start_time'],
+                $agenda['end_time'],
+                (int) $agenda['ruangan_id']
+            );
+
+            if (!empty($dbConflicts)) {
+                // Hanya ambil data yang diperlukan untuk UI/UX agar response tidak terlalu bengkak
+                $formattedConflicts = array_map(function ($c) {
+                    return [
+                        'id' => $c['id'],
+                        'title' => $c['title'],
+                        'start_time' => $c['start_time'],
+                        'end_time' => $c['end_time']
+                    ];
+                }, $dbConflicts);
+
+                $conflicts[$rowId] = $formattedConflicts;
+            }
+        }
+
+        return $conflicts;
+    }
 }
