@@ -324,7 +324,6 @@ export function initCsvUploader(AutocompleteClass, currentUser, apiCheckDbUrl, a
     // ==========================================
     if (btnUploadAll && !btnUploadAll.dataset.handled) {
         btnUploadAll.addEventListener('click', async () => {
-            // Lapis Keamanan Ganda: Cek ulang state sebelum nge-hit API
             const state = getProgress();
             if (!state.roomPassed || !state.internalPassed || !state.dbPassed) {
                 showModal({ title: 'Aksi Ditolak', message: 'Harap selesaikan semua tahapan pemeriksaan terlebih dahulu.', type: 'alert' });
@@ -334,12 +333,13 @@ export function initCsvUploader(AutocompleteClass, currentUser, apiCheckDbUrl, a
             // UI Loading state
             btnUploadAll.disabled = true;
             const originalText = btnUploadAll.textContent;
+            
+            // Ubah teks tombol saat proses API
             btnUploadAll.innerHTML = '<span class="spinner-mini" style="border-top-color: white; width: 14px; height: 14px; border-width: 2px;"></span> Mengunggah...';
 
             try {
                 let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
                 
-                // Cleansing Payload: Hapus properti meta internal agar JSON yang dikirim bersih
                 const cleanData = csvData.map(row => {
                     const { _rowId, _roomError, _timeError, _dbConflict, _conflictWith, ...cleanRow } = row;
                     return cleanRow;
@@ -354,10 +354,14 @@ export function initCsvUploader(AutocompleteClass, currentUser, apiCheckDbUrl, a
                 const result = await res.json();
 
                 if (res.ok && result.status === 'success') {
-                    // 1. Trigger SWR Global Mutate untuk Queue/Tabel lain (Standar Mazu)
+                    // 1. Trigger SWR Global Mutate
                     window.dispatchEvent(new CustomEvent('swr:mutate', { detail: { key: 'mazu_qw_cache' } }));
-                    // (Opsi cadangan jika Mazu Anda pakai format event biasa)
                     window.dispatchEvent(new Event('swr:mutate:mazu_qw_cache'));
+                    
+                    // FALLBACK SAKTI: Panggil fungsi fetch mazu queue secara langsung jika scriptnya sudah siap
+                    if (typeof window.mazuQueueTriggerFetch === 'function') {
+                        window.mazuQueueTriggerFetch();
+                    }
 
                     // 2. Bersihkan Memori Browser
                     localStorage.removeItem(STORAGE_KEY);
@@ -368,7 +372,7 @@ export function initCsvUploader(AutocompleteClass, currentUser, apiCheckDbUrl, a
                     showUpload();
 
                     // 4. Modal Sukses
-                    showModal({ title: 'Upload Berhasil!', message: 'Semua data agenda berhasil dikirim dan diproses oleh server.', type: 'alert' });
+                    showModal({ title: 'Upload Berhasil!', message: 'Semua data agenda berhasil dikirim dan ditambahkan ke dalam antrean (Queue) server.', type: 'alert' });
                 } else {
                     throw new Error(result.message || 'Gagal mengunggah data');
                 }
@@ -377,7 +381,6 @@ export function initCsvUploader(AutocompleteClass, currentUser, apiCheckDbUrl, a
                 console.error(e);
                 showModal({ title: 'Upload Gagal', message: e.message || 'Terjadi kesalahan koneksi. Silakan coba lagi.', type: 'error' });
                 
-                // Kembalikan tombol jika gagal
                 btnUploadAll.disabled = false;
                 btnUploadAll.textContent = originalText;
             }

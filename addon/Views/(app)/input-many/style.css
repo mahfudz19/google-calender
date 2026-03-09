@@ -698,3 +698,42 @@
     border-radius: 4px;
     font-family: inherit;
 }
+
+/* =========================================================
+   UPLOAD BUTTON STATES
+   ========================================================= */
+.input-many-upload-btn {
+    padding: 12px 24px;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.input-many-upload-btn:hover:not(:disabled) {
+    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.2);
+}
+
+/* STATE TERKUNCI (DISABLED) */
+.input-many-upload-btn:disabled {
+    background: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-outline);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Penyesuaian warna spinner saat tombol disabled (sedang loading upload) */
+.input-many-upload-btn:disabled .spinner-mini {
+    border-top-color: var(--md-sys-color-outline) !important;
+}
