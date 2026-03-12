@@ -942,16 +942,15 @@ function normalizeUrlWithBaseUrl(url, baseUrl) {
   }
 
   // Skip jika URL sudah menggunakan base_url
-  if (url.startsWith(baseUrl)) {
-    return url;
-  }
+  if (url.startsWith(baseUrl)) return url;
 
-  // Tambahkan base_url untuk URL yang dimulai dengan /
-  if (url.startsWith("/")) {
-    return baseUrl + url;
-  }
+  // Handle baseUrl yang tidak diakhiri dengan slash
+  if (!baseUrl.endsWith("/")) baseUrl += "/";
 
-  return url;
+  // Hapus slash di awal URL untuk menghindari double slash
+  if (url.startsWith("/")) url = url.substring(1);
+
+  return baseUrl + url;
 }
 
 // Tambahkan debugging

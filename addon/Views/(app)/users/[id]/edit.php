@@ -20,7 +20,7 @@
           </div>
         </div>
 
-        <form action="<?= getBaseUrl() ?>/users/<?= $item['id'] ?>/update" method="POST" data-spa class="mazu-edit-form">
+        <form action="<?= getBaseUrl('/users/' . $item['id'] . '/update') ?>" method="POST" data-spa class="mazu-edit-form">
 
           <div class="form-section">
             <label class="form-label">Tentukan Hak Akses <span class="text-danger">*</span></label>

@@ -58,7 +58,7 @@ class InputManyController
 
       if (empty($agendas)) return $response->json(['status' => 'error', 'message' => 'Data agenda kosong.'], 400);
 
-      return $response->json(['status' => 'success', 'data' => $agendas]);
+      return $response->json(['status' => 'success', 'message' => 'Data agenda berhasil diupload.', 'data' => $agendas]);
     } catch (\Throwable $th) {
       return $response->json(['status' => 'error', 'message' => 'Terjadi kesalahan internal: ' . $th->getMessage()], 500);
     }
