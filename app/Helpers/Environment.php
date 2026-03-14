@@ -166,7 +166,6 @@ function removeBaseUrl($requestUri)
   return $requestUri;
 }
 
-
 if (!isset($GLOBALS['dump_config'])) {
   $GLOBALS['dump_config'] = [
     'mode' => 'auto',
