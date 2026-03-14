@@ -159,12 +159,13 @@ $currentUser = [
 
   // Oper Endpoint API Mazu
   const apiCheckDbUrl = "<?= getBaseUrl('/input-many/check-database') ?>";
-  const apiUploadUrl = "<?= getBaseUrl('/input-many/upload') ?>"; // <-- ENDPOINT BARU
+  const apiUploadUrl = "<?= getBaseUrl('/input-many/upload') ?>";
+  const apiRuanganUrl = "<?= getBaseUrl('/api/ruangan') ?>";
 
   function runInit() {
     document.querySelectorAll('body > .autocomplete-list-wrapper').forEach(el => el.remove());
     // Tambahkan parameter ke-4
-    initCsvUploader(Autocomplete, currentUser, apiCheckDbUrl, apiUploadUrl);
+    initCsvUploader(Autocomplete, currentUser, apiCheckDbUrl, apiUploadUrl, apiRuanganUrl);
   }
 
   setTimeout(runInit, 50);
