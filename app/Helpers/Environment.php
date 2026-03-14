@@ -151,7 +151,7 @@ function getBaseUrl($path = '/')
   }
 
   // Fallback: Jika baseUrl kosong, kembalikan '/'
-  return empty($baseUrl) ? '/' : $baseUrl;
+  return $baseUrl;
 }
 
 function removeBaseUrl($requestUri)

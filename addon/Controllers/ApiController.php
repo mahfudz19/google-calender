@@ -14,7 +14,8 @@ class ApiController
 
   public function __construct()
   {
-    $this->apiUrl = 'https://siakad.univeral.ac.id/api/ruangan';
+    $isProduction = isProduction();
+    $this->apiUrl = $isProduction ? 'https://siakad.univeral.ac.id/api/ruangan' : 'http://localhost:8888/siakad-univeral/api/ruangan';
     $this->apiKey = 'c5a9e9f03b7d4a12e8f60b3c9d4a7e2f1b2c3d4e5f60718293a4b5c6d7e8f901';
   }
 

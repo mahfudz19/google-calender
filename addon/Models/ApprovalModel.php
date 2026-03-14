@@ -251,4 +251,18 @@ class ApprovalModel extends Model
 
         return $conflicts;
     }
+
+    /**
+     * Menyimpan data dan mengembalikan ID baris yang baru saja diinsert
+     * Sangat berguna untuk Bulk Insert yang membutuhkan ID untuk Job Queue
+     */
+    public function createGetId(array $data): string|int
+    {
+        try {
+            $this->create($data);
+            return $this->getDb()->lastInsertId();
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage() ?? "Error Processing Request", 1);
+        }
+    }
 }
