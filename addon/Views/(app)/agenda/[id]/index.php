@@ -1,4 +1,8 @@
-<?php $agenda = $agenda ?? []; ?>
+<?php
+$agenda = $agenda ?? [];
+// Pastikan variabel ini memeriksa apakah user berhak melakukan approval
+$isApprover = $_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role'] === 'approver';
+?>
 
 <div class="agenda-container">
   <div class="gcal-form-wrapper">
@@ -12,8 +16,9 @@
           </svg>
         </a>
       </div>
-      <div class="header-right" style="display: flex; gap: 4px;">
+      <div class="header-right" style="display: flex; gap: 8px; align-items: center;">
         <?php if ($agenda['status'] === 'pending'): ?>
+
           <a data-spa href="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/edit') ?>" class="icon-action-btn" title="Edit Agenda">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -28,6 +33,14 @@
               <line x1="14" y1="11" x2="14" y2="17"></line>
             </svg>
           </button>
+
+          <?php if ($isApprover): ?>
+            <div style="width: 1px; height: 24px; background-color: var(--border-light); margin: 0 4px;"></div>
+
+            <button type="button" class="btn-action danger" style="padding: 8px 16px;" onclick="document.getElementById('modal-reject-<?= $agenda['id'] ?>').classList.add('show')">Tolak</button>
+            <button type="button" class="btn-save-gcal" style="padding: 8px 20px; font-size: 13px;" onclick="document.getElementById('modal-approve-<?= $agenda['id'] ?>').classList.add('show')">Setujui</button>
+          <?php endif; ?>
+
         <?php endif; ?>
       </div>
     </div>
@@ -173,18 +186,128 @@
       <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title">Batalkan Agenda?</h3>
+          <h3 class="modal-title text-danger">Batalkan Agenda?</h3>
         </div>
-        <div class="modal-body">
-          Apakah Anda yakin ingin membatalkan pengajuan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>? Tindakan ini tidak dapat dikembalikan.
+        <div class="modal-body" style="text-align: left;">
+          <p>Apakah Anda yakin ingin membatalkan pengajuan agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>?</p>
+          <p>Tindakan ini tidak dapat dikembalikan.</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn-action outline" onclick="this.closest('.css-modal').classList.remove('show')">Kembali</button>
+          <button type="button" class="btn-cancel" onclick="this.closest('.css-modal').classList.remove('show')">Kembali</button>
           <form action="<?= getBaseUrl('/agenda/' . $agenda['id'] . '/cancel') ?>" method="post" data-spa style="margin:0;">
-            <button type="submit" class="btn-action danger">Ya, Batalkan</button>
+            <button type="submit" class="btn-confirm danger">Ya, Batalkan</button>
           </form>
         </div>
       </div>
     </div>
   <?php endif; ?>
+
+  <?php if ($isApprover && $agenda['status'] === 'pending'): ?>
+
+    <div id="modal-reject-<?= $agenda['id'] ?>" class="css-modal">
+      <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Tolak Agenda</h3>
+          <button type="button" class="modal-close" onclick="this.closest('.css-modal').classList.remove('show')">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" style="text-align: left;">
+          <p>Silakan berikan alasan penolakan untuk agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong>:</p>
+          <form id="rejectForm_<?= $agenda['id'] ?>" action="<?= getBaseUrl('/approval/' . $agenda['id'] . '/reject') ?>" method="POST" data-spa style="margin-top: 1rem;">
+            <textarea name="comment" class="gcal-input gcal-textarea" rows="3" placeholder="Contoh: Ruangan sudah dipakai acara lain..." required style="width: 100%; border: 1px solid var(--border-light); padding: 12px; border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="this.closest('.css-modal').classList.remove('show')">Batal</button>
+          <button type="submit" form="rejectForm_<?= $agenda['id'] ?>" class="btn-confirm danger">Tolak Pengajuan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-approve-<?= $agenda['id'] ?>" class="css-modal">
+      <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Setujui Agenda?</h3>
+          <button type="button" class="modal-close" onclick="this.closest('.css-modal').classList.remove('show')">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body" style="text-align: left;" id="approve-body-<?= $agenda['id'] ?>">
+          <p>Agenda <strong><?= htmlspecialchars($agenda['title']) ?></strong> akan diproses dan disinkronisasi langsung ke Google Calendar peserta.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" onclick="this.closest('.css-modal').classList.remove('show')">Batal</button>
+
+          <button type="button" id="btn-submit-approve-<?= $agenda['id'] ?>" class="btn-confirm success" onclick="submitApproveDetail(<?= $agenda['id'] ?>)">Ya, Setujui</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function submitApproveDetail(agendaId) {
+        const btn = document.getElementById('btn-submit-approve-' + agendaId);
+        const originalText = btn.innerHTML;
+
+        // State Loading
+        btn.disabled = true;
+        btn.innerHTML = `<svg style="animation: apv-spin 1s linear infinite; margin-right: 8px;" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"></circle></svg> Memproses...`;
+
+        // Hapus error sebelumnya jika ada
+        const existingError = document.getElementById('approve-error-' + agendaId);
+        if (existingError) existingError.remove();
+
+        fetch('<?= getBaseUrl('/approval/') ?>' + agendaId + '/approve', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest' // Penting agar dikenali sebagai AJAX
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Jika sukses, langsung arahkan ke Dashboard
+              window.location.href = '<?= getBaseUrl('/dashboard') ?>';
+            } else {
+              // Jika gagal, tampilkan error dan kembalikan tombol
+              showApproveError(agendaId, data.message || 'Terjadi kesalahan sistem. Tidak dapat menyetujui.');
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            showApproveError(agendaId, 'Terjadi kesalahan jaringan. Periksa koneksi Anda.');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          });
+      }
+
+      function showApproveError(agendaId, message) {
+        const modalBody = document.getElementById('approve-body-' + agendaId);
+        if (modalBody) {
+          const errDiv = document.createElement('div');
+          errDiv.id = 'approve-error-' + agendaId;
+          errDiv.style.cssText = 'background-color: var(--error-bg); border: 1px solid var(--error-main); color: var(--error-dark); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem;';
+          errDiv.innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span><strong>Gagal!</strong> ${message}</span>
+          `;
+          modalBody.prepend(errDiv);
+        }
+      }
+    </script>
+  <?php endif; ?>
+
 </div>
