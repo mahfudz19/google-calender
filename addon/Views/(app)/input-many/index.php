@@ -8,8 +8,15 @@ $currentUser = [
 ];
 ?>
 
-<div class="blk-layout">
-  <aside class="blk-sidebar">
+<div class="app-layout">
+  <aside class="app-sidebar">
+    <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="blk-btn-back">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Kembali ke Dashboard
+    </a>
     <div class="blk-widget">
       <div class="blk-widget-header">Alur Pemeriksaan</div>
       <ul class="blk-steps">
@@ -60,7 +67,7 @@ $currentUser = [
     <script src="<?= getBaseUrl('/components-js/queue-widget/index.js') ?>"></script>
   </aside>
 
-  <main class="blk-main">
+  <main class="app-main">
 
     <div id="upload-section" class="blk-upload-section">
       <div class="blk-upload-header">
