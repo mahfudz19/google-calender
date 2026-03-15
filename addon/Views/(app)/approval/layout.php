@@ -33,8 +33,8 @@
         <a data-spa href="<?= getBaseUrl('/approval') ?>"
           class="apv-chip <?= strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) === false ? 'active' : '' ?>">
           Menunggu
-          <?php if (isset($approvals) && strpos($_SERVER['REQUEST_URI'], getBaseUrl('/approval/history')) === false): ?>
-            <span class="apv-chip-badge"><?= count($approvals) ?></span>
+          <?php if (!empty($await)): ?>
+            <span class="apv-chip-badge"><?= ($await) ?></span>
           <?php endif; ?>
         </a>
         <a data-spa href="<?= getBaseUrl('/approval/history') ?>"

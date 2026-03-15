@@ -20,7 +20,7 @@ class ApprovalController
     $approvals = $this->model->getPending();
 
     return $response->renderPage(
-      ['approvals' => $approvals],
+      ['approvals' => $approvals, 'await' => count($approvals)],
       ['meta' => ['title' => 'Persetujuan Agenda | ' . env('APP_NAME')]]
     );
   }
@@ -28,10 +28,12 @@ class ApprovalController
   public function history(Request $request, Response $response): View
   {
     $approvals = $this->model->getHistory();
+    $await = $this->model->getPendingCount();
 
-    return $response->renderPage([
-      'approvals' => $approvals,
-    ], ['meta' => ['title' => 'Riwayat Persetujuan | ' . env('APP_NAME')]]);
+    return $response->renderPage(
+      ['approvals' => $approvals, 'await' => $await],
+      ['meta' => ['title' => 'Riwayat Persetujuan | ' . env('APP_NAME')]]
+    );
   }
 
   public function approve(Request $request, Response $response): JsonResponse

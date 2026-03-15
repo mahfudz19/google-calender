@@ -126,6 +126,13 @@ class ApprovalModel extends Model
         return $stmt->fetchAll();
     }
 
+    public function getPendingCount(): int
+    {
+        $stmt = $this->getDb()->prepare("SELECT COUNT(*) as count FROM {$this->table} WHERE status = :status");
+        $stmt->execute(['status' => 'pending']);
+        return (int) $stmt->fetch()['count'];
+    }
+
     public function getHistory(): array
     {
         $stmt = $this->getDb()->prepare("SELECT * FROM {$this->table} WHERE status != :status ORDER BY updated_at DESC");
