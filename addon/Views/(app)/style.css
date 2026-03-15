@@ -474,6 +474,30 @@
   overflow-y: auto;
 }
 
+
+/* =========================================================
+   SIDEBAR NAVIGATION (Tombol Kembali)
+   ========================================================= */
+
+.app-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding: 8px 16px 8px 8px;
+  border-radius: 100px; /* Bentuk Pill (kapsul) */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-left: -8px; /* Offset kiri agar ikon sejajar lurus dengan widget di bawahnya */
+}
+
+.app-btn-back:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+}
+
 .app-main {
   flex: 1;
   display: flex;

@@ -1,7 +1,7 @@
 <div class="app-layout">
 
   <aside class="app-sidebar">
-    <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="apv-btn-back">
+    <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="app-btn-back">
       <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
         <line x1="19" y1="12" x2="5" y2="12"></line>
         <polyline points="12 19 5 12 12 5"></polyline>

@@ -382,26 +382,3 @@
 .blk-edit-group label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
 .blk-edit-input { padding: 6px 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 0.85rem; font-family: inherit; background: var(--bg-paper); color: var(--text-primary); }
 .blk-edit-actions { display: flex; gap: 8px; margin-top: 8px; }
-
-/* =========================================================
-   SIDEBAR NAVIGATION (Tombol Kembali)
-   ========================================================= */
-
-.blk-btn-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-  text-decoration: none;
-  padding: 8px 16px 8px 8px;
-  border-radius: 100px; /* Bentuk Pill (kapsul) */
-  transition: background-color 0.2s ease, color 0.2s ease;
-  margin-left: -8px; /* Offset kiri agar ikon sejajar lurus dengan widget di bawahnya */
-}
-
-.blk-btn-back:hover {
-  background-color: var(--bg-default);
-  color: var(--text-primary);
-}

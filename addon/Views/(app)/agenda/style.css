@@ -2,19 +2,12 @@
    HALAMAN DAFTAR AGENDA (MD3 / GCal List Style)
    ========================================================= */
 
-/* Area Kontainer */
-.agenda-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
 /* --- HEADER --- */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin: 16px;
 }
 
 .page-title {
@@ -54,45 +47,13 @@
   box-shadow: var(--shadow-md);
 }
 
-/* --- FILTER CHIPS (Pengganti Tab Lama) --- */
-.filter-chips {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  overflow-x: auto; /* Aman untuk mobile */
-  padding-bottom: 4px;
-}
-
-.chip {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border-light);
-  background-color: var(--bg-paper);
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.chip:hover {
-  background-color: var(--bg-default);
-  color: var(--text-primary);
-}
-
-.chip.active {
-  background-color: var(--primary-bg);
-  border-color: var(--primary-bg);
-  color: var(--primary-dark);
-}
-
 /* --- AGENDA LIST CONTAINER --- */
 .agenda-list-container {
   background: var(--bg-paper);
   border-radius: 16px;
   border: 1px solid var(--border-light);
   overflow: hidden;
+  margin: 16px;
 }
 
 .empty-state {
@@ -624,4 +585,52 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* =========================================================
+   SIDEBAR NAVIGATION MENU WIDGET (GCal Style)
+   ========================================================= */
+
+.widget-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Jarak rapat antar menu */
+}
+
+.widget-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 100px; /* Bentuk Pill membulat ke ujung */
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.widget-nav-item:hover {
+  background-color: var(--bg-default); /* Abu-abu terang saat di-hover */
+}
+
+/* State Aktif (Menu yang sedang dibuka) */
+.widget-nav-item.active {
+  background-color: var(--primary-bg); /* Biru sangat muda */
+  color: var(--primary-dark); /* Biru gelap */
+  font-weight: 600;
+}
+
+/* Indikator Warna Status di Navigasi */
+.widget-nav-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 2px; /* Penyesuaian sejajar dengan ikon SVG */
+}
+
+.widget-nav-item.active .widget-nav-dot {
+  /* Opsional: Membuat dot lebih menonjol saat aktif */
+  box-shadow: 0 0 0 2px var(--bg-paper);
 }
