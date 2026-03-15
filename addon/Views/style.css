@@ -1,70 +1,82 @@
+/* =========================================================
+   MAZU GLOBAL STYLE - MATERIAL UI PALETTE
+   ========================================================= */
 :root {
-  /* Material Design 3 - Academic Harmony Palette */
+  /* --- 1. PRIMARY (Warna Utama Aplikasi - Google Blue) --- */
+  --primary-main: #1976d2;
+  --primary-light: #42a5f5;
+  --primary-dark: #1565c0;
+  --primary-contrast: #ffffff;
+  --primary-bg: #e3f2fd; /* Untuk hover state atau active menu */
 
-  /* Primary: Google Calendar Blue (Dominan untuk sistem) */
-  --md-sys-color-primary: #1a73e8;
-  --md-sys-color-on-primary: #ffffff;
-  --md-sys-color-primary-container: #d2e3fc;
-  --md-sys-color-on-primary-container: #174ea6;
+  /* --- 2. SECONDARY (Warna Pendukung) --- */
+  --secondary-main: #9c27b0;
+  --secondary-light: #ba68c8;
+  --secondary-dark: #7b1fa2;
+  --secondary-contrast: #ffffff;
+  --secondary-bg: #f3e5f5;
 
-  /* Secondary: Soft Slate (Untuk elemen pendukung agar tidak terlalu ramai) */
-  --md-sys-color-secondary: #5f6368;
-  --md-sys-color-on-secondary: #ffffff;
-  --md-sys-color-secondary-container: #f1f3f4;
-  --md-sys-color-on-secondary-container: #202124;
+  /* --- 3. SUCCESS (Berhasil / Lolos) --- */
+  --success-main: #2e7d32;
+  --success-light: #4caf50;
+  --success-dark: #1b5e20;
+  --success-contrast: #ffffff;
+  --success-bg: #e8f5e9;
 
-  /* Tertiary: Kampus Red (Identitas & Aksen) */
-  --md-sys-color-tertiary: #b91c1c; /* Merah Marun/Kampus yang elegan */
-  --md-sys-color-on-tertiary: #ffffff;
-  --md-sys-color-tertiary-container: #fee2e2;
-  --md-sys-color-on-tertiary-container: #7f1d1d;
+  /* --- 4. ERROR (Gagal / Bahaya / Bentrok) --- */
+  --error-main: #d32f2f;
+  --error-light: #ef5350;
+  --error-dark: #c62828;
+  --error-contrast: #ffffff;
+  --error-bg: #ffebee;
 
-  /* Error: Vibrant Red */
-  --md-sys-color-error: #ba1a1a;
-  --md-sys-color-on-error: #ffffff;
-  --md-sys-color-error-container: #ffdad6;
-  --md-sys-color-on-error-container: #410002;
+  /* --- 5. WARNING (Peringatan / Hati-hati) --- */
+  --warning-main: #ed6c02;
+  --warning-light: #ff9800;
+  --warning-dark: #e65100;
+  --warning-contrast: #ffffff;
+  --warning-bg: #fff3e0;
 
-  /* Background & Surface: Ciri khas Google (Clean White) */
-  --md-sys-color-background: #f8f9fa;
-  --md-sys-color-on-background: #1f1f1f;
+  /* --- 6. INFO (Informasi / Catatan) --- */
+  --info-main: #0288d1;
+  --info-light: #03a9f4;
+  --info-dark: #01579b;
+  --info-contrast: #ffffff;
+  --info-bg: #e1f5fe;
 
-  --md-sys-color-surface: #ffffff;
-  --md-sys-color-on-surface: #1f1f1f;
+  /* --- 7. BACKGROUND & SURFACE (Khas MUI) --- */
+  --bg-default: #f4f6f8; /* Warna latar aplikasi paling belakang */
+  --bg-paper: #ffffff;   /* Warna latar Card, Modal, Sidebar, Header */
 
-  /* Surface Variant: Abu-abu kebiruan yang sangat soft */
-  --md-sys-color-surface-variant: #f1f3f4;
-  --md-sys-color-on-surface-variant: #444746;
+  /* --- 8. TEXT COLORS (Transparansi standar MUI) --- */
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.60);
+  --text-disabled: rgba(0, 0, 0, 0.38);
 
-  --md-sys-color-outline: #747775;
-  --md-sys-color-outline-variant: #c4c7c5;
+  /* --- 9. BORDERS & DIVIDERS --- */
+  --divider: rgba(0, 0, 0, 0.12); /* Untuk garis pemisah tipis */
+  --border-light: #e0e0e0;        /* Untuk border input/card */
 
-  /* Mazu Compatibility Mapping */
-  --primary: var(--md-sys-color-primary);
-  --primary-light: var(--md-sys-color-primary-container);
-  --danger: var(
-    --md-sys-color-tertiary
-  ); /* Gunakan Merah Kampus untuk tombol hapus/penting */
-  --app-bg: var(--md-sys-color-background);
-  --border-light: var(--md-sys-color-outline-variant);
-  --text-main: var(--md-sys-color-on-surface);
-  --text-muted: var(--md-sys-color-on-surface-variant);
+  /* --- 10. ELEVATION (Shadows) --- */
+  --shadow-sm: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0px 10px 15px rgba(0, 0, 0, 0.1);
+
+  /* --- 11. LAYOUT VARIABLES --- */
+  --navbar-height: 64px;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
 }
 
-/* Base Styles */
+/* =========================================================
+   BASE STYLES (Tailwind-like Reset)
+   ========================================================= */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-/* Base Styles (Tailwind-like Reset) */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 
-/* Images & Media: Prevent overflow */
 img,
 picture,
 video,
@@ -74,7 +86,6 @@ svg {
   max-width: 100%;
 }
 
-/* Form Elements: Inherit font styles */
 input,
 button,
 textarea,
@@ -83,13 +94,9 @@ select {
 }
 
 body {
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
-  background-color: var(--md-sys-color-background);
-  color: var(--md-sys-color-on-background);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-default);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   line-height: 1.5;
@@ -97,38 +104,34 @@ body {
 }
 
 a {
-  color: var(--md-sys-color-primary);
+  color: var(--primary-main);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  color: var(--md-sys-color-on-primary-container);
+  color: var(--primary-dark);
 }
 
-/* Global Progress Bar */
+/* Global Progress Bar (Loading SPA) */
 .progress-bar-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 4px;
+  height: 3px;
+  background-color: transparent;
   z-index: 9999;
-  pointer-events: none;
-  transition: opacity 0.3s;
+  display: none;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(
-    to right,
-    var(--md-sys-color-primary),
-    var(--md-sys-color-secondary),
-    var(--md-sys-color-primary)
-  );
-  width: 0;
-  transition:
-    width 0.2s ease-out,
-    opacity 0.3s;
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  background-color: var(--primary-main);
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+.progress-bar-container.show {
+  display: block;
 }

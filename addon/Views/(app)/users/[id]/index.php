@@ -1,65 +1,82 @@
-<div class="users-container" style="max-width: 800px; margin: 0 auto;">
+<?php $item = $item ?? null; ?>
+<div class="upf-container">
 
-  <div class="page-header" style="margin-bottom: 1.5rem;">
-    <a data-spa href="<?= getBaseUrl('/users') ?>" class="btn-back">← Kembali ke Daftar User</a>
+  <div class="upf-page-header">
+    <a data-spa href="<?= getBaseUrl('/users') ?>" class="upf-btn-back">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Kembali ke Daftar Pengguna
+    </a>
   </div>
 
   <?php if ($item): ?>
-    <div class="profile-card">
-      <div class="profile-header">
-        <div class="profile-avatar-lg">
+    <div class="upf-card">
+
+      <div class="upf-header">
+        <div class="upf-avatar-wrapper">
           <?php if (!empty($item['avatar'])): ?>
-            <img src="<?= htmlspecialchars($item['avatar']) ?>" alt="Avatar">
+            <img src="<?= htmlspecialchars($item['avatar']) ?>" alt="Avatar" class="upf-avatar-lg">
           <?php else: ?>
-            <div class="avatar-placeholder"><?= strtoupper(substr($item['name'] ?? 'U', 0, 1)) ?></div>
+            <div class="upf-avatar-lg fallback"><?= strtoupper(substr($item['name'] ?? 'U', 0, 1)) ?></div>
           <?php endif; ?>
         </div>
-        <div class="profile-title-group">
-          <h2 class="profile-name"><?= htmlspecialchars($item['name'] ?? 'Tanpa Nama') ?></h2>
-          <p class="profile-email"><?= htmlspecialchars($item['email'] ?? '-') ?></p>
 
-          <div class="profile-badges">
+        <div class="upf-title-group">
+          <h2 class="upf-name"><?= htmlspecialchars($item['name'] ?? 'Tanpa Nama') ?></h2>
+          <p class="upf-email"><?= htmlspecialchars($item['email'] ?? '-') ?></p>
+
+          <div class="upf-badges">
             <?php
-            $roleClass = 'bg-blue';
-            if ($item['role'] === 'admin') $roleClass = 'bg-primary';
-            if ($item['role'] === 'approver') $roleClass = 'bg-orange';
+            $roleClass = 'badge-blue';
+            if ($item['role'] === 'admin') $roleClass = 'badge-primary';
+            if ($item['role'] === 'approver') $roleClass = 'badge-orange';
             ?>
-            <span class="badge <?= $roleClass ?>"><?= strtoupper($item['role'] ?? 'User') ?></span>
+            <span class="upf-badge <?= $roleClass ?>"><?= strtoupper($item['role'] ?? 'User') ?></span>
 
             <?php if ($item['is_active']): ?>
-              <span class="badge bg-green">AKTIF</span>
+              <span class="upf-badge badge-green">AKSES AKTIF</span>
             <?php else: ?>
-              <span class="badge bg-gray">NON-AKTIF</span>
+              <span class="upf-badge badge-gray">AKSES DITOLAK</span>
             <?php endif; ?>
           </div>
         </div>
       </div>
 
-      <div class="profile-body">
-        <h3 class="section-title">Informasi Aktivitas</h3>
-        <div class="info-grid">
-          <div class="info-box">
-            <span class="info-label">Terakhir Login</span>
-            <span class="info-value">
+      <div class="upf-body">
+        <h3 class="upf-section-title">Aktivitas Sistem</h3>
+        <div class="upf-info-grid">
+          <div class="upf-info-box">
+            <span class="upf-info-label">Terakhir Login</span>
+            <span class="upf-info-value">
               <?= $item['last_login_at'] ? date('d F Y • H:i', strtotime($item['last_login_at'])) : 'Belum pernah login' ?>
             </span>
           </div>
-          <div class="info-box">
-            <span class="info-label">Tanggal Didaftarkan</span>
-            <span class="info-value">
+          <div class="upf-info-box">
+            <span class="upf-info-label">Tanggal Didaftarkan</span>
+            <span class="upf-info-value">
               <?= $item['created_at'] ? date('d F Y', strtotime($item['created_at'])) : '-' ?>
             </span>
           </div>
         </div>
       </div>
 
-      <div class="profile-footer">
-        <a data-spa href="<?= getBaseUrl('/users/' . $item['id'] . '/edit') ?>" class="btn-confirm success" style="text-decoration: none;">✎ Edit Hak Akses</a>
+      <div class="upf-footer">
+        <a data-spa href="<?= getBaseUrl('/users/' . $item['id'] . '/edit') ?>" class="upf-btn-primary">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          Edit Hak Akses
+        </a>
       </div>
     </div>
   <?php else: ?>
-    <div class="table-card" style="padding: 4rem; text-align: center;">
-      <p class="text-muted">Pengguna tidak ditemukan di dalam sistem.</p>
+    <div class="upf-empty-state">
+      <div class="upf-empty-icon">🔍</div>
+      <p>Pengguna tidak ditemukan di dalam sistem.</p>
     </div>
   <?php endif; ?>
+
 </div>

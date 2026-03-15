@@ -1,119 +1,299 @@
-.users-container {
-    max-width: 100%;
+/* =========================================================
+   USER MANAGEMENT PAGE (Google Admin / MD3 Style)
+   ========================================================= */
+
+.usr-layout-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-paper);
+  border-radius: 16px;
+  min-height: calc(100vh - var(--navbar-height) - 48px);
 }
 
-.page-header {
-    display: flex;
+/* --- HEADER & CONTROLS --- */
+.usr-header-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .usr-header-section {
+    flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+  }
 }
 
-/* Controls (Search & Limit) */
-.table-controls { display: flex; gap: 1rem; align-items: center; }
-
-.search-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.search-icon { position: absolute; left: 1rem; color: var(--md-sys-color-on-surface-variant); font-size: 1.1rem; }
-.search-wrapper input {
-    padding: 0.75rem 1rem 0.75rem 2.8rem;
-    border: 1px solid var(--md-sys-color-outline-variant);
-    border-radius: 10px;
-    width: 280px;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    background: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-background);
-}
-.search-wrapper input:focus { border-color: var(--md-sys-color-primary); outline: none; box-shadow: 0 0 0 3px var(--md-sys-color-primary-container); }
-
-.limit-wrapper select {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--md-sys-color-outline-variant);
-    border-radius: 10px;
-    font-size: 0.95rem;
-    background: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-background);
-    cursor: pointer;
+.usr-page-title {
+  font-size: 1.75rem;
+  font-weight: 400;
+  font-family: "Product Sans", "Inter", sans-serif;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
 }
 
-/* Card Tabel */
-.table-card {
-    background: var(--md-sys-color-surface);
-    border-radius: 16px;
-    border: 1px solid var(--md-sys-color-outline-variant);
-    box-shadow: 0 2px 8px -2px rgba(0,0,0,0.05);
-    overflow: hidden;
+.usr-page-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
 }
-.table-responsive { overflow-x: auto; width: 100%; }
 
-/* Desain Tabel */
-.mazu-datatable { width: 100%; border-collapse: collapse; text-align: left; }
-.mazu-datatable th {
-    background-color: var(--md-sys-color-surface-variant);
-    padding: 1.25rem 1.5rem;
-    font-weight: 600;
-    color: var(--md-sys-color-on-surface-variant);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--md-sys-color-outline-variant);
-    user-select: none;
+.usr-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
 }
-.mazu-datatable th.sortable { cursor: pointer; transition: background 0.2s; }
-.mazu-datatable th.sortable:hover { background-color: var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-background); }
-.sort-icon { display: inline-block; margin-left: 0.25rem; font-size: 0.8rem; opacity: 0.5; }
 
-.mazu-datatable td {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    color: var(--md-sys-color-on-background);
-    vertical-align: middle;
+@media (min-width: 768px) {
+  .usr-controls { width: auto; }
 }
-.mazu-datatable tbody tr:hover { background-color: var(--md-sys-color-surface-variant); }
-.mazu-datatable tbody tr:last-child td { border-bottom: none; }
 
-/* Komponen dalam Sel Tabel */
-.user-profile { display: flex; align-items: center; gap: 1rem; }
-.user-name { font-weight: 600; color: var(--md-sys-color-on-background); }
+/* Kotak Pencarian Pill ala Google Drive */
+.usr-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
 
-/* Badge Colors dengan Material Design 3 */
-.bg-green { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-tertiary); }
-.bg-gray { background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface-variant); }
-.bg-primary { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-primary); }
-.bg-orange { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-secondary); }
-.bg-blue { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-primary); }
+.usr-search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-secondary);
+}
 
-/* Aksi Kanan */
-.action-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; }
-.btn-act { white-space: nowrap; background: transparent; border: 1px solid var(--md-sys-color-outline-variant); padding: 0.4rem; border-radius: 8px; color: var(--md-sys-color-on-surface-variant); cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-.btn-act:hover { background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-background); }
-.btn-act.danger:hover { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); border-color: var(--md-sys-color-error-container); }
-.btn-act.success { color: var(--md-sys-color-tertiary); border-color: var(--md-sys-color-tertiary-container); background: var(--md-sys-color-tertiary-container); padding: 0.4rem 1rem; font-size: 0.85rem; font-weight: 600; }
-.btn-act.success:hover { background: var(--md-sys-color-tertiary-container); }
+.usr-search-input {
+  width: 100%;
+  min-width: 260px;
+  padding: 10px 16px 10px 44px;
+  background-color: var(--bg-default);
+  border: 1px solid transparent;
+  border-radius: 100px; /* Pill */
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
 
-/* Helper Classes */
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-muted { color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
+.usr-search-input:focus {
+  outline: none;
+  background-color: var(--bg-paper);
+  border-color: var(--primary-main);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 
-/* Footer / Paginasi */
-.table-footer { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-top: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); }
-.table-info { color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
-.pagination-controls { display: flex; gap: 0.5rem; }
-.page-btn { padding: 0.5rem 1rem; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface); border-radius: 8px; cursor: pointer; color: var(--md-sys-color-on-background); font-weight: 500; transition: 0.2s; }
-.page-btn:hover:not(:disabled) { background: var(--md-sys-color-surface-variant); }
-.page-btn.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
-.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.usr-select-input {
+  padding: 10px 16px;
+  background-color: var(--bg-paper);
+  border: 1px solid var(--border-light);
+  border-radius: 100px; /* Pill */
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+}
 
-@media (max-width: 768px) {
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .table-controls { flex-direction: column; width: 100%; align-items: stretch; }
-    .search-wrapper input { width: 100%; }
-    .table-footer { flex-direction: column; gap: 1rem; }
+/* --- TABEL DATA --- */
+.usr-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-top: 1px solid var(--border-light);
+}
+
+.usr-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.usr-table th {
+  padding: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.usr-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.usr-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.usr-table tbody tr:hover {
+  background-color: var(--bg-default);
+}
+
+.usr-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.usr-sortable:hover {
+  color: var(--text-primary);
+}
+
+/* Elemen Profil di Tabel */
+.usr-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usr-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.usr-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Badges Status (MD3 Soft Colors) */
+.usr-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.badge-green { background: var(--success-bg); color: var(--success-dark); }
+.badge-gray { background: var(--bg-default); color: var(--text-secondary); }
+.badge-blue { background: var(--primary-bg); color: var(--primary-dark); }
+.badge-orange { background: var(--warning-bg); color: var(--warning-dark); }
+
+/* Tombol Aksi */
+.usr-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.usr-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.usr-btn-icon:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+}
+
+.usr-btn-icon.danger:hover {
+  background-color: var(--error-bg);
+  color: var(--error-main);
+}
+
+.usr-btn-text {
+  padding: 6px 16px;
+  border-radius: 100px; /* Pill */
+  font-size: 13px;
+  font-weight: 500;
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.usr-btn-text.success {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+}
+.usr-btn-text.success:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-contrast);
+}
+
+.usr-text-right { text-align: right; }
+
+/* --- FOOTER / PAGINATION --- */
+.usr-table-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+}
+
+@media (min-width: 768px) {
+  .usr-table-footer {
+    flex-direction: row;
+  }
+}
+
+.usr-table-info {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.usr-pagination {
+  display: flex;
+  gap: 4px;
+}
+
+.usr-page-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.usr-page-btn:hover:not(:disabled) {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+}
+
+.usr-page-btn.active {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+}
+
+.usr-page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }

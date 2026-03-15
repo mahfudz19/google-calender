@@ -1,4 +1,3 @@
-// Tambahkan parameter ke-4: apiUploadUrl
 export function initCsvUploader(
   AutocompleteClass,
   currentUser,
@@ -44,33 +43,38 @@ export function initCsvUploader(
   const modalConfirmBtn = document.getElementById("csvModalConfirmBtn");
 
   // ==========================================
-  // UTILS: MODAL
+  // UTILS: MODAL GLOBAL CSS
   // ==========================================
   function showModal({ title, message, type = "alert", onConfirm = null }) {
     if (!modalEl) return;
     modalTitle.textContent = title;
     modalText.innerHTML = message;
+    
+    // Reset Kelas
     modalTitle.className = "modal-title";
     modalIcon.className = "modal-icon-wrapper";
+    modalIcon.style.display = "flex";
     modalConfirmBtn.className = "btn-confirm";
 
     if (type === "error") {
       modalTitle.classList.add("text-danger");
       modalIcon.classList.add("danger");
-      modalIcon.textContent = "⚠️";
+      modalIcon.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
       modalConfirmBtn.classList.add("danger");
       modalCancelBtn.style.display = "none";
       modalConfirmBtn.textContent = "Tutup";
     } else if (type === "confirm") {
       modalIcon.classList.add("danger");
-      modalIcon.textContent = "🗑️";
+      modalIcon.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
       modalConfirmBtn.classList.add("danger");
       modalCancelBtn.style.display = "inline-block";
-      modalConfirmBtn.textContent = "Ya, Hapus";
+      modalConfirmBtn.textContent = "Ya, Lanjutkan";
     } else {
-      modalIcon.textContent = "ℹ️";
+      modalIcon.classList.add("success");
+      modalIcon.innerHTML = `✨`;
       modalCancelBtn.style.display = "none";
       modalConfirmBtn.textContent = "OK";
+      modalConfirmBtn.classList.add("success");
     }
 
     const closeHandler = () => {
@@ -83,6 +87,7 @@ export function initCsvUploader(
       closeHandler();
       if (typeof onConfirm === "function") onConfirm();
     };
+    
     modalEl.classList.add("show");
   }
 
@@ -109,9 +114,9 @@ export function initCsvUploader(
   function updateSidebarUI(state = getProgress()) {
     const hasData = !!localStorage.getItem(STORAGE_KEY);
 
-    btnCheckRuangan.className = "btn-step";
-    btnCheckInternal.className = "btn-step";
-    btnCheckDb.className = "btn-step";
+    btnCheckRuangan.className = "blk-btn-step";
+    btnCheckInternal.className = "blk-btn-step";
+    btnCheckDb.className = "blk-btn-step";
 
     if (!hasData) {
       stepRuangan.classList.add("disabled");
@@ -133,13 +138,13 @@ export function initCsvUploader(
     const csv = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
     if (state.roomPassed) {
-      btnCheckRuangan.textContent = "✅ Lolos";
+      btnCheckRuangan.textContent = "Lolos";
       btnCheckRuangan.classList.add("success");
       stepInternal.classList.remove("disabled");
       btnCheckInternal.disabled = false;
     } else {
       if (csv.some((r) => r._roomError)) {
-        btnCheckRuangan.textContent = "⚠️ Perbaiki";
+        btnCheckRuangan.textContent = "Perbaiki";
         btnCheckRuangan.classList.add("error");
       } else {
         btnCheckRuangan.textContent = "Check Ulang";
@@ -150,13 +155,13 @@ export function initCsvUploader(
     }
 
     if (state.roomPassed && state.internalPassed) {
-      btnCheckInternal.textContent = "✅ Lolos";
+      btnCheckInternal.textContent = "Lolos";
       btnCheckInternal.classList.add("success");
       stepDb.classList.remove("disabled");
       btnCheckDb.disabled = false;
     } else if (state.roomPassed) {
       if (csv.some((r) => r._timeError)) {
-        btnCheckInternal.textContent = "⚠️ Perbaiki";
+        btnCheckInternal.textContent = "Perbaiki";
         btnCheckInternal.classList.add("error");
       } else {
         btnCheckInternal.textContent = "Check";
@@ -167,12 +172,12 @@ export function initCsvUploader(
     }
 
     if (state.roomPassed && state.internalPassed && state.dbPassed) {
-      btnCheckDb.textContent = "✅ Lolos";
+      btnCheckDb.textContent = "Lolos";
       btnCheckDb.classList.add("success");
       btnUploadAll.disabled = false;
     } else if (state.roomPassed && state.internalPassed) {
       if (csv.some((r) => r._dbConflict)) {
-        btnCheckDb.textContent = "⚠️ Perbaiki";
+        btnCheckDb.textContent = "Perbaiki";
         btnCheckDb.classList.add("error");
       } else {
         btnCheckDb.textContent = "Check";
@@ -222,18 +227,11 @@ export function initCsvUploader(
 
     csvData = csvData.map((row) => {
       const rId = parseInt(row.ruangan_id);
-      const rName = String(row.ruangan_name || "")
-        .trim()
-        .toLowerCase();
+      const rName = String(row.ruangan_name || "").trim().toLowerCase();
 
       let matchedRoom = rooms.find((r) => parseInt(r.ID_ruangan) === rId);
       if (!matchedRoom && rName !== "") {
-        matchedRoom = rooms.find(
-          (r) =>
-            String(r.name || "")
-              .trim()
-              .toLowerCase() === rName,
-        );
+        matchedRoom = rooms.find((r) => String(r.name || "").trim().toLowerCase() === rName);
       }
 
       if (matchedRoom) {
@@ -252,14 +250,10 @@ export function initCsvUploader(
     renderTable(csvData);
 
     if (errorCount > 0) {
-      setProgress({
-        roomPassed: false,
-        internalPassed: false,
-        dbPassed: false,
-      });
+      setProgress({ roomPassed: false, internalPassed: false, dbPassed: false });
       showModal({
         title: "Ditemukan Kesalahan",
-        message: `Ditemukan <strong>${errorCount}</strong> ruangan yang tidak valid.`,
+        message: `Ditemukan <strong>${errorCount}</strong> baris ruangan yang tidak valid.`,
         type: "error",
       });
     } else {
@@ -316,8 +310,7 @@ export function initCsvUploader(
       setProgress({ internalPassed: false, dbPassed: false });
       showModal({
         title: "Jadwal Bertabrakan",
-        message:
-          "Terdapat agenda yang jadwal dan ruangannya bentrok di dalam file CSV.",
+        message: "Terdapat agenda yang jadwal dan ruangannya bentrok di dalam file CSV.",
         type: "error",
       });
     } else {
@@ -376,7 +369,7 @@ export function initCsvUploader(
         if (errorCount > 0) {
           setProgress({ dbPassed: false });
           showModal({
-            title: "Bentrok Database Server",
+            title: "Bentrok Server",
             message: `Ditemukan <strong>${errorCount}</strong> agenda yang bertabrakan dengan jadwal paten di Database.`,
             type: "error",
           });
@@ -415,7 +408,7 @@ export function initCsvUploader(
   }
 
   // ==========================================
-  // ACTION: UPLOAD SEMUA DATA (FINAL)
+  // ACTION: UPLOAD SEMUA DATA
   // ==========================================
   if (btnUploadAll && !btnUploadAll.dataset.handled) {
     btnUploadAll.addEventListener("click", async () => {
@@ -423,33 +416,22 @@ export function initCsvUploader(
       if (!state.roomPassed || !state.internalPassed || !state.dbPassed) {
         showModal({
           title: "Aksi Ditolak",
-          message:
-            "Harap selesaikan semua tahapan pemeriksaan terlebih dahulu.",
+          message: "Harap selesaikan semua tahapan pemeriksaan terlebih dahulu.",
           type: "alert",
         });
         return;
       }
 
-      // UI Loading state
       btnUploadAll.disabled = true;
       const originalText = btnUploadAll.textContent;
 
-      // Ubah teks tombol saat proses API
-      btnUploadAll.innerHTML =
-        '<span class="spinner-mini" style="border-top-color: white; width: 14px; height: 14px; border-width: 2px;"></span> Mengunggah...';
+      btnUploadAll.innerHTML = '<span class="spinner-mini" style="border-top-color: white; width: 14px; height: 14px; border-width: 2px;"></span> Mengunggah...';
 
       try {
         let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
         const cleanData = csvData.map((row) => {
-          const {
-            _rowId,
-            _roomError,
-            _timeError,
-            _dbConflict,
-            _conflictWith,
-            ...cleanRow
-          } = row;
+          const { _rowId, _roomError, _timeError, _dbConflict, _conflictWith, ...cleanRow } = row;
           return cleanRow;
         });
 
@@ -462,30 +444,22 @@ export function initCsvUploader(
         const result = await res.json();
 
         if (res.ok && result.status === "success") {
-          // 1. Trigger SWR Global Mutate
-          window.dispatchEvent(
-            new CustomEvent("swr:mutate", { detail: { key: "mazu_qw_cache" } }),
-          );
+          window.dispatchEvent(new CustomEvent("swr:mutate", { detail: { key: "mazu_qw_cache" } }));
           window.dispatchEvent(new Event("swr:mutate:mazu_qw_cache"));
 
-          // FALLBACK SAKTI: Panggil fungsi fetch mazu queue secara langsung jika scriptnya sudah siap
           if (typeof window.mazuQueueTriggerFetch === "function") {
             window.mazuQueueTriggerFetch();
           }
 
-          // 2. Bersihkan Memori Browser
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(PROGRESS_KEY);
 
-          // 3. Reset Tampilan ke Layar Upload Awal
           updateSidebarUI();
           showUpload();
 
-          // 4. Modal Sukses
           showModal({
             title: "Upload Berhasil!",
-            message:
-              "Semua data agenda berhasil dikirim dan ditambahkan ke dalam antrean (Queue) server.",
+            message: "Data agenda berhasil dikirim dan ditambahkan ke dalam antrean sinkronisasi server.",
             type: "alert",
           });
         } else {
@@ -512,9 +486,7 @@ export function initCsvUploader(
   function parseCSV(csvText) {
     const lines = csvText.split(/\r\n|\n/);
     if (lines.length < 2) return [];
-    const headers = lines[0]
-      .split(",")
-      .map((h) => h.trim().replace(/^"|"$/g, ""));
+    const headers = lines[0].split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
     const result = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -543,7 +515,7 @@ export function initCsvUploader(
       uploadZone.style.opacity = "0.7";
       iconUpload.style.display = "none";
       spinnerUpload.style.display = "block";
-      mainTextUpload.textContent = "Memproses Data CSV...";
+      mainTextUpload.textContent = "Memproses Data...";
       subTextUpload.style.display = "none";
       btnLabelUpload.style.display = "none";
     } else {
@@ -561,8 +533,8 @@ export function initCsvUploader(
   function processFile(file) {
     if (!file || (file.type !== "text/csv" && !file.name.endsWith(".csv"))) {
       showModal({
-        title: "Format Tidak Valid",
-        message: "Harap unggah file <strong>.csv</strong>",
+        title: "Format Salah",
+        message: "Harap unggah file dengan format <strong>.csv</strong>",
         type: "error",
       });
       return;
@@ -585,7 +557,7 @@ export function initCsvUploader(
           setUploadLoadingState(false);
           showModal({
             title: "File Kosong",
-            message: "File CSV kosong atau header tidak valid.",
+            message: "File CSV kosong atau header kolom tidak ditemukan.",
             type: "error",
           });
         }
@@ -621,8 +593,7 @@ export function initCsvUploader(
     btnReset.addEventListener("click", () => {
       showModal({
         title: "Konfirmasi Hapus",
-        message:
-          "Yakin menghapus data tabel saat ini? Seluruh progress check juga akan direset.",
+        message: "Yakin menghapus data preview saat ini? Seluruh progress check juga akan direset.",
         type: "confirm",
         onConfirm: () => {
           localStorage.removeItem(STORAGE_KEY);
@@ -644,9 +615,6 @@ export function initCsvUploader(
     previewSection.style.display = "block";
   }
 
-  // ==========================================
-  // UTILS FORMAT DATE
-  // ==========================================
   function toDatetimeLocal(sqlDateStr) {
     if (!sqlDateStr) return "";
     return sqlDateStr.replace(" ", "T").slice(0, 16);
@@ -665,110 +633,92 @@ export function initCsvUploader(
   }
 
   // ==========================================
-  // RENDERING TABEL & WIDGET EDIT
+  // RENDERING TABEL & WIDGET EDIT INLINE
   // ==========================================
   function renderTable(data) {
     tbody.innerHTML = "";
     rowCountSpan.textContent = data.length;
-    const roomCache = JSON.parse(
-      localStorage.getItem(ROOM_STORAGE_KEY) || "[]",
-    );
+    const roomCache = JSON.parse(localStorage.getItem(ROOM_STORAGE_KEY) || "[]");
 
     data.forEach((row, index) => {
       const startStr = formatDateTime(row.start_time);
       const endStr = formatDateTime(row.end_time);
-      const avatarInitial = row.requester_name
-        ? row.requester_name.charAt(0).toUpperCase()
-        : "U";
-      const avatarHtml = row.requester_avatar
-        ? `<img src="${row.requester_avatar}" alt="${avatarInitial}">`
-        : avatarInitial;
-      let roleClass =
-        row.requester_role === "admin"
-          ? "role-admin"
-          : row.requester_role === "approver"
-            ? "role-approver"
-            : "role-user";
+      const avatarInitial = row.requester_name ? row.requester_name.charAt(0).toUpperCase() : "U";
+      const avatarHtml = row.requester_avatar ? `<img src="${row.requester_avatar}" alt="Ava">` : avatarInitial;
+      let roleClass = row.requester_role === "admin" ? "role-admin" : row.requester_role === "approver" ? "role-approver" : "role-user";
 
-      let timeTdClass = row._dbConflict
-        ? "cell-error"
-        : row._timeError
-          ? "cell-warning"
-          : "";
+      let timeTdClass = row._dbConflict ? "blk-cell-error" : row._timeError ? "blk-cell-warning" : "";
 
       let conflictHtml = "";
       if (row._dbConflict) {
         conflictHtml = `
-                    <div class="error-msg" style="margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
-                        <span><i class="bi bi-x-circle"></i> Bentrok dgn DB Server</span>
-                        <button type="button" class="btn-show-conflict btn-xs-action danger" data-index="${index}" style="margin-top: 0; padding: 2px 8px; width: fit-content;">🔍 Lihat Detail</button>
-                    </div>`;
+                    <div class="blk-error-msg danger">
+                        Bentrok Database Server
+                    </div>
+                    <button type="button" class="btn-show-conflict blk-btn-inline danger" data-index="${index}">🔍 Lihat Detail</button>`;
       } else if (row._timeError) {
         conflictHtml = `
-                    <div class="error-msg warning" style="margin-top: 6px;">
-                        <i class="bi bi-exclamation-triangle"></i> Bentrok Internal Baris: ${row._conflictWith.join(", ")}
+                    <div class="blk-error-msg warning">
+                        Bentrok Baris CSV: ${row._conflictWith.join(", ")}
                     </div>`;
       }
 
       let timeHtml = `
                 <div id="time-card-${index}">
-                    <div class="time-info">
+                    <div class="blk-time-info">
                         <span class="date">${startStr.date}</span>
                         <span class="time">${startStr.time} - ${endStr.time}</span>
                         ${conflictHtml}
                     </div>
-                    <button type="button" class="btn-edit-time btn-xs-action outline" data-index="${index}">✏️ Edit Waktu</button>
+                    <button type="button" class="btn-edit-time blk-btn-inline outline" data-index="${index}">✏️ Edit Waktu</button>
                 </div>
-                <div class="time-edit-container" id="time-edit-${index}" style="display: none;">
-                    <div class="time-edit-group">
+                <div class="blk-edit-container" id="time-edit-${index}" style="display: none;">
+                    <div class="blk-edit-group">
                         <label>Mulai:</label>
-                        <input type="datetime-local" id="time-start-${index}" class="time-edit-input" value="${toDatetimeLocal(row.start_time)}">
+                        <input type="datetime-local" id="time-start-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.start_time)}">
                     </div>
-                    <div class="time-edit-group">
+                    <div class="blk-edit-group">
                         <label>Selesai:</label>
-                        <input type="datetime-local" id="time-end-${index}" class="time-edit-input" value="${toDatetimeLocal(row.end_time)}">
+                        <input type="datetime-local" id="time-end-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.end_time)}">
                     </div>
-                    <div style="display: flex; gap: 4px; margin-top: 4px;">
-                        <button type="button" class="btn-save-time btn-xs-action primary" data-index="${index}">Simpan</button>
-                        <button type="button" class="btn-cancel-time btn-xs-action outline" data-index="${index}">Batal</button>
+                    <div class="blk-edit-actions">
+                        <button type="button" class="btn-save-time blk-btn-inline primary" data-index="${index}">Simpan</button>
+                        <button type="button" class="btn-cancel-time blk-btn-inline outline" data-index="${index}">Batal</button>
                     </div>
                 </div>
             `;
 
-      let roomTdClass = row._roomError ? "cell-error" : "";
+      let roomTdClass = row._roomError ? "blk-cell-error" : "";
       let optionsHtml = '<option value="">Pilih Ruangan...</option>';
       roomCache.forEach((r) => {
-        const isSelected =
-          !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan)
-            ? "selected"
-            : "";
+        const isSelected = !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan) ? "selected" : "";
         optionsHtml += `<option value="${r.ID_ruangan}" data-name="${r.name}" data-capacity="${r.capacity}" ${isSelected}>ID ${r.ID_ruangan} - ${r.name}</option>`;
       });
 
       const cardContent = row._roomError
         ? `
-                <span class="room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
-                <span class="room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                <div class="error-msg"><i class="bi bi-exclamation-octagon"></i> Ruangan tak terdaftar!</div>
-                <button type="button" class="btn-fix-room btn-xs-action danger" data-index="${index}">Perbaiki</button>
+                <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
+                <span class="blk-room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+                <div class="blk-error-msg danger">Tak terdaftar!</div>
+                <button type="button" class="btn-fix-room blk-btn-inline danger" data-index="${index}">Perbaiki</button>
             `
         : `
-                <span class="room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
-                <span class="room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                <button type="button" class="btn-fix-room btn-xs-action outline" data-index="${index}">✏️ Edit Ruangan</button>
+                <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
+                <span class="blk-room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+                <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Ruangan</button>
             `;
 
       let roomHtml = `
-                <div class="room-card ${!row._roomError ? "valid" : ""}" id="room-card-${index}">
+                <div class="blk-room-card" id="room-card-${index}">
                     ${cardContent}
                 </div>
-                <div class="room-edit-container" id="room-edit-${index}" style="display: none; margin-top: 4px;">
+                <div class="blk-edit-container" id="room-edit-${index}" style="display: none;">
                     <div class="autocomplete-container" data-placeholder="Ketik nama ruangan...">
                         <select id="select-room-${index}" class="form-select">${optionsHtml}</select>
                     </div>
-                    <div style="display: flex; gap: 4px; margin-top: 8px;">
-                        <button type="button" class="btn-save-room btn-xs-action primary" data-index="${index}">Simpan</button>
-                        <button type="button" class="btn-cancel-room btn-xs-action outline" data-index="${index}">Batal</button>
+                    <div class="blk-edit-actions">
+                        <button type="button" class="btn-save-room blk-btn-inline primary" data-index="${index}">Simpan</button>
+                        <button type="button" class="btn-cancel-room blk-btn-inline outline" data-index="${index}">Batal</button>
                     </div>
                 </div>
             `;
@@ -776,9 +726,24 @@ export function initCsvUploader(
       const tr = document.createElement("tr");
       tr.innerHTML = `
                 <td>${index + 1}</td>
-                <td><div class="agenda-info"><strong>${row.title || "Tanpa Judul"}</strong><span class="agenda-desc">${row.description || "-"}</span></div></td>
+                <td>
+                  <div class="blk-agenda-info">
+                    <strong>${row.title || "Tanpa Judul"}</strong>
+                    <span class="blk-agenda-desc">${row.description || "-"}</span>
+                    ${row.location ? `<span class="blk-agenda-loc">📍 ${row.location}</span>` : ''}
+                  </div>
+                </td>
                 <td class="${timeTdClass}">${timeHtml}</td>
-                <td><div class="requester-card"><div class="req-avatar">${avatarHtml}</div><div class="req-details"><span class="req-name">${row.requester_name || "Unknown"}</span><span class="req-email">${row.requester_email || "-"}</span><span class="req-role ${roleClass}">${row.requester_role || "user"}</span></div></div></td>
+                <td>
+                  <div class="blk-req-card">
+                    <div class="blk-req-avatar">${avatarHtml}</div>
+                    <div class="blk-req-details">
+                      <span class="blk-req-name">${row.requester_name || "Unknown"}</span>
+                      <span class="blk-req-email">${row.requester_email || "-"}</span>
+                      <span class="blk-req-role ${roleClass}">${row.requester_role || "user"}</span>
+                    </div>
+                  </div>
+                </td>
                 <td class="${roomTdClass}">${roomHtml}</td>
             `;
       tbody.appendChild(tr);
@@ -797,7 +762,7 @@ export function initCsvUploader(
         if (conflicts && conflicts.length > 0) {
           let detailHtml = '<div style="text-align: left; margin-top: 10px;">';
           detailHtml +=
-            '<p style="margin-bottom: 12px; font-size: 0.95rem; color: var(--md-sys-color-on-surface-variant);">Agenda Anda bertabrakan dengan jadwal berikut yang sudah ada di database:</p>';
+            '<p style="margin-bottom: 12px; font-size: 0.95rem; color: var(--text-secondary);">Agenda Anda bertabrakan dengan jadwal berikut yang sudah ada di database:</p>';
           detailHtml +=
             '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
 
@@ -805,10 +770,10 @@ export function initCsvUploader(
             const startFmt = formatDateTime(c.start_time);
             const endFmt = formatDateTime(c.end_time);
             detailHtml += `
-                            <li style="background: var(--md-sys-color-surface-container); padding: 12px; border-radius: 8px; border-left: 4px solid var(--md-sys-color-error);">
-                                <strong style="display: block; color: var(--md-sys-color-on-surface); font-size: 1rem; margin-bottom: 4px;">${c.title}</strong>
-                                <span style="display: block; font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">📅 ${startFmt.date}</span>
-                                <span style="display: block; font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">⏰ ${startFmt.time} - ${endFmt.time}</span>
+                            <li style="background: var(--bg-default); padding: 12px; border-radius: 8px; border-left: 4px solid var(--error-main);">
+                                <strong style="display: block; color: var(--text-primary); font-size: 1rem; margin-bottom: 4px;">${c.title}</strong>
+                                <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">📅 ${startFmt.date}</span>
+                                <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">⏰ ${startFmt.time} - ${endFmt.time}</span>
                             </li>
                         `;
           });
@@ -864,8 +829,7 @@ export function initCsvUploader(
 
         csvData[idx].ruangan_id = selectEl.value;
         csvData[idx].ruangan_name = selectedOption.getAttribute("data-name");
-        csvData[idx].ruangan_capacity =
-          selectedOption.getAttribute("data-capacity");
+        csvData[idx].ruangan_capacity = selectedOption.getAttribute("data-capacity");
         csvData[idx]._roomError = false;
         csvData[idx]._timeError = false;
         csvData[idx]._dbConflict = null;
@@ -881,7 +845,7 @@ export function initCsvUploader(
       btn.addEventListener("click", function () {
         const idx = this.getAttribute("data-index");
         document.getElementById(`time-card-${idx}`).style.display = "none";
-        document.getElementById(`time-edit-${idx}`).style.display = "flex";
+        document.getElementById(`time-edit-${idx}`).style.display = "block";
       });
     });
 

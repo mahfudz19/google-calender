@@ -1,157 +1,357 @@
-/* Layout Split Screen */
-.dashboard-split {
-  display: grid;
-  grid-template-columns: 2.3fr 1fr; /* Rasio ~70% Kiri, 30% Kanan */
-  gap: 2rem;
-  align-items: start;
+/* =========================================================
+   DASHBOARD LAYOUT (Hybrid: GCal + Mazu Enterprise)
+   ========================================================= */
+.dashboard-layout {
+  display: flex;
+  height: calc(100vh - var(--navbar-height));
+  overflow: hidden;
 }
 
-/* --- KIRI: HEADER & KALENDER --- */
-.dash-header {
-  margin-bottom: 1.5rem;
-}
-.dash-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--md-sys-color-on-background);
-  margin-bottom: 0.3rem;
-}
-.dash-subtitle {
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 1rem;
-}
-
-.calendar-card {
-  background: var(--md-sys-color-surface);
-  padding: 1.5rem;
-  border-radius: 16px;
-  border: 1px solid var(--md-sys-color-outline-variant);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  min-height: 600px;
-}
-
-/* Override FullCalendar Mazu Engine */
-.fc-toolbar-title {
-  font-size: 1.25rem !important;
-  font-weight: 700;
-  color: var(--md-sys-color-on-background);
-}
-.fc .fc-button-primary {
-  background-color: var(--md-sys-color-surface) !important;
-  color: var(--md-sys-color-on-background) !important;
-  border: 1px solid var(--md-sys-color-outline-variant) !important;
-  border-radius: 8px !important;
-  text-transform: capitalize !important;
-  font-weight: 500;
-}
-.fc .fc-button-primary:not(:disabled).fc-button-active {
-  background-color: var(--md-sys-color-primary) !important;
-  color: var(--md-sys-color-on-primary) !important;
-  border-color: var(--md-sys-color-primary) !important;
-}
-
-/* --- KANAN: SIDEBAR COMMAND CENTER --- */
+/* --- KIRI: SIDEBAR --- */
 .dash-sidebar {
+  width: 280px; /* Diperlebar sedikit agar kartu lega */
+  min-width: 280px;
+  padding: 16px 12px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  position: sticky;
-  top: calc(var(--navbar-height) + 2rem);
+  gap: 24px;
+  border-right: none;
+  overflow-y: auto;
 }
 
-/* CTA Agenda Baru */
-.btn-create-agenda {
+/* Tombol Buat (FAB Pill) */
+.create-btn-wrapper {
+  padding-left: 4px;
+  margin-bottom: 8px;
+}
+
+.btn-create-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-paper);
+  color: var(--text-primary);
+  padding: 8px 24px 8px 8px;
+  border-radius: 28px;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+.btn-create-event:hover {
+  background-color: var(--bg-default);
+  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+}
+
+.btn-create-event svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* --- SIDEBAR SECTIONS & CARDS --- */
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.section-title {
+  font-size: 13px;
   font-weight: 600;
-  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.badge-count {
+  background-color: var(--error-main);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* KARTU WIDGET INFORMATIF */
+.sidebar-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--bg-paper);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 104, 116, 0.25);
-}
-.btn-create-agenda:hover {
-  background-color: #004d54; /* Darker version of primary */
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 104, 116, 0.35);
 }
 
-/* Desain Widget */
-.widget-card {
-  background: var(--md-sys-color-surface);
-  border-radius: 16px;
-  border: 1px solid var(--md-sys-color-outline-variant);
-  padding: 1.25rem;
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+.sidebar-card:hover {
+  background-color: var(--bg-default);
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px); /* Efek melayang */
 }
 
-.widget-card .page-title {
-  font-size: 1rem;
-}
-
-.widget-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.widget-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: background 0.2s;
-  border: 1px solid transparent;
-}
-.widget-item:hover {
-  background: var(--md-sys-color-surface-variant);
-  border-color: var(--md-sys-color-outline-variant);
-}
-
-.item-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+.card-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
   flex-shrink: 0;
 }
 
-.item-info {
+.card-info {
   display: flex;
   flex-direction: column;
+  gap: 4px;
   overflow: hidden;
+  width: 100%;
 }
-.item-info strong {
-  color: var(--md-sys-color-on-background);
-  font-size: 0.9rem;
+
+.card-title {
+  font-size: 13px;
   font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.item-info span {
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.75rem;
-  margin-top: 0.15rem;
+
+.card-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Responsive Mobile Turun Ke Bawah */
-@media (max-width: 1024px) {
-  .dashboard-split {
-    grid-template-columns: 1fr;
+.empty-state-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+  text-align: center;
+  background-color: var(--bg-default);
+  border-radius: 12px;
+  border: 1px dashed var(--border-light);
+}
+
+.empty-state-sidebar .empty-emoji {
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.empty-state-sidebar p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* --- KANAN: MAIN CALENDAR --- */
+.dash-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-paper);
+  border-top-left-radius: 24px;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.5);
+}
+
+.google-calendar-wrap {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+    overflow-y: auto;
   }
   .dash-sidebar {
-    position: relative;
-    top: 0;
+    width: 100%;
+    min-width: 100%;
+    border-bottom: 1px solid var(--border-light);
   }
+  .dash-main {
+    border-top-left-radius: 0;
+    min-height: 500px;
+  }
+  .fc .fc-toolbar-title {
+    font-size: 18px;
+    margin-left: 8px !important;
+  }
+}
+
+/* =========================================================
+   REDESAIN HEADER TOOLBAR (GCal Modern)
+   ========================================================= */
+.fc-toolbar.fc-header-toolbar {
+  padding: 16px;
+  margin-bottom: 0.5rem !important;
+}
+
+.fc .fc-button-primary.fc-today-button {
+  border-radius: 100px !important;
+  border: 1px solid var(--border-light) !important;
+  background: var(--bg-paper) !important;
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  padding: 6px 16px !important;
+  text-transform: capitalize;
+  box-shadow: none !important;
+  transition: background-color 0.2s;
+}
+.fc .fc-button-primary.fc-today-button:hover {
+  background: var(--bg-default) !important;
+}
+.fc .fc-button-primary.fc-today-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fc .fc-prev-button, .fc .fc-next-button {
+  border-radius: 50% !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px !important;
+  box-shadow: none !important;
+  transition: background-color 0.2s;
+}
+.fc .fc-prev-button:hover, .fc .fc-next-button:hover {
+  background: var(--bg-default) !important;
+}
+.fc .fc-prev-button .fc-icon, .fc .fc-next-button .fc-icon {
+  font-size: 1.5em;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  color: var(--text-primary);
+  margin-left: 12px !important;
+}
+
+.fc .fc-toolbar-chunk:last-child .fc-button-group {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+.fc .fc-toolbar-chunk:last-child .fc-button {
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  border-radius: 0 !important;
+  padding: 6px 16px !important;
+  font-weight: 500 !important;
+  border-right: 1px solid var(--border-light) !important;
+  box-shadow: none !important;
+  text-transform: capitalize;
+  transition: all 0.2s;
+}
+.fc .fc-toolbar-chunk:last-child .fc-button:last-child {
+  border-right: none !important;
+}
+.fc .fc-toolbar-chunk:last-child .fc-button:hover {
+  background: var(--bg-default) !important;
+  color: var(--text-primary) !important;
+}
+.fc .fc-toolbar-chunk:last-child .fc-button.fc-button-active {
+  background: var(--primary-bg) !important;
+  color: var(--primary-dark) !important;
+  font-weight: 600 !important;
+}
+
+/* =========================================================
+   FULLCALENDAR OVERRIDES (GCal 99% Look)
+   ========================================================= */
+.fc {
+  --fc-border-color: #dadce0; 
+  --fc-button-bg-color: transparent;
+  --fc-button-border-color: var(--fc-border-color);
+  --fc-button-text-color: var(--text-secondary);
+  --fc-button-hover-bg-color: var(--bg-default);
+  --fc-button-hover-border-color: var(--fc-border-color);
+  --fc-button-active-bg-color: var(--primary-bg);
+  --fc-button-active-border-color: var(--primary-bg);
+  --fc-button-active-text-color: var(--primary-dark);
+  --fc-today-bg-color: var(--primary-bg);
+  font-family: inherit;
+}
+
+.fc-theme-standard th {
+  font-weight: 500;
+  color: #70757a;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.fc-theme-standard td {
+  border: 1px solid var(--fc-border-color); 
+}
+
+.fc-daygrid-event-dot {
+  border-width: 4px !important;
+  border-radius: 50% !important;
+  background-color: transparent !important;
+}
+
+.fc-h-event .fc-event-main-frame, 
+.fc-daygrid-dot-event .fc-event-title {
+  color: var(--text-primary);
+}
+
+.fc-event-time { font-weight: 600 !important; font-size: 12px; }
+.fc-event-title { font-weight: 400 !important; font-size: 12px; }
+.fc-event:focus { box-shadow: none !important; }
+
+/* =========================================================
+   MENGHILANGKAN BORDER LUAR KALENDER (Bleed Edge)
+   ========================================================= */
+.fc-theme-standard .fc-scrollgrid {
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+}
+.fc-theme-standard td:first-child,
+.fc-theme-standard th:first-child {
+  border-left: none !important;
+}
+.fc-theme-standard td:last-child,
+.fc-theme-standard th:last-child {
+  border-right: none !important;
+}
+.fc .fc-scrollgrid-section-body:last-child td {
+  border-bottom: none !important;
 }

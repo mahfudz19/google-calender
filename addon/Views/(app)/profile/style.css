@@ -1,249 +1,194 @@
-/* Profile Page Styles */
-.profile-view-container {
-  max-width: 900px;
+/* ====================================================
+   PERSONAL PROFILE PAGE (Google Account Style)
+   ==================================================== */
+
+/* Kontainer dipersempit agar nyaman dibaca di layar besar */
+.myprof-container {
+  max-width: 720px; 
   margin: 0 auto;
-  padding: 2rem;
+  padding: 24px 16px;
 }
 
-.profile-view-header {
-  margin-bottom: 2rem;
+.myprof-page-header {
+  margin-bottom: 24px;
 }
 
-.profile-view-header-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.profile-view-back-btn {
+/* Tombol Kembali / Kapsul */
+.myprof-btn-back {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0.5rem 1rem;
-  background: var(--md-sys-color-surface);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 0.5rem;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
   text-decoration: none;
-  color: var(--md-sys-color-on-surface-variant);
-  transition: all 0.2s;
+  padding: 8px 16px 8px 8px;
+  border-radius: 100px;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.profile-view-back-btn:hover {
-  background: var(--md-sys-color-surface-variant);
-  color: var(--md-sys-color-on-background);
+.myprof-btn-back:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
 }
 
-.profile-view-title-section h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: var(--md-sys-color-on-background);
-  margin: 0;
-}
-
-.profile-view-title-section p {
-  color: var(--md-sys-color-on-surface-variant);
-  margin: 0.25rem 0 0 0;
-}
-
-.profile-view-main-card {
-  background: var(--md-sys-color-surface);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* --- BAGIAN HEADER TERPUSAT --- */
+.myprof-header-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  border: 1px solid var(--md-sys-color-outline-variant);
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.profile-view-avatar-wrapper {
-  position: relative;
+.myprof-avatar-wrapper {
+  margin-bottom: 16px;
 }
 
-.profile-view-avatar-wrapper img {
-  width: 80px;
-  height: 80px;
+.myprof-avatar {
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
-.avatar-status {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 20px;
-  height: 20px;
-  background: var(--md-sys-color-tertiary);
-  border: 3px solid var(--md-sys-color-surface);
-  border-radius: 50%;
+.myprof-name {
+  font-size: 1.75rem;
+  font-family: "Product Sans", "Inter", sans-serif;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
 }
 
-.profile-view-user-info h2 {
-  font-size: 1.5rem;
+.myprof-email {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+}
+
+/* Badge Role */
+.myprof-badge {
+  display: inline-flex;
+  padding: 4px 16px;
+  border-radius: 100px;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--md-sys-color-on-background);
-  margin: 0 0 0.25rem 0;
+  letter-spacing: 0.5px;
 }
 
-.profile-view-user-info .email {
-  color: var(--md-sys-color-on-surface-variant);
-  margin: 0 0 0.75rem 0;
+.myprof-badge.badge-admin { background: var(--primary-bg); color: var(--primary-dark); }
+.myprof-badge.badge-approver { background: var(--warning-bg); color: var(--warning-dark); }
+.myprof-badge.badge-user { background: var(--success-bg); color: var(--success-dark); }
+
+/* --- KARTU INFORMASI --- */
+.myprof-card {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-light);
+  border-radius: 24px;
+  padding: 0;
+  margin-bottom: 24px;
+  overflow: hidden;
 }
 
-.profile-view-role-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
+.myprof-card-title {
+  font-size: 1.25rem;
+  font-weight: 400;
+  font-family: "Product Sans", "Inter", sans-serif;
+  color: var(--text-primary);
+  padding: 24px 24px 16px 24px;
+  margin: 0;
 }
 
-.profile-view-badge-admin {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary-container);
-}
-
-.profile-view-badge-approver {
-  background: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
-}
-
-.profile-view-badge-user {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
-}
-
-.profile-view-details-container {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.profile-view-detail-section {
-  background: var(--md-sys-color-surface);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.profile-view-detail-section h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--md-sys-color-on-background);
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.profile-view-detail-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.profile-view-detail-item {
+/* List / Grid dalam Kartu */
+.myprof-list {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--md-sys-color-surface-variant);
+  flex-direction: column;
 }
 
-.profile-view-detail-item:last-child {
-  border-bottom: none;
+.myprof-list-item {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-light);
+  gap: 4px;
 }
 
-.profile-view-detail-item label {
+@media (min-width: 600px) {
+  .myprof-list-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.myprof-item-label {
+  font-size: 0.85rem;
   font-weight: 500;
-  color: var(--md-sys-color-on-background);
+  color: var(--text-secondary);
+  width: 150px;
+  flex-shrink: 0;
 }
 
-.profile-view-detail-item span {
-  color: var(--md-sys-color-on-surface-variant);
+.myprof-item-value {
+  font-size: 1rem;
+  color: var(--text-primary);
+  flex: 1;
 }
 
-.profile-view-status-active {
-  color: var(--md-sys-color-tertiary);
-  font-weight: 500;
-}
-
-.profile-view-google-id {
-  font-family: monospace;
-  background: var(--md-sys-color-surface-variant);
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.profile-view-security-container {
-  display: grid;
-  gap: 1rem;
-}
-
-.profile-view-security-item {
+/* --- KARTU KEAMANAN --- */
+.myprof-security-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: var(--md-sys-color-surface-variant);
-  border-radius: 0.5rem;
+  gap: 16px;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid var(--border-light);
 }
 
-.profile-view-security-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--md-sys-color-primary-container);
+.myprof-security-icon {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
+  background: var(--info-bg);
+  color: var(--info-dark);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--md-sys-color-on-primary-container);
+  flex-shrink: 0;
 }
 
-.profile-view-security-content h4 {
+.myprof-security-info {
+  flex: 1;
+}
+
+.myprof-security-info h3 {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--md-sys-color-on-background);
-  margin: 0 0 0.25rem 0;
-}
-
-.profile-view-security-content p {
-  font-size: 0.875rem;
-  color: var(--md-sys-color-on-surface-variant);
-  margin: 0 0 0.5rem 0;
-}
-
-.profile-view-auth-status.connected {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary-container);
-  border-radius: 9999px;
-  font-size: 0.75rem;
   font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .profile-view-container {
-    padding: 1rem;
-  }
-  
-  .profile-view-header-content {
+.myprof-security-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.myprof-status-pill {
+  background: var(--success-bg);
+  color: var(--success-dark);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Mobile Responsiveness untuk Kartu Keamanan */
+@media (max-width: 600px) {
+  .myprof-security-item {
     flex-direction: column;
     align-items: flex-start;
-  }
-  
-  .profile-view-main-card {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .profile-view-detail-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+    gap: 12px;
   }
 }

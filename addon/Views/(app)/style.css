@@ -1,419 +1,275 @@
-/* Variabel Khusus Area App */
-:root {
-  --navbar-height: 70px;
-}
 .app-wrapper {
   min-height: 100vh;
-  background-color: var(--md-sys-color-background);
   display: flex;
   flex-direction: column;
 }
 
-/* === NAVBAR TOP === */
 .top-navbar {
-  background-color: var(--md-sys-color-surface);
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  height: var(--navbar-height);
+  display: flex;
+  align-items: center;
 }
 
 .nav-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  height: var(--navbar-height);
+  width: 100%;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.nav-brand img {
-  height: 36px;
-  display: block;
+/* --- KIRI: Hamburger & Brand --- */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.mobile-menu-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-menu-btn:hover {
+  background-color: var(--bg-default);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.nav-brand img {
+  height: 36px;
+  width: 36px;
+}
+
+.nav-brand-text {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-family: "Product Sans", "Inter", sans-serif;
+}
+
+/* --- TENGAH: Nav Menu --- */
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
   flex: 1;
-  margin-left: 3rem;
+  margin-left: 32px;
 }
 
 .nav-item {
-  text-decoration: none;
-  color: var(--md-sys-color-on-surface-variant);
+  color: var(--text-secondary);
   font-weight: 500;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 100px; /* Bentuk Pill */
   transition: all 0.2s ease;
 }
 
-.nav-item:hover,
-.nav-item.active {
-  color: var(--md-sys-color-primary);
-  background-color: var(--md-sys-color-primary-container);
+.nav-item:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
 }
 
 .nav-item.active {
-  font-weight: 600;
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
 }
 
-/* === PROFIL USER === */
-/* Profile Dropdown */
-.nav-profile {
-  position: relative;
-}
-
-.dropdown-toggle {
-  display: none;
-}
-
-.profile-trigger {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background-color 0.2s;
-}
-
-.profile-trigger:hover {
-  background-color: var(--md-sys-color-surface-variant);
-}
-
-.avatar {
+/* --- KANAN: Settings & Profil --- */
+.icon-action-btn {
+  background: transparent;
+  color: var(--text-secondary);
   width: 40px;
   height: 40px;
-  min-width: 40px;
-  min-height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.icon-action-btn:hover {
+  background-color: var(--bg-default);
+}
+
+.profile-btn {
+  background: transparent;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+}
+
+.profile-btn:hover {
+  background-color: var(--bg-default);
+}
+
+.profile-btn img {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--md-sys-color-outline-variant);
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-.profile-text {
-  display: flex;
-  flex-direction: column;
-}
+/* =========================================================
+   PURE CSS LOGIC: DROPDOWN & MOBILE DRAWER (TANPA JS!)
+   ========================================================= */
 
-.user-name {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--md-sys-color-on-background);
-}
-
-.user-role {
-  font-size: 0.75rem;
-  color: var(--md-sys-color-on-surface-variant);
-}
-
-.dropdown-arrow {
-  color: var(--md-sys-color-on-surface-variant);
-  transition: transform 0.2s;
-}
-
-.dropdown-toggle:checked ~ .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-}
-
-.dropdown-toggle:checked ~ .dropdown-overlay {
-  opacity: 1;
-  visibility: visible;
-}
-.dropdown-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: transparent;
-  opacity: 0;
-  visibility: hidden;
-  z-index: 999;
-  transition:
-    opacity 0.2s,
-    visibility 0.2s;
-}
-
-.dropdown-toggle:checked ~ .profile-trigger .dropdown-arrow {
-  transform: rotate(180deg);
-}
-
+/* 1. Global Dropdown Logic */
 .dropdown-menu {
+  display: none;
   position: absolute;
-  top: 100%;
   right: 0;
-  margin-top: 0.5rem;
-  background-color: var(--md-sys-color-surface);
-  border: 1px solid var(--md-sys-color-outline-variant);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  min-width: 240px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px) scale(0.8);
-  transform-origin: top right;
-  transition: all 0.2s cubic-bezier(0.2, 0, 0.2, 1);
-  z-index: 1000;
+  background-color: var(--bg-paper);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
   overflow: hidden;
+  z-index: 60;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
+.dropdown-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  cursor: default;
+}
+
+/* Toggle rule untuk Settings & Profile */
+#settings-toggle:checked ~ .dropdown-menu,
+#profile-toggle:checked ~ .dropdown-menu { display: block; }
+
+#settings-toggle:checked ~ .dropdown-backdrop,
+#profile-toggle:checked ~ .dropdown-backdrop { display: block; }
+
+/* Styling Isi Dropdown Profile/Settings */
 .dropdown-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 16px;
+  padding: 16px;
 }
-
-.dropdown-avatar {
+.dropdown-avatar-large {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--md-sys-color-outline-variant);
 }
-
-.dropdown-info {
-  flex: 1;
-}
-
 .dropdown-name {
   font-weight: 600;
-  color: var(--md-sys-color-on-background);
-  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-size: 15px;
 }
-
 .dropdown-role {
-  font-size: 0.8rem;
-  color: var(--md-sys-color-on-surface-variant);
+  font-size: 13px;
+  color: var(--text-secondary);
 }
-
 .dropdown-divider {
   height: 1px;
-  background-color: var(--md-sys-color-outline-variant);
-  margin: 0 1rem;
+  background-color: var(--border-light);
+  margin: 0;
 }
-
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  color: var(--md-sys-color-on-background);
-  font-size: 0.9rem;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.dropdown-item:hover {
-  background-color: var(--md-sys-color-surface-variant);
-}
-
-.dropdown-item.logout {
-  color: var(--md-sys-color-error);
-}
-
-.dropdown-item.logout:hover {
-  background-color: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-error);
-}
-
-.dropdown-item svg {
-  flex-shrink: 0;
-}
-
-/* === MAIN KONTEN BOKS === */
-.app-main {
-  flex: 1;
-  padding: 2rem 1.5rem;
-}
-
-.content-container {
-  max-width: 1280px;
-  margin: 0 auto;
-}
-
-/* Utilitas Helper */
-.mobile-menu-btn {
-  display: none;
-  background: none;
+  width: 100%;
   border: none;
-  color: var(--md-sys-color-on-background);
-  width: 40px;
-  height: 40px;
+  background: transparent;
   cursor: pointer;
+  text-align: left;
 }
-.mobile-menu-btn svg {
-  width: 24px;
-  height: 24px;
+.dropdown-item:hover {
+  background-color: var(--bg-default);
 }
-.mobile-only {
-  display: none !important;
+.dropdown-item.logout {
+  color: var(--error-main);
+}
+.dropdown-item.logout svg {
+  stroke: var(--error-main);
 }
 
-/* === MOBILE RESPONSIVE === */
+/* 2. Mobile Drawer Logic (Slide from left) */
 @media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .desktop-only {
-    display: none !important;
-  }
-  .mobile-only {
-    display: flex !important;
-  }
-
-  /* Dropdown Navigasi Mobile */
+  .nav-left { flex: 1; }
+  .nav-brand-text { font-size: 20px; }
+  .mobile-menu-btn { display: flex; }
+  
   .nav-menu {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
+    position: fixed;
     top: var(--navbar-height);
-    left: 0;
-    right: 0;
-    background-color: var(--md-sys-color-surface);
+    left: -280px; /* Sembunyikan di kiri layar */
+    width: 280px;
+    height: calc(100vh - var(--navbar-height));
+    background-color: var(--bg-paper);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 8px;
     margin: 0;
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-    /* Animasi Sembunyi Tampil */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-  }
-
-  .nav-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    gap: 4px;
+    box-shadow: var(--shadow-lg);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 60;
   }
 
   .nav-item {
     width: 100%;
-    padding: 0.75rem 1rem;
+    border-radius: 0 100px 100px 0; /* Pill khas Drawer Google */
   }
 
-  .nav-profile.mobile-only {
-    width: 100%;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--md-sys-color-outline-variant);
-    justify-content: space-between;
+  .mobile-menu-backdrop {
+    display: none;
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 55;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
-  .profile-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 600;
+  #mobile-menu-toggle:checked ~ .nav-menu {
+    left: 0; /* Munculkan drawer */
   }
-  .btn-logout {
-    background-color: var(--md-sys-color-error-container);
-    color: var(--md-sys-color-error);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 0.5rem;
-  }
-
-  .app-main {
-    padding: 1rem;
+  
+  #mobile-menu-toggle:checked ~ .mobile-menu-backdrop {
+    display: block;
+    opacity: 1;
   }
 }
 
-.btn-primary {
-  background: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 104, 116, 0.2);
-}
-.btn-primary:hover {
-  background: #004d54;
-  transform: translateY(-2px);
-}
-
-.badge {
-  padding: 0.35rem 0.8rem;
-  border-radius: 99px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.badge-orange {
-  background: var(--md-sys-color-secondary-container);
-  color: var(--md-sys-color-on-secondary);
-  border: 1px solid var(--md-sys-color-secondary);
-}
-.badge-green {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-on-tertiary);
-  border: 1px solid var(--md-sys-color-tertiary);
-}
-.badge-red {
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-error);
-  border: 1px solid var(--md-sys-color-error);
-}
-
-.page-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--md-sys-color-on-background);
-  margin-bottom: 0.3rem;
-}
-.page-subtitle {
-  color: var(--md-sys-color-on-surface-variant);
-  font-size: 0.95rem;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: var(--md-sys-color-on-surface-variant);
-}
-.empty-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-.empty-state h3 {
-  color: var(--md-sys-color-on-background);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ====================================================
-   MODAL COMPONENT (SPA SAFE - PREMIUM DESIGN)
+   MODAL COMPONENT (MD3 / Google Workspace Style)
    ==================================================== */
 
 .css-modal {
@@ -425,9 +281,7 @@
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition:
-    opacity 0.25s ease,
-    visibility 0.25s ease;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 /* Tampilkan Modal */
@@ -436,34 +290,29 @@
   visibility: visible;
 }
 
-/* Area gelap (Click-Away) dengan efek blur */
+/* Area gelap (Click-Away) */
 .modal-overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(
-    15,
-    23,
-    42,
-    0.6
-  ); /* Warna overlay lebih gelap/elegan */
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.4); /* Gelap transparan standar */
+  backdrop-filter: blur(2px);
   cursor: pointer;
 }
 
 /* Kontainer Utama Modal */
 .modal-content {
   position: relative;
-  background-color: var(--md-sys-color-surface);
-  width: 92%;
-  max-width: 480px; /* Dibuat sedikit lebih lebar */
-  border-radius: 20px; /* Sudut lebih bulat ala Material 3 / iOS */
-  box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(0, 0, 0, 0.05); /* Bayangan dalam */
+  background-color: var(--bg-paper);
+  width: 90%;
+  max-width: 420px; 
+  border-radius: 28px; /* Sudut sangat melengkung khas MD3 */
+  box-shadow: var(--shadow-lg);
   z-index: 10000;
-  transform: translateY(30px) scale(0.95);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efek membal (bouncing) yang lebih natural */
-  overflow: hidden; /* Agar footer tidak keluar dari radius */
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1); /* Animasi masuk mulus */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Animasi Boks masuk */
@@ -475,83 +324,67 @@
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 1.5rem 1rem; /* Padding atas lebih besar */
+  align-items: flex-start; /* Sejajarkan ke atas jika judul panjang */
+  padding: 24px 24px 16px 24px; 
 }
 
 .modal-title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--md-sys-color-on-background);
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
+  font-family: "Product Sans", "Inter", sans-serif;
 }
+
 .modal-title.text-danger {
-  color: var(--md-sys-color-error);
+  color: var(--error-main);
 }
 
 /* Tombol X (Close) di Header */
 .modal-close {
-  background: var(--md-sys-color-surface-variant);
+  background: transparent;
   border: none;
   cursor: pointer;
-  font-family: inherit;
-  color: var(--md-sys-color-on-surface-variant);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%; /* Tombol bulat */
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%; 
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
+  margin-top: -4px; /* Penyesuaian presisi visual */
+  margin-right: -8px;
 }
+
 .modal-close:hover {
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-error);
-  transform: rotate(90deg); /* Efek putar sedikit saat dihover */
+  background: var(--bg-default);
+  color: var(--text-primary);
 }
 
 /* --- BODY MODAL --- */
 .modal-body {
-  text-align: center;
-  padding: 0 1.5rem 1.5rem;
-  color: var(
-    --md-sys-color-on-surface-variant
-  ); /* Warna text agak redup agar elegan */
+  text-align: left; /* MD3 / Google lebih suka left-aligned untuk dialog */
+  padding: 0 24px 24px 24px;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
 .modal-body strong {
-  color: var(--md-sys-color-on-background); /* Highlight nama user */
-  font-weight: 700;
-}
-.modal-body p {
-  margin: 0 0 0.5rem 0;
-}
-.modal-body p:last-child {
-  margin-bottom: 0;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
-/* Tambahan Icon Peringatan Besar (Opsional, ditaruh lewat JS jika mau) */
-.modal-icon-wrapper {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+.modal-body p {
+  margin: 0 0 8px 0;
 }
-.modal-icon-wrapper.danger {
-  background: var(--md-sys-color-error-container);
-  color: var(--md-sys-color-error);
-}
-.modal-icon-wrapper.success {
-  background: var(--md-sys-color-tertiary-container);
-  color: var(--md-sys-color-tertiary);
+
+.modal-body p:last-child {
+  margin-bottom: 0;
 }
 
 /* --- FOOTER MODAL (Area Tombol) --- */
@@ -559,78 +392,65 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1.25rem 1.5rem;
-  background-color: var(
-    --md-sys-color-surface-variant
-  ); /* Latar belakang footer abu-abu terang */
-  border-top: 1px solid var(--md-sys-color-outline-variant);
+  gap: 8px; /* Jarak antar tombol */
+  padding: 0 24px 24px 24px; /* Footer putih menyatu dengan body */
 }
 
-/* Tombol Batal */
+/* Tombol Batal (Gaya Teks Murni khas Google) */
 .btn-cancel {
   background: transparent;
-  border: 1px solid var(--md-sys-color-outline);
-  padding: 0.6rem 1.25rem;
-  color: var(--md-sys-color-on-surface-variant);
-  font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.2s;
+  border: none;
+  padding: 10px 16px;
+  color: var(--primary-main);
+  font-weight: 500;
+  border-radius: 100px; /* Bentuk Pill */
+  transition: background-color 0.2s;
   font-size: 0.95rem;
   cursor: pointer;
 }
+
 .btn-cancel:hover {
-  background-color: var(--md-sys-color-outline-variant);
-  color: var(--md-sys-color-on-background);
+  background-color: var(--primary-bg);
 }
 
-/* Tombol Aksi Utama (Ya, Hapus / Konfirmasi) */
+/* Tombol Aksi Utama (Pill Terisi) */
 .btn-confirm {
-  padding: 0.6rem 1.5rem;
+  padding: 10px 24px;
   border: none;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: 100px; /* Bentuk Pill */
+  font-weight: 500;
   cursor: pointer;
-  color: white;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
   transition: all 0.2s;
   font-family: inherit;
   font-size: 0.95rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 .btn-confirm:hover {
-  transform: translateY(-2px); /* Efek terangkat saat dihover */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
 }
+
 .btn-confirm:active {
   transform: translateY(0);
 }
 
 /* Varian Warna Tombol Konfirmasi */
 .btn-confirm.danger {
-  background-color: var(--md-sys-color-error);
+  background-color: var(--error-main);
+  color: var(--error-contrast);
 }
+
 .btn-confirm.danger:hover {
-  background-color: #b91c1c; /* Warna merah lebih gelap */
+  background-color: var(--error-dark);
 }
 
 .btn-confirm.success {
-  background-color: var(--md-sys-color-primary);
-  color: var(--md-sys-color-on-primary);
-}
-.btn-confirm.success:hover {
-  background-color: #4338ca; /* Warna primary lebih gelap */
+  background-color: var(--success-main);
+  color: var(--success-contrast);
 }
 
-/* Utilitas Navigasi */
-.btn-back {
-  display: inline-block;
-  color: var(--md-sys-color-on-surface-variant);
-  font-weight: 500;
-  font-size: 0.95rem;
-  text-decoration: none;
-  margin-bottom: 1.5rem;
-  transition: color 0.2s;
-}
-.btn-back:hover {
-  color: var(--md-sys-color-primary);
+.btn-confirm.success:hover {
+  background-color: var(--success-dark);
 }

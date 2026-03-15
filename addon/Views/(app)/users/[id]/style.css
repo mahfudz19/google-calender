@@ -1,101 +1,404 @@
 /* ====================================================
-   PROFILE & EDIT VIEW DESIGN
+   USER PROFILE & EDIT VIEW (GCal / Google Account Style)
    ==================================================== */
 
-.profile-card {
-    background: var(--md-sys-color-surface);
-    border-radius: 20px;
-    border: 1px solid var(--md-sys-color-outline-variant);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-    overflow: hidden;
+.upf-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
 }
 
-/* Header Profil Besar (View) */
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding: 2.5rem;
-    background: linear-gradient(to right, var(--md-sys-color-surface-variant), var(--md-sys-color-surface));
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-}
-.profile-avatar-lg img, .profile-avatar-lg .avatar-placeholder {
-    width: 110px; height: 110px;
-    border-radius: 50%;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    object-fit: cover;
-}
-.profile-avatar-lg .avatar-placeholder {
-    background: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.5rem; font-weight: bold;
-}
-.profile-title-group { flex: 1; }
-.profile-name { font-size: 1.75rem; font-weight: 800; margin: 0 0 0.3rem 0; color: var(--md-sys-color-on-background); }
-.profile-email { font-size: 1rem; color: var(--md-sys-color-on-surface-variant); margin: 0 0 1.25rem 0; }
-.profile-badges { display: flex; gap: 0.5rem; }
-
-/* Header Profil Kecil (Edit) */
-.profile-header-sm {
-    display: flex; align-items: center; gap: 1.5rem; padding: 2rem;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-}
-.profile-avatar-sm img, .profile-avatar-sm .avatar-placeholder { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
-.profile-avatar-sm .avatar-placeholder {
-    background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-    display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;
+.upf-container.narrow {
+  max-width: 600px;
 }
 
-/* Body & Grid Info (View) */
-.profile-body { padding: 2.5rem; }
-.section-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 1.5rem 0; color: var(--md-sys-color-on-background); }
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-.info-box { background: var(--md-sys-color-surface-variant); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--md-sys-color-outline-variant); }
-.info-label { display: block; font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
-.info-value { font-size: 1.05rem; font-weight: 600; color: var(--md-sys-color-on-background); }
-
-.profile-footer { padding: 1.5rem 2.5rem; background: var(--md-sys-color-surface-variant); border-top: 1px solid var(--md-sys-color-outline-variant); display: flex; justify-content: flex-end; }
-
-/* === FORM EDIT COMPONENTS === */
-.mazu-edit-form { padding: 2rem; }
-.form-section { margin-bottom: 2rem; }
-.form-label { display: block; font-size: 1rem; font-weight: 700; color: var(--md-sys-color-on-background); margin-bottom: 1rem; }
-
-/* Selectable Role Cards */
-.role-cards-wrapper { display: flex; flex-direction: column; gap: 1rem; }
-.role-card {
-    display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem;
-    border: 2px solid var(--md-sys-color-outline-variant); border-radius: 14px;
-    cursor: pointer; transition: all 0.2s; background: var(--md-sys-color-surface);
-}
-.role-card:hover { border-color: #cbd5e1; }
-.role-card input[type="radio"] { display: none; } /* Sembunyikan radio default */
-
-.role-icon { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; }
-.role-info strong { display: block; font-size: 1.1rem; color: var(--md-sys-color-on-background); margin-bottom: 0.2rem; }
-.role-info span { font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant); }
-
-/* Jika radio button dipilih */
-.role-card.selected {
-    border-color: var(--md-sys-color-primary);
-    background-color: var(--md-sys-color-primary-container);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+.upf-page-header {
+  margin-bottom: 24px;
 }
 
-/* Toggle Switch Interaktif */
-.toggle-wrapper { display: flex; justify-content: space-between; align-items: center; }
-.mazu-switch { position: relative; display: inline-block; width: 54px; height: 30px; flex-shrink: 0; }
-.mazu-switch input { opacity: 0; width: 0; height: 0; }
-.mazu-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-.mazu-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+/* Tombol Kembali / Batal ala Google */
+.upf-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding: 8px 16px 8px 8px;
+  border-radius: 100px; /* Pill */
+  transition: background-color 0.2s, color 0.2s;
+}
 
-.mazu-switch input:checked + .slider { background-color: var(--md-sys-color-primary); }
-.mazu-switch input:checked + .slider:before { transform: translateX(24px); }
+.upf-btn-back:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
+}
 
+/* Kartu Utama Profil (Tanpa bayangan berat) */
+.upf-card {
+  background: var(--bg-paper);
+  border-radius: 24px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+/* --- HEADER PROFIL (VIEW) --- */
+.upf-header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 40px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.upf-avatar-lg {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.upf-avatar-lg.fallback {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.upf-title-group {
+  flex: 1;
+}
+
+.upf-name {
+  font-size: 2rem;
+  font-weight: 400;
+  font-family: "Product Sans", "Inter", sans-serif;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.upf-email {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+}
+
+.upf-badges {
+  display: flex;
+  gap: 8px;
+}
+
+/* Badges Status Profil */
+.upf-badge {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.upf-badge.badge-green { background: var(--success-bg); color: var(--success-dark); }
+.upf-badge.badge-gray { background: var(--bg-default); color: var(--text-secondary); }
+.upf-badge.badge-blue { background: var(--info-bg); color: var(--info-dark); }
+.upf-badge.badge-primary { background: var(--primary-bg); color: var(--primary-dark); }
+.upf-badge.badge-orange { background: var(--warning-bg); color: var(--warning-dark); }
+
+/* --- BODY PROFIL (VIEW) --- */
+.upf-body {
+  padding: 32px 40px;
+}
+
+.upf-section-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 24px 0;
+}
+
+.upf-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.upf-info-box {
+  background: var(--bg-default);
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.upf-info-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.upf-info-value {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* --- FOOTER PROFIL (VIEW) --- */
+.upf-footer {
+  padding: 24px 40px;
+  background: var(--bg-paper);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Tombol Aksi Utama (Pill) */
+.upf-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upf-btn-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.upf-btn-primary.full {
+  width: 100%;
+}
+
+
+/* ====================================================
+   HALAMAN EDIT (MINI HEADER & FORM)
+   ==================================================== */
+
+.upf-header-sm {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-default);
+}
+
+.upf-avatar-sm {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.upf-avatar-sm.fallback {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.upf-name-sm {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.upf-email-sm {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Formulir Edit */
+.upf-form {
+  padding: 32px;
+}
+
+.upf-form-section {
+  margin-bottom: 32px;
+}
+
+.upf-form-section.divider {
+  border-top: 1px solid var(--border-light);
+  padding-top: 32px;
+}
+
+.upf-form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.upf-form-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 4px;
+}
+
+/* Role Cards Interaktif (MD3 Style) */
+.upf-role-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upf-role-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--bg-paper);
+}
+
+.upf-role-card input[type="radio"] {
+  display: none;
+}
+
+.upf-role-card:hover {
+  background: var(--bg-default);
+}
+
+.upf-role-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.upf-role-info strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.upf-role-info span {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* State Jika Dipilih */
+.upf-role-card.selected {
+  border: 2px solid var(--primary-main);
+  background-color: var(--primary-bg);
+  padding: 15px 19px; /* Kompensasi border 2px */
+}
+
+.upf-role-card.selected .upf-role-info strong {
+  color: var(--primary-dark);
+}
+
+/* Toggle Switch MD3 Murni */
+.upf-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upf-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.upf-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.upf-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border-light);
+  transition: 0.3s;
+  border-radius: 34px;
+}
+
+.upf-slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.upf-switch input:checked + .upf-slider {
+  background-color: var(--primary-main);
+}
+
+.upf-switch input:checked + .upf-slider:before {
+  transform: translateX(20px);
+}
+
+/* Empty State */
+.upf-empty-state {
+  text-align: center;
+  padding: 64px;
+  background: var(--bg-paper);
+  border-radius: 24px;
+  border: 1px dashed var(--border-light);
+  color: var(--text-secondary);
+}
+
+.upf-empty-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .profile-header { flex-direction: column; text-align: center; }
-    .profile-badges { justify-content: center; }
-    .info-grid { grid-template-columns: 1fr; }
+  .upf-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 32px 24px;
+  }
+  .upf-badges {
+    justify-content: center;
+  }
+  .upf-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .upf-body, .upf-form, .upf-footer {
+    padding: 24px;
+  }
 }

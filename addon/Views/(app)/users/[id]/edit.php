@@ -1,81 +1,101 @@
-  <div class="users-container" style="max-width: 600px; margin: 0 auto;">
+<?php $item = $item ?? null; ?>
+<div class="upf-container narrow">
 
-    <div class="page-header" style="margin-bottom: 1.5rem;">
-      <a data-spa href="<?= getBaseUrl('/users') ?>" class="btn-back">← Batal Edit</a>
-    </div>
+  <div class="upf-page-header">
+    <a data-spa href="<?= getBaseUrl('/users') ?>" class="upf-btn-back">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+      Batal Edit
+    </a>
+  </div>
 
-    <?php if ($item): ?>
-      <div class="profile-card">
-        <div class="profile-header-sm">
-          <div class="profile-avatar-sm">
-            <?php if (!empty($item['avatar'])): ?>
-              <img src="<?= htmlspecialchars($item['avatar']) ?>" alt="Avatar">
-            <?php else: ?>
-              <div class="avatar-placeholder"><?= strtoupper(substr($item['name'] ?? 'U', 0, 1)) ?></div>
-            <?php endif; ?>
-          </div>
-          <div class="profile-title-group">
-            <h2 class="profile-name" style="font-size: 1.2rem;"><?= htmlspecialchars($item['name'] ?? 'Tanpa Nama') ?></h2>
-            <p class="profile-email"><?= htmlspecialchars($item['email'] ?? '-') ?></p>
+  <?php if ($item): ?>
+    <div class="upf-card">
+
+      <div class="upf-header-sm">
+        <div class="upf-avatar-wrapper">
+          <?php if (!empty($item['avatar'])): ?>
+            <img src="<?= htmlspecialchars($item['avatar']) ?>" alt="Avatar" class="upf-avatar-sm">
+          <?php else: ?>
+            <div class="upf-avatar-sm fallback"><?= strtoupper(substr($item['name'] ?? 'U', 0, 1)) ?></div>
+          <?php endif; ?>
+        </div>
+        <div class="upf-title-group">
+          <h2 class="upf-name-sm"><?= htmlspecialchars($item['name'] ?? 'Tanpa Nama') ?></h2>
+          <p class="upf-email-sm"><?= htmlspecialchars($item['email'] ?? '-') ?></p>
+        </div>
+      </div>
+
+      <form action="<?= getBaseUrl('/users/' . $item['id'] . '/update') ?>" method="POST" data-spa class="upf-form">
+
+        <div class="upf-form-section">
+          <label class="upf-form-label">Peran Sistem <span style="color: var(--error-main);">*</span></label>
+          <div class="upf-role-grid">
+
+            <label class="upf-role-card <?= ($item['role'] ?? '') === 'approver' ? 'selected' : '' ?>">
+              <input type="radio" name="role" value="approver" <?= ($item['role'] ?? '') === 'approver' ? 'checked' : '' ?> onchange="updateRoleSelection(this)">
+              <div class="upf-role-icon" style="color: var(--warning-dark); background: var(--warning-bg);">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div class="upf-role-info">
+                <strong>Approver</strong>
+                <span>Penyetuju agenda.</span>
+              </div>
+            </label>
+
+            <label class="upf-role-card <?= ($item['role'] ?? '') === 'admin' ? 'selected' : '' ?>">
+              <input type="radio" name="role" value="admin" <?= ($item['role'] ?? '') === 'admin' ? 'checked' : '' ?> onchange="updateRoleSelection(this)">
+              <div class="upf-role-icon" style="color: var(--primary-dark); background: var(--primary-bg);">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+              <div class="upf-role-info">
+                <strong>Super Admin</strong>
+                <span>Akses penuh sistem.</span>
+              </div>
+            </label>
+
           </div>
         </div>
 
-        <form action="<?= getBaseUrl('/users/' . $item['id'] . '/update') ?>" method="POST" data-spa class="mazu-edit-form">
-
-          <div class="form-section">
-            <label class="form-label">Tentukan Hak Akses <span class="text-danger">*</span></label>
-            <div class="role-cards-wrapper">
-              <label class="role-card <?= ($item['role'] ?? '') === 'approver' ? 'selected' : '' ?>">
-                <input type="radio" name="role" value="approver" <?= ($item['role'] ?? '') === 'approver' ? 'checked' : '' ?> onchange="updateRoleSelection(this)">
-                <div class="role-icon bg-orange">✓</div>
-                <div class="role-info">
-                  <strong>Approver</strong>
-                  <span>Dapat menyetujui atau menolak pengajuan agenda.</span>
-                </div>
-              </label>
-
-              <label class="role-card <?= ($item['role'] ?? '') === 'admin' ? 'selected' : '' ?>">
-                <input type="radio" name="role" value="admin" <?= ($item['role'] ?? '') === 'admin' ? 'checked' : '' ?> onchange="updateRoleSelection(this)">
-                <div class="role-icon bg-primary">★</div>
-                <div class="role-info">
-                  <strong>Super Admin</strong>
-                  <span>Akses penuh ke sistem dan manajemen user.</span>
-                </div>
-              </label>
+        <div class="upf-form-section divider">
+          <div class="upf-toggle-row">
+            <div class="upf-toggle-info">
+              <label class="upf-form-label" style="margin: 0;">Izin Akses Mazu</label>
+              <span class="upf-form-desc">Izinkan pengguna ini untuk masuk ke dalam aplikasi.</span>
             </div>
+
+            <label class="upf-switch">
+              <input type="hidden" name="is_active" value="0">
+              <input type="checkbox" name="is_active" value="1" <?= ($item['is_active'] ?? false) ? 'checked' : '' ?>>
+              <span class="upf-slider"></span>
+            </label>
           </div>
+        </div>
 
-          <div class="form-section" style="border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 1.5rem;">
-            <div class="toggle-wrapper">
-              <div class="toggle-info">
-                <label class="form-label" style="margin: 0;">Status Akun</label>
-                <span class="text-muted" style="font-size: 0.85rem; display: block;">Izinkan user login ke Mazu Calendar</span>
-              </div>
+        <div class="upf-form-footer">
+          <button type="submit" class="upf-btn-primary full">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  <?php else: ?>
+    <div class="upf-empty-state">
+      <div class="upf-empty-icon">🔍</div>
+      <p>Pengguna tidak ditemukan.</p>
+    </div>
+  <?php endif; ?>
 
-              <label class="mazu-switch">
-                <input type="hidden" name="is_active" value="0">
-                <input type="checkbox" name="is_active" value="1" <?= ($item['is_active'] ?? false) ? 'checked' : '' ?>>
-                <span class="slider round"></span>
-              </label>
-            </div>
-          </div>
+</div>
 
-          <div class="form-footer">
-            <button type="submit" class="btn-confirm success" style="width: 100%;">Simpan Perubahan</button>
-          </div>
-        </form>
-      </div>
-    <?php else: ?>
-      <div class="table-card" style="padding: 4rem; text-align: center;">
-        <p class="text-muted">Pengguna tidak ditemukan.</p>
-      </div>
-    <?php endif; ?>
-  </div>
-
-  <script>
-    // Fungsi kecil untuk mengubah class 'selected' pada Role Card saat diklik
-    function updateRoleSelection(radioElement) {
-      document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
-      radioElement.closest('.role-card').classList.add('selected');
-    }
-  </script>
+<script>
+  function updateRoleSelection(radioElement) {
+    document.querySelectorAll('.upf-role-card').forEach(card => card.classList.remove('selected'));
+    radioElement.closest('.upf-role-card').classList.add('selected');
+  }
+</script>

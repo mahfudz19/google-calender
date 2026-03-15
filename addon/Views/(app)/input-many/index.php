@@ -1,5 +1,4 @@
 <?php
-// Ambil data user dari session (Sesuaikan dengan struktur framework Mazu Anda)
 $userSession = $_SESSION['user'] ?? [];
 $currentUser = [
   'name' => $userSession['name'] ?? 'Unknown User',
@@ -9,41 +8,42 @@ $currentUser = [
 ];
 ?>
 
-<div class="input-many-layout-wrapper">
-  <aside class="input-many-sidebar">
-    <div class="input-many-checking-widget">
-      <div class="input-many-checking-widget-title" style="margin-bottom: 1rem; font-weight: 700;">Alur Pemeriksaan</div>
-
-      <ul class="input-many-step-list">
-
-        <li class="step-item disabled" id="step-ruangan">
-          <div class="step-header">
-            <span class="step-title">1. Check Ruangan</span>
-            <button class="btn-step" id="btn-check-ruangan" disabled>Check</button>
+<div class="blk-layout">
+  <aside class="blk-sidebar">
+    <div class="blk-widget">
+      <div class="blk-widget-header">Alur Pemeriksaan</div>
+      <ul class="blk-steps">
+        <li class="blk-step disabled" id="step-ruangan">
+          <div class="blk-step-head">
+            <span class="blk-step-title">1. Check Ruangan</span>
+            <button class="blk-btn-step" id="btn-check-ruangan" disabled>Check</button>
           </div>
-          <p class="step-desc">Memastikan ID ruangan pada file CSV terdaftar di database.</p>
+          <p class="blk-step-desc">Memastikan ID ruangan terdaftar di database server.</p>
         </li>
-
-        <li class="step-item disabled" id="step-internal">
-          <div class="step-header">
-            <span class="step-title">2. Check Internal</span>
-            <button class="btn-step" id="btn-check-internal" disabled>Check</button>
+        <li class="blk-step disabled" id="step-internal">
+          <div class="blk-step-head">
+            <span class="blk-step-title">2. Check Internal</span>
+            <button class="blk-btn-step" id="btn-check-internal" disabled>Check</button>
           </div>
-          <p class="step-desc">Mendeteksi bentrok jadwal antar baris di dalam file CSV ini.</p>
+          <p class="blk-step-desc">Mendeteksi bentrok jadwal di dalam file CSV.</p>
         </li>
-
-        <li class="step-item disabled" id="step-db">
-          <div class="step-header">
-            <span class="step-title">3. Check Database</span>
-            <button class="btn-step" id="btn-check-db" disabled>Check</button>
+        <li class="blk-step disabled" id="step-db">
+          <div class="blk-step-head">
+            <span class="blk-step-title">3. Check Database</span>
+            <button class="blk-btn-step" id="btn-check-db" disabled>Check</button>
           </div>
-          <p class="step-desc">Mencocokkan jadwal CSV dengan data asli di server.</p>
+          <p class="blk-step-desc">Mencocokkan jadwal dengan data di server Mazu.</p>
         </li>
-
       </ul>
-
-      <div class="input-many-upload-section" style="margin-top: 1.5rem;">
-        <button class="input-many-upload-btn" id="btn-upload-all" disabled style="width: 100%;">Upload Semua Data</button>
+      <div class="blk-upload-action">
+        <button class="blk-btn-upload" id="btn-upload-all" disabled>
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Upload Semua Data
+        </button>
       </div>
     </div>
 
@@ -60,61 +60,66 @@ $currentUser = [
     <script src="<?= getBaseUrl('/components-js/queue-widget/index.js') ?>"></script>
   </aside>
 
-  <div class="input-many-main">
+  <main class="blk-main">
 
-    <div class="csv-upload-container" id="upload-section">
-      <div class="csv-upload-header">
-        <h2 class="csv-upload-title">Upload File CSV</h2>
-        <p class="csv-upload-description">Pilih file CSV untuk diunggah. Header CSV harus sesuai dengan skema database.</p>
+    <div id="upload-section" class="blk-upload-section">
+      <div class="blk-upload-header">
+        <h2 class="blk-title">Upload File CSV</h2>
+        <p class="blk-subtitle">Pilih file CSV untuk diunggah. Pastikan format kolom sesuai dengan template.</p>
       </div>
 
-      <div class="csv-upload-area">
-        <div class="csv-upload-zone" id="csv-upload-zone">
-          <div class="csv-upload-icon" id="csv-upload-icon">📁</div>
-          <div class="spinner-mini" id="csv-upload-spinner" style="display: none; width: 40px; height: 40px; border-width: 4px; margin: 0 auto 1rem auto; border-top-color: var(--md-sys-color-primary);"></div>
-
-          <div class="csv-upload-text">
-            <p class="csv-upload-main-text" id="csv-upload-main-text">Seret dan lepas file CSV di sini</p>
-            <p class="csv-upload-subtext" id="csv-upload-subtext">atau</p>
-          </div>
-          <label for="csv-file-input" class="csv-upload-button" id="csv-upload-btn-label">Pilih File</label>
-          <input type="file" id="csv-file-input" accept=".csv" class="csv-file-input">
+      <div class="blk-dropzone" id="csv-upload-zone">
+        <div class="blk-dropzone-icon" id="csv-upload-icon">
+          <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <polyline points="9 15 12 12 15 15"></polyline>
+          </svg>
         </div>
+        <div class="spinner-mini" id="csv-upload-spinner" style="display: none; width: 40px; height: 40px; border-width: 4px; margin: 0 auto 1rem auto; border-top-color: var(--primary-main);"></div>
 
-        <div class="csv-upload-info">
-          <div class="csv-info-item" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-            <div>
-              <span class="csv-info-icon">✅</span>
-              <span class="csv-info-text">Format file: CSV (.csv)</span>
-            </div>
-            <a href="<?= getBaseUrl('/example/contoh_agenda.csv') ?>" download="contoh_agenda.csv" style="font-size: 0.75rem; color: var(--md-sys-color-primary); text-decoration: none; font-weight: 600; padding: 4px 10px; border: 1px solid var(--md-sys-color-primary); border-radius: 6px; background: var(--md-sys-color-surface); transition: all 0.2s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
-              📥 Unduh Contoh
-            </a>
-          </div>
+        <p class="blk-dropzone-text" id="csv-upload-main-text">Seret dan lepas file CSV di sini</p>
+        <p class="blk-dropzone-subtext" id="csv-upload-subtext">atau</p>
 
-          <div class="csv-info-item">
-            <span class="csv-info-icon">👤</span>
-            <span class="csv-info-text">Pengaju agenda: <strong><?= $currentUser['name'] ?></strong></span>
-          </div>
+        <label for="csv-file-input" class="blk-btn-select" id="csv-upload-btn-label">Pilih File</label>
+        <input type="file" id="csv-file-input" accept=".csv" class="blk-file-input">
+      </div>
+
+      <div class="blk-info-grid">
+        <div class="blk-info-card">
+          <span class="blk-info-icon">📄</span>
+          <span class="blk-info-text">Format file: CSV (.csv)</span>
+          <a href="<?= getBaseUrl('/example/contoh_agenda.csv') ?>" download="contoh_agenda.csv" class="blk-download-link">
+            Unduh Contoh
+          </a>
+        </div>
+        <div class="blk-info-card">
+          <span class="blk-info-icon">👤</span>
+          <span class="blk-info-text">Pengaju: <strong><?= htmlspecialchars($currentUser['name']) ?></strong></span>
         </div>
       </div>
     </div>
 
-    <div class="csv-preview-container" id="preview-section" style="display: none;">
-      <div class="preview-header">
-        <h3 class="preview-title">Preview Data Agenda (<span id="preview-count">0</span> Baris)</h3>
-        <button type="button" id="btn-reset-data" style="background: transparent; border: 1px solid var(--md-sys-color-error); color: var(--md-sys-color-error); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-          🗑️ Hapus Data
+    <div id="preview-section" class="blk-preview-section" style="display: none;">
+      <div class="blk-preview-header">
+        <h3 class="blk-preview-title">Preview Data (<span id="preview-count">0</span> Baris)</h3>
+        <button type="button" id="btn-reset-data" class="blk-btn-reset">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Hapus Data
         </button>
       </div>
 
-      <div class="table-responsive">
-        <table class="preview-table">
+      <div class="blk-table-wrapper">
+        <table class="blk-table">
           <thead>
             <tr>
               <th width="5%">No</th>
               <th width="25%">Detail Agenda</th>
-              <th width="20%">Waktu Pelaksanaan</th>
+              <th width="25%">Waktu Pelaksanaan</th>
               <th width="25%">Pemohon</th>
               <th width="20%">Ruangan</th>
             </tr>
@@ -124,8 +129,7 @@ $currentUser = [
         </table>
       </div>
     </div>
-
-  </div>
+  </main>
 </div>
 
 <div id="csvGlobalModal" class="css-modal">
@@ -133,10 +137,15 @@ $currentUser = [
   <div class="modal-content">
     <div class="modal-header">
       <h3 class="modal-title" id="csvModalTitle">Pemberitahuan</h3>
-      <button type="button" class="modal-close" id="csvModalCloseBtn">&times;</button>
+      <button type="button" class="modal-close" id="csvModalCloseBtn">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
-    <div class="modal-body">
-      <div class="modal-icon-wrapper" id="csvModalIcon" style="margin: 0 auto 1rem;">⚠️</div>
+    <div class="modal-body" style="text-align: left;">
+      <div class="modal-icon-wrapper" id="csvModalIcon" style="margin: 0 auto 16px; display: none;"></div>
       <p id="csvModalText">Pesan akan muncul di sini</p>
     </div>
     <div class="modal-footer" id="csvModalFooter">
@@ -154,17 +163,13 @@ $currentUser = [
     initCsvUploader
   } from "<?= getBaseUrl('/components-js/input-many/script.js') ?>";
 
-  // Oper Session Data ke JS
   const currentUser = <?= json_encode($currentUser) ?>;
-
-  // Oper Endpoint API Mazu
   const apiCheckDbUrl = "<?= getBaseUrl('/input-many/check-database') ?>";
   const apiUploadUrl = "<?= getBaseUrl('/input-many/upload') ?>";
   const apiRuanganUrl = "<?= getBaseUrl('/api/ruangan') ?>";
 
   function runInit() {
     document.querySelectorAll('body > .autocomplete-list-wrapper').forEach(el => el.remove());
-    // Tambahkan parameter ke-4
     initCsvUploader(Autocomplete, currentUser, apiCheckDbUrl, apiUploadUrl, apiRuanganUrl);
   }
 
