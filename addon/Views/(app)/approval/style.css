@@ -2,35 +2,8 @@
    APPROVAL PAGE REDESIGN (GCal / Material 3 Style)
    ========================================================= */
 
-.apv-layout-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin: 0 auto;
-  padding: 24px 16px;
-}
-
-@media (min-width: 992px) {
-  .apv-layout-wrapper {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .apv-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 24px;
-  }
-}
-
 .apv-main {
-  flex: 1;
-  min-width: 0;
-  background: var(--bg-paper);
-  border-radius: 16px;
-  border: 1px solid var(--border-light);
   padding: 24px;
-  min-height: calc(100vh - 120px);
 }
 
 /* --- HEADER & CHIPS --- */
@@ -326,4 +299,27 @@
   outline: none;
   border-color: var(--primary-main);
   background: var(--bg-paper);
+}
+
+/* =========================================================
+   SIDEBAR NAVIGATION (Tombol Kembali)
+   ========================================================= */
+
+.apv-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding: 8px 16px 8px 8px;
+  border-radius: 100px; /* Bentuk Pill (kapsul) */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin-left: -8px; /* Offset kiri agar ikon sejajar lurus dengan widget di bawahnya */
+}
+
+.apv-btn-back:hover {
+  background-color: var(--bg-default);
+  color: var(--text-primary);
 }

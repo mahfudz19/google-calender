@@ -3,9 +3,9 @@ $role = $role ?? 'user';
 $pendingTasks = $pendingTasks ?? [];
 $recentAgendas = $recentAgendas ?? [];
 ?>
-<div class="dashboard-layout">
+<div class="app-layout">
 
-  <aside class="dash-sidebar">
+  <aside class="app-sidebar">
 
     <div class="create-btn-wrapper">
       <a data-spa href="<?= getBaseUrl('/agenda/create') ?>" class="btn-create-event">
@@ -24,9 +24,7 @@ $recentAgendas = $recentAgendas ?? [];
       <div class="sidebar-section">
         <div class="section-header">
           <h3 class="section-title">Tugas Persetujuan</h3>
-          <?php if (count($pendingTasks) > 0): ?>
-            <span class="badge-count"><?= count($pendingTasks) ?></span>
-          <?php endif; ?>
+          <a data-spa href="<?= getBaseUrl('/approval') ?>" class="link-see-all">Lihat Semua</a>
         </div>
         <div class="section-content">
           <?php if (count($pendingTasks) > 0): ?>
@@ -59,7 +57,8 @@ $recentAgendas = $recentAgendas ?? [];
 
     <div class="sidebar-section">
       <div class="section-header">
-        <h3 class="section-title">Status Pengajuan Saya</h3>
+        <h3 class="section-title">Pengajuan Saya</h3>
+        <a data-spa href="<?= getBaseUrl('/agenda') ?>" class="link-see-all">Lihat Semua</a>
       </div>
       <div class="section-content">
         <?php if (empty($recentAgendas)): ?>
@@ -70,7 +69,6 @@ $recentAgendas = $recentAgendas ?? [];
         <?php else: ?>
           <?php foreach ($recentAgendas as $agenda): ?>
             <?php
-            // Logic Tema Kartu Berdasarkan Status
             if ($agenda['status'] === 'approved') {
               $iconColor = 'var(--success-dark)';
               $iconBg = 'var(--success-bg)';
@@ -82,7 +80,6 @@ $recentAgendas = $recentAgendas ?? [];
               $statusText = 'Ditolak';
               $iconSvg = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
             } else {
-              // Pending
               $iconColor = 'var(--warning-dark)';
               $iconBg = 'var(--warning-bg)';
               $statusText = 'Menunggu';
@@ -110,7 +107,7 @@ $recentAgendas = $recentAgendas ?? [];
 
   </aside>
 
-  <main class="dash-main">
+  <main class="app-main">
     <div id="mazuCalendar" class="google-calendar-wrap"></div>
   </main>
 
@@ -120,3 +117,4 @@ $recentAgendas = $recentAgendas ?? [];
   window.approvedAgendas = <?= json_encode($approvedAgendas ?? []) ?>;
 </script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="<?= getBaseUrl('/components-js/dashboard/script.js') ?>"></script>

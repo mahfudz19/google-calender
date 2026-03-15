@@ -1,23 +1,6 @@
 /* =========================================================
    DASHBOARD LAYOUT (Hybrid: GCal + Mazu Enterprise)
    ========================================================= */
-.dashboard-layout {
-  display: flex;
-  height: calc(100vh - var(--navbar-height));
-  overflow: hidden;
-}
-
-/* --- KIRI: SIDEBAR --- */
-.dash-sidebar {
-  width: 280px; /* Diperlebar sedikit agar kartu lega */
-  min-width: 280px;
-  padding: 16px 12px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  border-right: none;
-  overflow-y: auto;
-}
 
 /* Tombol Buat (FAB Pill) */
 .create-btn-wrapper {
@@ -59,18 +42,38 @@
 
 .section-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end; /* Sejajarkan ke bawah agar rapi jika judul 2 baris */
   justify-content: space-between;
   padding: 0 4px;
+  gap: 12px; /* Memberi jarak aman antara judul dan link */
 }
 
 .section-title {
-  font-size: 13px;
+  font-size: 12px; /* Diperkecil sedikit agar tidak terlalu sesak */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-secondary);
   margin: 0;
+  line-height: 1.4; /* Memberi ruang napas jika teks terpaksa 2 baris */
+}
+
+.link-see-all {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary-main);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap; /* KUNCI: Mencegah teks "Lihat Semua" terpotong/wrap */
+  flex-shrink: 0; /* KUNCI: Mencegah tombol mengecil tergencet teks judul */
+  margin-bottom: -4px; /* Kompensasi visual agar sejajar dengan teks judul */
+}
+
+.link-see-all:hover {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
 }
 
 .badge-count {
@@ -86,6 +89,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.section-action {
+  margin-top: 8px;
 }
 
 /* KARTU WIDGET INFORMATIF */
@@ -169,16 +176,6 @@
 }
 
 /* --- KANAN: MAIN CALENDAR --- */
-.dash-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: var(--bg-paper);
-  border-top-left-radius: 24px;
-  box-shadow: 0 2px 2px rgba(0,0,0,0.5);
-}
-
 .google-calendar-wrap {
   flex: 1;
   min-height: 0;
@@ -186,19 +183,6 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .dashboard-layout {
-    flex-direction: column;
-    overflow-y: auto;
-  }
-  .dash-sidebar {
-    width: 100%;
-    min-width: 100%;
-    border-bottom: 1px solid var(--border-light);
-  }
-  .dash-main {
-    border-top-left-radius: 0;
-    min-height: 500px;
-  }
   .fc .fc-toolbar-title {
     font-size: 18px;
     margin-left: 8px !important;

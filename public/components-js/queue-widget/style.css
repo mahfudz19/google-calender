@@ -3,7 +3,6 @@
    ========================================================= */
 .queue-widget {
   position: sticky;
-  top: 5.5rem;
   background: var(--bg-paper);
   border: 1px solid var(--divider);
   border-radius: 16px;

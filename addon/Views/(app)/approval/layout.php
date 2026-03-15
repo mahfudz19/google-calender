@@ -1,6 +1,14 @@
-<div class="apv-layout-wrapper">
+<div class="app-layout">
 
-  <aside class="apv-sidebar">
+  <aside class="app-sidebar">
+    <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="apv-btn-back">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Kembali ke Dashboard
+    </a>
+
     <link rel="stylesheet" href="<?= getBaseUrl('/components-js/queue-widget/style.css') ?>">
     <div id="queue-widget" class="queue-widget"></div>
     <script>
@@ -14,7 +22,7 @@
     <script src="<?= getBaseUrl('/components-js/queue-widget/index.js') ?>"></script>
   </aside>
 
-  <main class="apv-main">
+  <main class="app-main apv-main">
     <header class="apv-header">
       <div class="apv-header-text">
         <h1 class="apv-page-title">Persetujuan Agenda</h1>
