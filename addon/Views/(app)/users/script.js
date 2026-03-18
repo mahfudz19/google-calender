@@ -21,6 +21,7 @@
   let sortColumn = "name";
   let sortDirection = "asc";
   let searchQuery = "";
+  let currentRoleFilter = "all"; 
 
   const tableBody = document.getElementById("tableBody");
   const searchInput = document.getElementById("searchInput");
@@ -28,8 +29,8 @@
   const tableInfo = document.getElementById("tableInfo");
   const paginationWrapper = document.getElementById("paginationWrapper");
   const sortableHeaders = document.querySelectorAll("th.usr-sortable");
+  const filterButtons = document.querySelectorAll(".usr-filter-btn"); // Ambil tombol filter sidebar
 
-  // Ikon SVG untuk digunakan berulang kali agar UI bersih
   const iconView = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
   const iconEdit = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
   const iconTrash = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
@@ -39,13 +40,24 @@
     if (!tableBody) return;
     tableBody.innerHTML = "";
 
+    // PROSES PENYARINGAN DATA (FILTER)
     let filtered = rawData.filter((user) => {
+      // 1. Cek Filter Peran (Sidebar)
+      if (currentRoleFilter !== "all") {
+        const userRole = (user.role || "").toLowerCase();
+        if (userRole !== currentRoleFilter) return false;
+      }
+
+      // 2. Cek Pencarian Teks (Search Box)
       const term = searchQuery.toLowerCase();
+      if (term === "") return true;
+
       const nameMatch = (user.name || "").toLowerCase().includes(term);
       const emailMatch = (user.email || "").toLowerCase().includes(term);
       return nameMatch || emailMatch;
     });
 
+    // PENGURUTAN (SORTING)
     filtered.sort((a, b) => {
       let valA = (a[sortColumn] || "").toString().toLowerCase();
       let valB = (b[sortColumn] || "").toString().toLowerCase();
@@ -96,7 +108,6 @@
         if (user.email === currentUserEmail) {
           actionHtml = `<span style="color: var(--text-secondary); font-size: 13px; margin-right: 16px;">(Anda)</span>`;
         } else if (user.is_registered) {
-          // Terintegrasi penuh dengan GLOBAL MODAL `.css-modal`
           actionHtml = `
             <div class="usr-actions">
               <a data-spa href="${baseUrl}/users/${user.id}" class="usr-btn-icon" title="Lihat Profil">${iconView}</a>
@@ -241,6 +252,7 @@
     });
   }
 
+  // EVENT LISTENERS UNTUK FILTER, PENCARIAN, DAN SORTING
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value;
@@ -270,5 +282,25 @@
     });
   });
 
+  // Event Listener khusus untuk Tombol Filter di Sidebar
+  if (filterButtons) {
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        // Hilangkan kelas 'active' dari semua tombol filter
+        filterButtons.forEach(b => b.classList.remove("active"));
+        
+        // Tambahkan kelas 'active' ke tombol yang diklik
+        const targetBtn = e.currentTarget;
+        targetBtn.classList.add("active");
+
+        // Perbarui state filter dan render ulang tabel
+        currentRoleFilter = targetBtn.getAttribute("data-filter");
+        currentPage = 1;
+        renderTable();
+      });
+    });
+  }
+
+  // Panggilan Pertama
   renderTable();
 })();
