@@ -10,10 +10,11 @@
 .top-navbar {
   position: sticky;
   top: 0;
-  z-index: 1050; 
+  z-index: 1050;
   height: var(--navbar-height);
   display: flex;
   align-items: center;
+  background-color: var(--bg-default);
 }
 
 .nav-container {
@@ -102,13 +103,16 @@
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-light);
   overflow: hidden;
-  z-index: 9999; 
-  right: -4px; 
+  z-index: 9999;
+  right: -4px;
   transform-origin: top right;
   transform: scale(0.85);
   opacity: 0;
   visibility: hidden;
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease, visibility 0.2s ease;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.2s ease,
+    visibility 0.2s ease;
 }
 
 .dropdown-backdrop {
@@ -122,27 +126,31 @@
 
 /* Pemicu Buka/Tutup via Checkbox */
 #apps-toggle:checked ~ .dropdown-menu,
-#profile-toggle:checked ~ .dropdown-menu { 
+#profile-toggle:checked ~ .dropdown-menu {
   transform: scale(1);
   opacity: 1;
-  visibility: visible;}
+  visibility: visible;
+}
 
 #apps-toggle:checked ~ .dropdown-backdrop,
-#profile-toggle:checked ~ .dropdown-backdrop { 
-  display: block; 
+#profile-toggle:checked ~ .dropdown-backdrop {
+  display: block;
 }
 
 .apps-dropdown-custom {
   width: 320px;
   top: 48px;
   right: 0;
-  
+
   /* Setup Animasi Scale (Pusat di Kanan Atas) */
   transform-origin: top right;
   transform: scale(0.85);
   opacity: 0;
   visibility: hidden;
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease, visibility 0.2s ease;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.2s ease,
+    visibility 0.2s ease;
 }
 
 /* Logic Tampil (Gunakan class yang sudah ada) */
@@ -154,15 +162,15 @@
 
 @media (max-width: 768px) {
   .apps-dropdown-custom {
-    right: -1.5rem; 
-    width: 280px; 
+    right: -1.5rem;
+    width: 280px;
   }
 }
 
 /* --- GRID LAYOUT APLIKASI --- */
 .apps-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 16px;
 }
@@ -180,7 +188,8 @@
   cursor: pointer;
 }
 
-.app-grid-item:hover, .app-grid-item.active {
+.app-grid-item:hover,
+.app-grid-item.active {
   background-color: var(--bg-default);
 }
 
@@ -262,8 +271,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ====================================================
@@ -279,7 +294,9 @@
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
 }
 
 /* Tampilkan Modal */
@@ -302,7 +319,7 @@
   position: relative;
   background-color: var(--bg-paper);
   width: 90%;
-  max-width: 420px; 
+  max-width: 420px;
   border-radius: 28px; /* Sudut sangat melengkung khas MD3 */
   box-shadow: var(--shadow-lg);
   z-index: 10000;
@@ -323,7 +340,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start; /* Sejajarkan ke atas jika judul panjang */
-  padding: 24px 24px 16px 24px; 
+  padding: 24px 24px 16px 24px;
 }
 
 .modal-title {
@@ -349,7 +366,7 @@
   color: var(--text-secondary);
   width: 36px;
   height: 36px;
-  border-radius: 50%; 
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -473,8 +490,10 @@
   text-decoration: none;
   padding: 8px 16px 8px 8px;
   border-radius: 100px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  margin-left: -8px; 
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  margin-left: -8px;
 }
 
 .app-btn-back:hover {
@@ -483,7 +502,7 @@
 }
 
 .app-sidebar {
-  width: 280px; 
+  width: 280px;
   min-width: 280px;
   padding: 16px 12px 16px 16px;
   display: flex;
@@ -500,7 +519,7 @@
   overflow: hidden;
   background-color: var(--bg-paper);
   border-top-left-radius: 24px;
-  box-shadow: 0 2px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* --- Tambahkan ke bagian Desktop --- */
@@ -517,11 +536,11 @@
 .sidebar-overlay {
   display: none;
   position: fixed;
-  top: var(--navbar-height); 
+  top: var(--navbar-height);
   left: 0;
   right: 0;
   bottom: 0;
-  
+
   background: rgba(0, 0, 0, 0.4);
   z-index: 998; /* Di bawah sidebar (1000) */
   backdrop-filter: blur(2px);
