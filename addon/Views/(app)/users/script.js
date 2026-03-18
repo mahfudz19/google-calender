@@ -88,7 +88,7 @@
         if (user.role === "user") roleClass = "badge-green";
 
         const statusBadge = user.is_registered
-          ? `<span class="usr-badge badge-green">Mazu System</span>`
+          ? `<span class="usr-badge badge-green">User Integrated</span>`
           : `<span class="usr-badge badge-gray">G-Suite Only</span>`;
 
         let actionHtml = "";
