@@ -39,7 +39,7 @@ $currentUser = [
             <span class="blk-step-title">3. Check Database</span>
             <button class="blk-btn-step" id="btn-check-db" disabled>Check</button>
           </div>
-          <p class="blk-step-desc">Mencocokkan jadwal dengan data di server Mazu.</p>
+          <p class="blk-step-desc">Mencocokkan jadwal dengan data di server <?= env('APP_NAME') ?>.</p>
         </li>
       </ul>
       <div class="blk-upload-action">

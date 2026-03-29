@@ -20,7 +20,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
         </button>
 
         <a data-spa href="<?= getBaseUrl('/dashboard') ?>" class="nav-brand">
-          <img src="<?= getBaseUrl('/logo_app/apple-touch-icon.png') ?>" alt="Mazu">
+          <img src="<?= getBaseUrl('/logo_app/apple-touch-icon.png') ?>" alt="Logo <?= env('APP_NAME') ?>">
           <span class="nav-brand-text">Calendar</span>
         </a>
       </div>
@@ -33,7 +33,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
           <div class="apps-wrapper" style="position: relative;">
             <input type="checkbox" id="apps-toggle" class="css-toggle-input" hidden>
 
-            <label for="apps-toggle" class="icon-action-btn" title="Aplikasi Mazu">
+            <label for="apps-toggle" class="icon-action-btn" title="Aplikasi <?= env('APP_NAME') ?>">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                 <path d="M6 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 14c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 20c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
               </svg>

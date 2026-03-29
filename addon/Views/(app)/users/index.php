@@ -60,7 +60,7 @@
         <line x1="12" y1="8" x2="12.01" y2="8"></line>
       </svg>
       <div>
-        <strong>G-Suite Only</strong> berarti akun ada di Google Workspace organisasi Anda, tetapi belum didaftarkan ke database Mazu Calendar.
+        <strong>G-Suite Only</strong> berarti akun ada di Google Workspace organisasi Anda, tetapi belum didaftarkan ke database <?= env('APP_NAME') ?>.
       </div>
     </div>
   </aside>

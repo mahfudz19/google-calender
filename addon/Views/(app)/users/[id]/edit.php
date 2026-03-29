@@ -67,7 +67,7 @@
         <div class="upf-form-section divider">
           <div class="upf-toggle-row">
             <div class="upf-toggle-info">
-              <label class="upf-form-label" style="margin: 0;">Izin Akses Mazu</label>
+              <label class="upf-form-label" style="margin: 0;">Izin Akses <?= env('APP_NAME') ?></label>
               <span class="upf-form-desc">Izinkan pengguna ini untuk masuk ke dalam aplikasi.</span>
             </div>
 
