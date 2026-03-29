@@ -339,3 +339,57 @@
 .fc .fc-scrollgrid-section-body:last-child td {
   border-bottom: none !important;
 }
+
+.fc-event {
+  cursor: pointer !important;
+}
+
+/* =========================================================
+   DASHBOARD MODAL DETAIL (MD3 / GCal Style)
+   ========================================================= */
+.ds-modal-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.ds-modal-row:last-child {
+  margin-bottom: 0;
+}
+
+.ds-modal-icon {
+  flex-shrink: 0;
+  width: 24px;
+  display: flex;
+  justify-content: center;
+  color: #5f6368; /* Warna abu-abu ikon Google */
+  padding-top: 2px; /* Sejajarkan ikon dengan teks baris pertama */
+}
+
+.ds-modal-content-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-modal-title {
+  font-size: 22px;
+  font-weight: 400;
+  color: #202124;
+  margin: 0;
+  line-height: 1.2;
+  font-family: "Product Sans", "Inter", sans-serif;
+}
+
+.ds-modal-text {
+  font-size: 14px;
+  color: #202124;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.ds-modal-subtext {
+  font-size: 14px;
+  color: #5f6368;
+  line-height: 1.5;
+}

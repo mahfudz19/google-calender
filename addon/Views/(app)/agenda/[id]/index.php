@@ -137,9 +137,7 @@ $isApprover = $_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role']
 
           <?php if (!empty($agenda['location'])): ?>
             <div class="gcal-detail-text" style="<?= !empty($agenda['ruangan_name']) ? 'margin-top: 8px;' : '' ?>">
-              <a href="<?= (str_starts_with($agenda['location'], 'http') ? '' : 'https://') . htmlspecialchars($agenda['location']) ?>" target="_blank" rel="noopener noreferrer" style="color: var(--primary-main); text-decoration: underline; word-break: break-all;">
-                <?= htmlspecialchars($agenda['location']) ?>
-              </a>
+              <?= htmlspecialchars($agenda['location']) ?>
             </div>
           <?php endif; ?>
 

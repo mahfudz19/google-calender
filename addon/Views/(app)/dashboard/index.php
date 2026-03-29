@@ -113,8 +113,62 @@ $recentAgendas = $recentAgendas ?? [];
 
 </div>
 
+<div id="modal-event-detail" class="css-modal">
+  <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
+  <div class="modal-content" style="max-width: 448px; padding: 0; border-radius: 24px;">
+    
+    <div class="modal-header" style="border-bottom: none; padding: 12px 12px 0; justify-content: flex-end;">
+      <button type="button" class="modal-close" style="background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; color: #5f6368;" onclick="document.getElementById('modal-event-detail').classList.remove('show')">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="modal-body" style="padding: 0 24px 24px 24px; text-align: left;">
+      
+      <div class="ds-modal-row">
+        <div class="ds-modal-icon" style="padding-top: 6px;">
+          <div style="width: 14px; height: 14px; border-radius: 50%; background-color: var(--primary-main);"></div>
+        </div>
+        <div class="ds-modal-content-wrap">
+          <h2 id="modal-ev-title" class="ds-modal-title">Judul Agenda</h2>
+        </div>
+      </div>
+
+      <div class="ds-modal-row">
+        <div class="ds-modal-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <div class="ds-modal-content-wrap" id="modal-ev-time">
+          </div>
+      </div>
+
+      <div class="ds-modal-row">
+        <div class="ds-modal-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </div>
+        <div class="ds-modal-content-wrap" id="modal-ev-location">
+          </div>
+      </div>
+
+      <div class="ds-modal-row">
+        <div class="ds-modal-content-wrap" id="modal-ev-requester"></div>
+      </div>
+
+      <div class="ds-modal-row">
+        <div class="ds-modal-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
+        </div>
+        <div class="ds-modal-content-wrap">
+          <div id="modal-ev-desc" class="ds-modal-text">Deskripsi</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
   window.approvedAgendas = <?= json_encode($approvedAgendas ?? []) ?>;
+  console.log(window.approvedAgendas);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-<script src="<?= getBaseUrl('/components-js/dashboard/script.js') ?>"></script>
