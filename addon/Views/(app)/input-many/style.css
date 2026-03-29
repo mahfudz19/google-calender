@@ -8,6 +8,8 @@
   border: 1px solid var(--border-light);
   border-radius: 16px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .blk-widget-header {
@@ -16,6 +18,7 @@
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-light);
   background: var(--bg-default);
+  flex: 0;
 }
 
 .blk-steps {
@@ -25,6 +28,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+  overflow: auto;
 }
 
 .blk-step {
@@ -86,6 +91,7 @@
   padding: 16px 20px;
   border-top: 1px solid var(--border-light);
   background: var(--bg-paper);
+  flex: 0;
 }
 
 .blk-btn-upload {
@@ -257,7 +263,6 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-light);
-  background: var(--bg-default);
 }
 
 .blk-preview-title {
