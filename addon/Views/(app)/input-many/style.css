@@ -254,7 +254,7 @@
 /* --- PREVIEW SECTION --- */
 .blk-preview-section {
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .blk-preview-header {

@@ -54,8 +54,11 @@
   width: 100%;
 }
 
-@media (min-width: 768px) {
-  .usr-controls { width: auto; }
+@media (max-width: 768px) {
+  .usr-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 /* Kotak Pencarian Pill ala Google Drive */
