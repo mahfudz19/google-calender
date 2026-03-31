@@ -38,18 +38,24 @@ class CalenderJob
 
             // Step 1: Validasi data (25%)
             $this->updateProgress($jobId, 25, 'processing', 'Membaca dan memvalidasi data agenda...');
-            // FIX: Gunakan validateData() agar seluruh aturan bisnis tereksekusi
             $agenda = $this->validateData($id);
+            $isGlobal = !empty($agenda['is_global']);
 
-            // Step 2: Ambil semua User dari Google Directory (50%)
-            $this->updateProgress($jobId, 50, 'processing', 'Mengambil data Directory Users...');
-            $targetEmails = $this->getProcessData($agenda);
+            // Step 2: Ambil target email peserta (50%)
+            $targetEmails = [];
+            if ($isGlobal) {
+                // OPTIMASI: Bypass pemanggilan Google Directory API yang lambat untuk Kalender Akademik
+                $this->updateProgress($jobId, 50, 'processing', 'Bypass Directory API untuk Kalender Global...');
+            } else {
+                $this->updateProgress($jobId, 50, 'processing', 'Mengambil data Directory Users...');
+                $targetEmails = $this->getProcessData($agenda);
+            }
 
-            // Step 3: Proses Push Massal (Google Batch API) (75%)
-            $this->updateProgress($jobId, 75, 'processing', 'Mengirim data via Google API Batch...');
+            // Step 3: Proses Push (75%)
+            $this->updateProgress($jobId, 75, 'processing', 'Mengirim data ke Google Calendar API...');
             $this->prossessData($agenda, $id, $targetEmails);
 
-            $this->updateProgress($jobId, 100, 'success', 'Berhasil disinkronkan ke seluruh kalender!');
+            $this->updateProgress($jobId, 100, 'success', 'Berhasil disinkronkan ke Google Calendar!');
         } catch (\Throwable $th) {
             $this->updateProgress($jobId, 100, 'failed', $th->getMessage());
             throw $th;
@@ -124,32 +130,31 @@ class CalenderJob
             throw new \Exception("Job dibatalkan: Agenda sudah memiliki Google Event ID.");
         }
 
-        // FIX: Tambahkan parameter ruangan_id sebagai parameter ke-3 yang benar
-        $ruanganId = isset($agenda['ruangan_id']) ? (int)$agenda['ruangan_id'] : null;
-        $conflicts = $this->model->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $ruanganId, (int)$id);
+        // Agenda Global mem-bypass pengecekan bentrok ruangan
+        if (empty($agenda['is_global'])) {
+            $ruanganId = isset($agenda['ruangan_id']) ? (int)$agenda['ruangan_id'] : null;
+            $conflicts = $this->model->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $ruanganId, (int)$id);
 
-        if (!empty($conflicts)) {
-            throw new \Exception("Conflict detected! Jadwal bertabrakan dengan agenda lain.");
+            if (!empty($conflicts)) {
+                throw new \Exception("Conflict detected! Jadwal bertabrakan dengan agenda lain.");
+            }
         }
 
-        // Tandai sebagai sedang diproses
         $this->model->updateStatus($agenda['id'], 'processing');
 
         return $agenda;
     }
 
     /**
-     * Proses utama job
+     * Mengambil email seluruh user dari Google Directory
      */
     private function getProcessData(array $agenda): array
     {
         $directory = new GoogleDirectoryService();
         $users = $directory->impersonate($this->adminEmail)->getAllUsers();
 
-        // Ekstrak emailnya saja
         $targetEmails = [];
         foreach ($users as $u) {
-            // Mendukung jika $u adalah objek atau array
             $email = is_object($u) ? ($u->primaryEmail ?? null) : ($u['email'] ?? $u['primaryEmail'] ?? null);
             if ($email) {
                 $targetEmails[] = $email;
@@ -171,41 +176,45 @@ class CalenderJob
         $timezone = new \DateTimeZone('Asia/Makassar');
         $start = new \DateTime($agenda['start_time'], $timezone);
         $end = new \DateTime($agenda['end_time'], $timezone);
+        
+        $isGlobal = !empty($agenda['is_global']);
 
-        // 1. Format array targetEmails menjadi format Attendees yang diterima service
-        $attendees = [];
-        foreach ($targetEmails as $email) {
-            // Kita bungkus ke dalam format yang bisa dibaca oleh buildEventObject
-            $attendees[] = ['email' => $email];
-        }
-
-        // 2. Siapkan data dengan key yang SESUAI dengan buildEventObject()
+        // 1. Siapkan Data Dasar
         $eventData = [
             'title'       => $agenda['title'],
             'description' => $agenda['description'],
-            // Gabungkan nama ruangan dan lokasi spesifik agar lebih informatif
             'location'    => trim(($agenda['ruangan_name'] ?? '') . ' ' . ($agenda['location'] ?? '')),
-            'start_time'  => $start->format('c'),
-            'end_time'    => $end->format('c'),
-            'attendees'   => $attendees
         ];
+
+        // 2. LOGIKA PERCABANGAN (Global vs Reguler)
+        if ($isGlobal) {
+            $eventData['start_date']   = $start->format('Y-m-d');
+            $end->modify('+1 day'); 
+            $eventData['end_date']     = $end->format('Y-m-d');
+            $eventData['transparency'] = 'transparent'; 
+            
+            $sendUpdates = 'none'; 
+            // Field 'attendees' sengaja tidak disertakan agar tombol RSVP hilang
+        } else {
+            $eventData['start_time'] = $start->format('c');
+            $eventData['end_time']   = $end->format('c');
+            
+            $attendees = [];
+            foreach ($targetEmails as $email) {
+                $attendees[] = ['email' => $email];
+            }
+            $eventData['attendees']  = $attendees;
+            
+            $sendUpdates = 'all';
+        }
 
         $gcal = new GoogleCalendarService();
 
-        // Panggil fungsi bulk insert yang sudah kita buat
+        // 3. Eksekusi API Insert
         $googleEventId = $gcal->impersonate($this->adminEmail)
-            ->insertEvent($eventData, ['sendUpdates' => 'all']);
+            ->insertEvent($eventData, ['sendUpdates' => $sendUpdates]);
 
-        // 4. Update Database dan SIMPAN $googleEventId yang kita dapatkan
-        $this->model->updateStatus($id, 'approved', 'Telah disinkronisasi ke seluruh user kampus', $googleEventId);
-    }
-
-    /**
-     * Cleanup resources
-     */
-    private function cleanup(array $data): void
-    {
-        echo "Cleaning up after job completion\n";
-        // Add your cleanup logic here
+        // 4. Catat Keberhasilan di Database
+        $this->model->updateStatus($id, 'approved', 'Telah disinkronisasi ke Google Calendar', $googleEventId);
     }
 }

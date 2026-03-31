@@ -31,7 +31,7 @@ class GoogleCalendarService
     return $this;
   }
 
-  /**
+/**
    * Helper private untuk membangun objek Event Google
    */
   private function buildEventObject(array $data, ?Google_Service_Calendar_Event $event = null): Google_Service_Calendar_Event
@@ -43,16 +43,28 @@ class GoogleCalendarService
     if (isset($data['title'])) $event->setSummary($data['title']);
     if (isset($data['description'])) $event->setDescription($data['description']);
     if (isset($data['location'])) $event->setLocation($data['location']);
+    
+    if (isset($data['transparency'])) {
+      $event->setTransparency($data['transparency']);
+    }
 
-    if (isset($data['start_time'])) {
-      $start = new Google_Service_Calendar_EventDateTime();
-      $start->setDateTime($data['start_time']);
+    $start = new Google_Service_Calendar_EventDateTime();
+    if (isset($data['start_date'])) {
+      $start->setDate($data['start_date']);
+    } elseif (isset($data['start_time'])) {
+      $start->setDateTime($data['start_time']); 
+    }
+    if (isset($data['start_date']) || isset($data['start_time'])) {
       $event->setStart($start);
     }
 
-    if (isset($data['end_time'])) {
-      $end = new Google_Service_Calendar_EventDateTime();
+    $end = new Google_Service_Calendar_EventDateTime();
+    if (isset($data['end_date'])) {
+      $end->setDate($data['end_date']);
+    } elseif (isset($data['end_time'])) {
       $end->setDateTime($data['end_time']);
+    }
+    if (isset($data['end_date']) || isset($data['end_time'])) {
       $event->setEnd($end);
     }
 
