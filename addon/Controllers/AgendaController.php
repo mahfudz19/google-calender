@@ -98,12 +98,20 @@ class AgendaController
       $body['requester_email'] = $user['email'] ?? null;
       $body['requester_role'] = $user['role'] ?? 'user';
       $body['requester_avatar'] = $user['avatar'] ?? null;
+      $body['is_global'] = $data['is_global'] ?? false;
       $body['status'] = 'pending';
 
-      $body['ruangan_id'] = $data['ruangan_id'] ?? null;
-      $body['ruangan_name'] = $data['ruangan_name'] ?? null;
-      $body['ruangan_location'] = $data['ruangan_location'] ?? null;
-      $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+      if ($body['is_global']) {
+        $body['ruangan_id'] = null;
+        $body['ruangan_name'] = null;
+        $body['ruangan_location'] = null;
+        $body['ruangan_capacity'] = null;
+      } else {
+        $body['ruangan_id'] = $data['ruangan_id'] ?? null;
+        $body['ruangan_name'] = $data['ruangan_name'] ?? null;
+        $body['ruangan_location'] = $data['ruangan_location'] ?? null;
+        $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+      }
       $this->model->create($body);
 
 
@@ -190,12 +198,20 @@ class AgendaController
       $body['description'] = $data['description'] ?? null;
       $body['start_time'] = $data['start_time'] ?? null;
       $body['end_time'] = $data['end_time'] ?? null;
+      $body['is_global'] = $data['is_global'] ?? false;
       $body['location'] = $data['location'] ?? null;
 
-      $body['ruangan_id'] = $data['ruangan_id'] ?? null;
-      $body['ruangan_name'] = $data['ruangan_name'] ?? null;
-      $body['ruangan_location'] = $data['ruangan_location'] ?? null;
-      $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+      if ($body['is_global']) {
+        $body['ruangan_id'] = null;
+        $body['ruangan_name'] = null;
+        $body['ruangan_location'] = null;
+        $body['ruangan_capacity'] = null;
+      } else {
+        $body['ruangan_id'] = $data['ruangan_id'] ?? null;
+        $body['ruangan_name'] = $data['ruangan_name'] ?? null;
+        $body['ruangan_location'] = $data['ruangan_location'] ?? null;
+        $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+      }
 
       $oldAgenda = $this->model->find($id);
       // 1. Cek Konflik Waktu (Menggunakan fungsi di Model)
@@ -209,11 +225,9 @@ class AgendaController
       }
 
       // 2. Update ke Database
-      logger()->log('2. Update ke Database');
       $this->model->updateById($id, $body);
 
       // 3. Jika agenda sudah "approved", edit juga di Google Calendar
-      logger()->log('3.1 Jika agenda sudah "approved", edit juga di Google Calendar');
       if ($oldAgenda['status'] === 'approved' && !empty($oldAgenda['google_event_id'])) {
         $timezone = new \DateTimeZone('Asia/Makassar');
         $start = new \DateTime($body['start_time'], $timezone);
@@ -233,16 +247,13 @@ class AgendaController
         $updatedEventData = array_filter($updatedEventData);
 
         // Update via Google API
-        logger()->log('3.2 Update via Google API');
         $gcal->impersonate($this->adminEmail)
           ->updateEvent($oldAgenda['google_event_id'], $updatedEventData, ['sendUpdates' => 'all']);
       }
 
       if ($oldAgenda['status'] === 'approved') {
-        logger()->log('4 redirect /approval/history');
         return $response->redirect('/approval/history');
       }
-      logger()->log('4 redirect /agenda');
       return $response->redirect('/agenda');
     } catch (\Throwable $th) {
       return $response->redirect('/agenda/' . $id . '/edit?error=500&message=' . urlencode($th->getMessage()));

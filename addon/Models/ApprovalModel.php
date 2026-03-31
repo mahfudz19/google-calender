@@ -26,6 +26,7 @@ class ApprovalModel extends Model
         'description' => ['type' => 'text', 'nullable' => true],
         'start_time' => ['type' => 'datetime', 'nullable' => false],
         'end_time' => ['type' => 'datetime', 'nullable' => false],
+        'is_global' => ['type' => 'boolean', 'default' => false],
         'location' => ['type' => 'string', 'nullable' => true],
         'requester_name' => ['type' => 'string', 'nullable' => true],
         'requester_email' => ['type' => 'string', 'nullable' => true],
@@ -186,7 +187,8 @@ class ApprovalModel extends Model
     public function checkTimeConflict(string $startTime, string $endTime, ?int $ruanganId = null, ?int $excludeId = null): array
     {
         $sql = "SELECT * FROM {$this->table} 
-        WHERE status = 'approved' 
+        WHERE status = 'approved'
+        AND is_global = 0
         AND ((start_time < :end_time AND end_time > :start_time))";
 
         $params = ['start_time' => $startTime, 'end_time' => $endTime];
@@ -226,6 +228,11 @@ class ApprovalModel extends Model
         $conflicts = [];
 
         foreach ($agendas as $agenda) {
+            // JIKA AGENDA GLOBAL, LANGSUNG SKIP PENGECEKAN BENTROK
+            if (!empty($agenda['is_global']) && $agenda['is_global'] == 1) {
+                continue;
+            }
+            
             // Validasi data minimal harus ada
             if (empty($agenda['start_time']) || empty($agenda['end_time']) || empty($agenda['ruangan_id'])) {
                 continue;

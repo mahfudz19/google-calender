@@ -73,7 +73,24 @@ if ($error && $message) {
       </div>
     </div>
 
-    <div class="gcal-row">
+    <div class="gcal-row align-top">
+      <div class="gcal-icon" title="Opsi Kalender">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div class="gcal-input-wrapper" style="padding-top: 2px;">
+        <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+          <input type="checkbox" name="is_global" id="is_global_checkbox" value="1" <?= (!empty($agenda['is_global'])) ? 'checked' : '' ?> style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary-main);">
+          <div>
+            <span style="font-weight: 500; color: var(--text-primary); display: block;">Jadikan sebagai Kalender Akademik / Global</span>
+            <span style="font-size: 13px; color: var(--text-secondary); display: block; margin-top: 2px;">Gunakan untuk Libur, Minggu Tenang, dsb. Mengabaikan validasi ruangan.</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="gcal-row" id="ruangan_row">
       <div class="gcal-icon" title="Pilih Ruangan">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
@@ -88,7 +105,7 @@ if ($error && $message) {
           <line x1="1" y1="14" x2="4" y2="14"></line>
         </svg>
       </div>
-      <div class="gcal-input-wrapper">
+      <div class="gcal-input-wrapper" id="ruangan_input_wrapper">
         <?php $dbRuanganId = $agenda['ruangan_id'] ?? $agenda['ID_ruangan'] ?? ''; ?>
         <input type="hidden" id="input_ruangan_id" name="ruangan_id" value="<?= htmlspecialchars($dbRuanganId) ?>">
         <input type="hidden" id="input_ruangan_name" name="ruangan_name" value="<?= htmlspecialchars($agenda['ruangan_name'] ?? '') ?>">
@@ -148,7 +165,7 @@ if ($error && $message) {
 
   <div class="gcal-form-actions">
     <button type="submit" class="btn-save-gcal">
-      <?= $isEdit ? 'Simpan' : 'Simpan' ?>
+      <?= $isEdit ? 'Simpan Perubahan' : 'Simpan' ?>
     </button>
   </div>
 </form>
@@ -162,6 +179,37 @@ if ($error && $message) {
     if (!form) return;
     initAutocomplete(form);
     initTimeValidation(form);
+    initGlobalCheckboxToggle();
+  }
+
+  // Logika Disable/Enable Ruangan berdasarkan opsi Kalender Akademik
+  function initGlobalCheckboxToggle() {
+    const globalCheckbox = document.getElementById('is_global_checkbox');
+    const ruanganWrapper = document.getElementById('ruangan_input_wrapper');
+    const ruanganRow = document.getElementById('ruangan_row');
+
+    if (!globalCheckbox || !ruanganWrapper) return;
+
+    const toggleRuangan = () => {
+      if (globalCheckbox.checked) {
+        // Redupkan dan matikan interaksi pada form ruangan
+        ruanganWrapper.style.opacity = '0.4';
+        ruanganWrapper.style.pointerEvents = 'none';
+        
+        // Hapus custom validation error jika ada
+        const err = ruanganWrapper.parentNode.querySelector('.autocomplete-error');
+        if (err) err.remove();
+      } else {
+        // Nyalakan kembali
+        ruanganWrapper.style.opacity = '1';
+        ruanganWrapper.style.pointerEvents = 'auto';
+      }
+    };
+
+    // Pasang Event Listener dan jalankan saat pertama load (untuk mode Edit)
+    globalCheckbox.removeEventListener('change', toggleRuangan);
+    globalCheckbox.addEventListener('change', toggleRuangan);
+    toggleRuangan();
   }
 
   function initAutocomplete(form) {
@@ -206,11 +254,15 @@ if ($error && $message) {
 
     if (!form.dataset.autocompleteHandled) {
       select.addEventListener('change', updateHiddenFields);
+      
       form.addEventListener('submit', (e) => {
         const inId = document.getElementById('input_ruangan_id');
-        if (!inId || !inId.value) {
+        const isGlobal = document.getElementById('is_global_checkbox');
+        
+        // JIKA bukan agenda global, MAKA ruangan wajib diisi
+        if ((!isGlobal || !isGlobal.checked) && (!inId || !inId.value)) {
           e.preventDefault();
-          showError(container, 'Silakan pilih ruangan terlebih dahulu');
+          showError(container, 'Silakan pilih ruangan terlebih dahulu atau centang opsi Kalender Akademik.');
         }
       });
       form.dataset.autocompleteHandled = 'true';
@@ -222,9 +274,9 @@ if ($error && $message) {
     const err = document.createElement('div');
     err.className = 'autocomplete-error';
     err.textContent = message;
-    err.style.cssText = 'color: var(--md-sys-color-error); font-size: 0.8rem; margin-top: 4px; display: block;';
+    err.style.cssText = 'color: var(--error-main, #d32f2f); font-size: 0.85rem; margin-top: 6px; display: block;';
     container.parentNode.insertBefore(err, container.nextSibling);
-    setTimeout(() => err?.remove(), 3000);
+    setTimeout(() => err?.remove(), 4000);
   }
 
   function initTimeValidation(form) {
