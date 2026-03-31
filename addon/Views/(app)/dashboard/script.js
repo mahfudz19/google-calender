@@ -1,6 +1,21 @@
 function initFullCalendar() {
   const calendarEl = document.getElementById("mazuCalendar");
   if (calendarEl && window.FullCalendar) {
+
+    // Palet Warna Khas Google Workspace
+    const gcalPalette = [
+      '#4285F4', // 0: Blue (Default)
+      '#0F9D58', // 1: Green
+      '#DB4437', // 2: Red
+      '#AB47BC', // 3: Purple
+      '#00ACC1', // 4: Cyan
+      '#FF7043', // 5: Orange
+      '#9E9D24', // 6: Olive
+      '#5C6BC0', // 7: Indigo
+      '#F06292', // 8: Pink
+      '#00796B'  // 9: Teal
+    ];
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: "dayGridMonth",
       height: "100%", 
@@ -13,31 +28,53 @@ function initFullCalendar() {
         today: 'Hari ini', month: 'Bulan', week: 'Minggu', day: 'Hari', list: 'Agenda'
       },
       
-      // 1. PETAKAN SELURUH DATA & TANGANI "ALL-DAY"
+      // 1. PETAKAN SELURUH DATA & TANGANI "ALL-DAY" SERTA WARNA DINAMIS
       events: (window.approvedAgendas || []).map((agenda) => {
-        // Cek apakah ini Kalender Akademik
         const isGlobal = agenda.is_global == 1 || agenda.is_global == '1' || agenda.is_global === true;
         
         let eventStart = agenda.start_time;
         let eventEnd = agenda.end_time;
-        let eventColor = 'var(--primary-main)'; // Default Biru Mazu
-        let eventTextColor = '#ffffff';
+        let isAllDay = isGlobal;
 
-        if (isGlobal) {
-          // Hilangkan jam, ambil tanggalnya saja (YYYY-MM-DD)
-          eventStart = agenda.start_time.split(' ')[0];
+        // DETEKSI CERDAS: Jika bukan global, tapi event multi-hari yang diinput dari jam 00:00
+        // Kita ubah paksa menjadi "All-Day" agar teks "12a" hilang dan menjadi blok rapi.
+        if (!isGlobal && agenda.start_time && agenda.start_time.includes('00:00:00')) {
+          const startDateStr = agenda.start_time.split(' ')[0];
+          const endDateStr = agenda.end_time ? agenda.end_time.split(' ')[0] : startDateStr;
           
-          // FullCalendar "allDay" bersifat eksklusif untuk tanggal akhir.
-          // Kita harus memanipulasi tanggal akhir +1 hari agar blok kalender merentang penuh.
-          if (agenda.end_time) {
+          if (startDateStr !== endDateStr) {
+            isAllDay = true;
+            eventStart = startDateStr;
+            
+            // Aturan FullCalendar: End Date harus +1 hari (Exclusive)
             const endDateObj = new Date(agenda.end_time.replace(' ', 'T'));
-            endDateObj.setDate(endDateObj.getDate() + 1); // Tambah 1 hari
+            endDateObj.setDate(endDateObj.getDate() + 1);
             eventEnd = endDateObj.toISOString().split('T')[0];
           }
+        }
 
-          // Ubah warnanya menjadi Kuning khas Google Workspace agar sangat menonjol
-          eventColor = '#fbbc04'; 
-          eventTextColor = '#202124'; // Teks gelap agar mudah dibaca di atas kuning
+        // LOGIKA WARNA BARU (HASHING): Agar warna selalu unik meski ID ruangan sama / kosong
+        const seedString = agenda.ruangan_id ? String(agenda.ruangan_id) : String(agenda.title);
+        let hash = 0;
+        for (let i = 0; i < seedString.length; i++) {
+            hash = seedString.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        // Ambil angka absolut dari hash, lalu mod dengan jumlah warna di palet kita (10)
+        const colorIndex = Math.abs(hash) % gcalPalette.length;
+        
+        let eventColor = gcalPalette[colorIndex];
+        let eventTextColor = '#ffffff'; // Teks putih untuk background warna-warni
+
+        // KONDISI KHUSUS: KALENDER AKADEMIK
+        if (isGlobal) {
+          eventStart = agenda.start_time.split(' ')[0];
+          if (agenda.end_time) {
+            const endDateObj = new Date(agenda.end_time.replace(' ', 'T'));
+            endDateObj.setDate(endDateObj.getDate() + 1);
+            eventEnd = endDateObj.toISOString().split('T')[0];
+          }
+          eventColor = '#fbbc04'; // Kuning mencolok
+          eventTextColor = '#202124'; // Teks gelap agar kontras
         }
 
         return {
@@ -45,10 +82,10 @@ function initFullCalendar() {
           title: agenda.title,
           start: eventStart,
           end: eventEnd,
-          allDay: isGlobal,           // <--- KUNCI: Menghilangkan teks jam "12a"
+          allDay: isAllDay,
           color: eventColor,
           textColor: eventTextColor,
-          extendedProps: agenda       // Membawa sisa data JSON untuk keperluan Modal
+          extendedProps: agenda
         };
       }),
       
@@ -57,10 +94,9 @@ function initFullCalendar() {
 
       // 2. TAMBAHKAN EVENT CLICK (MODAL CERDAS)
       eventClick: function(info) {
-        info.jsEvent.preventDefault(); // Mencegah reload
+        info.jsEvent.preventDefault();
         const data = info.event.extendedProps;
         
-        // --- Ekstrak & Format Data ---
         document.getElementById('modal-ev-title').textContent = data.title;
         
         const start = new Date((data.start_time || "").replace(' ', 'T'));
@@ -80,12 +116,10 @@ function initFullCalendar() {
           let displayDate = startDateStr;
           let displayTime = `${timeStrStart} – ${timeStrEnd}`;
 
-          // Jika acara beda hari
           if (startDateStr !== endDateStr) {
             displayDate = `${startDateStr} – ${endDateStr}`;
           }
 
-          // Jika Kalender Akademik
           if (isGlobal) {
             displayTime = "Sepanjang Hari (All-Day)";
           }
@@ -96,7 +130,6 @@ function initFullCalendar() {
           `;
         }
         
-        // --- Lokasi Cerdas ---
         let locText = "";
         if (isGlobal) {
            locText = `<div class="ds-modal-text" style="color: var(--primary-main); font-weight: 600;">🌍 Berlaku Global (Seluruh Kampus)</div>`;
@@ -112,7 +145,6 @@ function initFullCalendar() {
         }
         document.getElementById('modal-ev-location').innerHTML = locText;
 
-        // --- Profil Pemohon ---
         const avatarStr = data.requester_avatar 
           ? `<img src="${data.requester_avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">` 
           : `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-default); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">${(data.requester_name || 'U').charAt(0).toUpperCase()}</div>`;
@@ -129,7 +161,12 @@ function initFullCalendar() {
 
         document.getElementById('modal-ev-desc').textContent = data.description || "Tidak ada deskripsi.";
         
-        // Munculkan Modal
+        // PENTING: Set warna titik ikon di modal agar sesuai dengan warna event-nya!
+        const modalIconDot = document.querySelector('.ds-modal-icon div');
+        if (modalIconDot) {
+          modalIconDot.style.backgroundColor = info.event.backgroundColor;
+        }
+
         document.getElementById('modal-event-detail').classList.add('show');
       }
     });

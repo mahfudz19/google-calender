@@ -316,9 +316,20 @@
   background-color: transparent !important;
 }
 
-.fc-h-event .fc-event-main-frame, 
-.fc-daygrid-dot-event .fc-event-title {
-  color: var(--text-primary);
+.fc-theme-standard .fc-h-event {
+  border: 1px solid var(--fc-event-border-color, var(--primary-main));
+  background-color: var(--fc-event-bg-color, var(--primary-main));
+  border-radius: 4px;
+}
+
+/* Pastikan teks di dalam blok horizontal menggunakan warna yang kita set di JS */
+.fc-h-event .fc-event-main {
+  color: inherit !important; /* Mewarisi textColor yang kita atur di JS */
+}
+
+.fc-h-event .fc-event-title {
+  font-weight: 500 !important; /* Sedikit ditebalkan agar mudah dibaca */
+  padding: 2px 4px;
 }
 
 .fc-event-time { font-weight: 600 !important; font-size: 12px; }
