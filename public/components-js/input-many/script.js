@@ -43,14 +43,13 @@ export function initCsvUploader(
   const modalConfirmBtn = document.getElementById("csvModalConfirmBtn");
 
   // ==========================================
-  // UTILS: MODAL GLOBAL CSS
+  // UTILS: MODAL GLOBAL & HELPERS
   // ==========================================
   function showModal({ title, message, type = "alert", onConfirm = null }) {
     if (!modalEl) return;
     modalTitle.textContent = title;
     modalText.innerHTML = message;
-    
-    // Reset Kelas
+
     modalTitle.className = "modal-title";
     modalIcon.className = "modal-icon-wrapper";
     modalIcon.style.display = "flex";
@@ -87,12 +86,29 @@ export function initCsvUploader(
       closeHandler();
       if (typeof onConfirm === "function") onConfirm();
     };
-    
+
     modalEl.classList.add("show");
   }
 
   function isGlobalAgenda(row) {
     return row.is_global == '1' || String(row.is_global).toLowerCase() === 'true';
+  }
+
+  function toDatetimeLocal(sqlDateStr) {
+    if (!sqlDateStr) return "";
+    return sqlDateStr.replace(" ", "T").slice(0, 16);
+  }
+
+  function formatDateTime(datetimeStr) {
+    if (!datetimeStr) return { date: "-", time: "-" };
+    const d = new Date(datetimeStr.replace(" ", "T"));
+    if (isNaN(d.getTime())) return { date: datetimeStr, time: "" };
+    const dateOpt = { day: "numeric", month: "short", year: "numeric" };
+    const timeOpt = { hour: "2-digit", minute: "2-digit" };
+    return {
+      date: d.toLocaleDateString("id-ID", dateOpt),
+      time: d.toLocaleTimeString("id-ID", timeOpt) + " WITA",
+    };
   }
 
   // ==========================================
@@ -230,7 +246,6 @@ export function initCsvUploader(
     let errorCount = 0;
 
     csvData = csvData.map((row) => {
-      // 1. Bypass Cek Ruangan Jika Ini Adalah Kalender Akademik (is_global)
       if (isGlobalAgenda(row)) {
         row.ruangan_id = null;
         row.ruangan_name = null;
@@ -299,7 +314,6 @@ export function initCsvUploader(
         let r1 = csvData[i];
         let r2 = csvData[j];
 
-        // 2. Bypass Cek Internal Jika Salah Satu Adalah Kalender Akademik
         if (isGlobalAgenda(r1) || isGlobalAgenda(r2)) {
             continue;
         }
@@ -350,7 +364,6 @@ export function initCsvUploader(
 
     let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-    // 3. Sertakan is_global di Payload agar backend bisa Bypass Cek Database
     const payload = {
       agendas: csvData.map((row) => ({
         _rowId: row._rowId,
@@ -450,7 +463,6 @@ export function initCsvUploader(
       try {
         let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-        // 4. Pastikan flag is_global dikirim ke Backend
         const cleanData = csvData.map((row) => {
           const { _rowId, _roomError, _timeError, _dbConflict, _conflictWith, ...cleanRow } = row;
           cleanRow.is_global = isGlobalAgenda(cleanRow) ? 1 : 0;
@@ -637,23 +649,6 @@ export function initCsvUploader(
     previewSection.style.display = "block";
   }
 
-  function toDatetimeLocal(sqlDateStr) {
-    if (!sqlDateStr) return "";
-    return sqlDateStr.replace(" ", "T").slice(0, 16);
-  }
-
-  function formatDateTime(datetimeStr) {
-    if (!datetimeStr) return { date: "-", time: "-" };
-    const d = new Date(datetimeStr.replace(" ", "T"));
-    if (isNaN(d.getTime())) return { date: datetimeStr, time: "" };
-    const dateOpt = { day: "numeric", month: "short", year: "numeric" };
-    const timeOpt = { hour: "2-digit", minute: "2-digit" };
-    return {
-      date: d.toLocaleDateString("id-ID", dateOpt),
-      time: d.toLocaleTimeString("id-ID", timeOpt) + " WITA",
-    };
-  }
-
   // ==========================================
   // RENDERING TABEL & WIDGET EDIT INLINE
   // ==========================================
@@ -674,112 +669,131 @@ export function initCsvUploader(
       let conflictHtml = "";
       if (row._dbConflict) {
         conflictHtml = `
-                    <div class="blk-error-msg danger">
-                        Bentrok Database Server
-                    </div>
-                    <button type="button" class="btn-show-conflict blk-btn-inline danger" data-index="${index}">🔍 Lihat Detail</button>`;
+            <div class="blk-error-msg danger">
+                Bentrok Database Server
+            </div>
+            <button type="button" class="btn-show-conflict blk-btn-inline danger" data-index="${index}">🔍 Lihat Detail</button>`;
       } else if (row._timeError) {
         conflictHtml = `
-                    <div class="blk-error-msg warning">
-                        Bentrok Baris CSV: ${row._conflictWith.join(", ")}
-                    </div>`;
+            <div class="blk-error-msg warning">
+                Bentrok Baris CSV: ${row._conflictWith.join(", ")}
+            </div>`;
+      }
+
+      // LOGIKA TAMPILAN TANGGAL & WAKTU CERDAS
+      let dateDisplay = startStr.date;
+      let timeDisplay = `${startStr.time} - ${endStr.time}`;
+
+      if (startStr.date !== endStr.date) {
+        dateDisplay = `${startStr.date} s/d ${endStr.date}`;
+      }
+
+      if (isGlobalAgenda(row)) {
+        timeDisplay = "Sepanjang Hari (All-Day)";
       }
 
       let timeHtml = `
-                <div id="time-card-${index}">
-                    <div class="blk-time-info">
-                        <span class="date">${startStr.date}</span>
-                        <span class="time">${startStr.time} - ${endStr.time}</span>
-                        ${conflictHtml}
-                    </div>
-                    <button type="button" class="btn-edit-time blk-btn-inline outline" data-index="${index}">✏️ Edit Waktu</button>
-                </div>
-                <div class="blk-edit-container" id="time-edit-${index}" style="display: none;">
-                    <div class="blk-edit-group">
-                        <label>Mulai:</label>
-                        <input type="datetime-local" id="time-start-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.start_time)}">
-                    </div>
-                    <div class="blk-edit-group">
-                        <label>Selesai:</label>
-                        <input type="datetime-local" id="time-end-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.end_time)}">
-                    </div>
-                    <div class="blk-edit-actions">
-                        <button type="button" class="btn-save-time blk-btn-inline primary" data-index="${index}">Simpan</button>
-                        <button type="button" class="btn-cancel-time blk-btn-inline outline" data-index="${index}">Batal</button>
-                    </div>
-                </div>
-            `;
-
-      // 5. Ubah Tampilan Ruangan Jika Kalender Akademik
-      let roomTdClass = row._roomError ? "blk-cell-error" : "";
-      let roomHtml = "";
-      
-      if (isGlobalAgenda(row)) {
-          roomHtml = `
-              <div class="blk-room-card" id="room-card-${index}">
-                  <span class="blk-room-name" style="color: var(--primary-main);">🌍 Kalender Akademik</span>
-                  <span class="blk-room-meta">Bypass Validasi Server</span>
+          <div id="time-card-${index}">
+              <div class="blk-time-info">
+                  <span class="date">${dateDisplay}</span>
+                  <span class="time">${timeDisplay}</span>
+                  ${conflictHtml}
               </div>
+              <button type="button" class="btn-edit-time blk-btn-inline outline" data-index="${index}">✏️ Edit Waktu</button>
+          </div>
+          <div class="blk-edit-container" id="time-edit-${index}" style="display: none;">
+              <div class="blk-edit-group">
+                  <label>Mulai:</label>
+                  <input type="datetime-local" id="time-start-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.start_time)}">
+              </div>
+              <div class="blk-edit-group">
+                  <label>Selesai:</label>
+                  <input type="datetime-local" id="time-end-${index}" class="blk-edit-input" value="${toDatetimeLocal(row.end_time)}">
+              </div>
+              <div class="blk-edit-actions">
+                  <button type="button" class="btn-save-time blk-btn-inline primary" data-index="${index}">Simpan</button>
+                  <button type="button" class="btn-cancel-time blk-btn-inline outline" data-index="${index}">Batal</button>
+              </div>
+          </div>
+      `;
+
+      // LOGIKA UI/UX RUANGAN & TOGGLE KALENDER AKADEMIK
+      let roomTdClass = row._roomError && !isGlobalAgenda(row) ? "blk-cell-error" : "";
+      
+      let cardContent = "";
+      if (isGlobalAgenda(row)) {
+          cardContent = `
+              <span class="blk-room-name" style="color: var(--primary-main);">🌍 Kalender Akademik</span>
+              <span class="blk-room-meta">Bypass Validasi Server</span>
+              <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Mode</button>
+          `;
+      } else if (row._roomError) {
+          cardContent = `
+              <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
+              <span class="blk-room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+              <div class="blk-error-msg danger">Tak terdaftar!</div>
+              <button type="button" class="btn-fix-room blk-btn-inline danger" data-index="${index}">Perbaiki</button>
           `;
       } else {
-          let optionsHtml = '<option value="">Pilih Ruangan...</option>';
-          roomCache.forEach((r) => {
-            const isSelected = !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan) ? "selected" : "";
-            optionsHtml += `<option value="${r.ID_ruangan}" data-name="${r.name}" data-capacity="${r.capacity}" ${isSelected}>ID ${r.ID_ruangan} - ${r.name}</option>`;
-          });
-    
-          const cardContent = row._roomError
-            ? `
-                    <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
-                    <span class="blk-room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                    <div class="blk-error-msg danger">Tak terdaftar!</div>
-                    <button type="button" class="btn-fix-room blk-btn-inline danger" data-index="${index}">Perbaiki</button>
-                `
-            : `
-                    <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
-                    <span class="blk-room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                    <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Ruangan</button>
-                `;
-    
-          roomHtml = `
-                    <div class="blk-room-card" id="room-card-${index}">
-                        ${cardContent}
-                    </div>
-                    <div class="blk-edit-container" id="room-edit-${index}" style="display: none;">
-                        <div class="autocomplete-container" data-placeholder="Ketik nama ruangan...">
-                            <select id="select-room-${index}" class="form-select">${optionsHtml}</select>
-                        </div>
-                        <div class="blk-edit-actions">
-                            <button type="button" class="btn-save-room blk-btn-inline primary" data-index="${index}">Simpan</button>
-                            <button type="button" class="btn-cancel-room blk-btn-inline outline" data-index="${index}">Batal</button>
-                        </div>
-                    </div>
-                `;
+          cardContent = `
+              <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
+              <span class="blk-room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+              <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Ruangan</button>
+          `;
       }
+
+      let optionsHtml = '<option value="">Pilih Ruangan...</option>';
+      roomCache.forEach((r) => {
+        const isSelected = (!isGlobalAgenda(row) && !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan)) ? "selected" : "";
+        optionsHtml += `<option value="${r.ID_ruangan}" data-name="${r.name}" data-capacity="${r.capacity}" ${isSelected}>ID ${r.ID_ruangan} - ${r.name}</option>`;
+      });
+
+      const isGlobalChecked = isGlobalAgenda(row) ? "checked" : "";
+      const isAutoWrapFaded = isGlobalAgenda(row) ? "opacity: 0.4; pointer-events: none;" : "";
+
+      let roomHtml = `
+          <div class="blk-room-card" id="room-card-${index}">
+              ${cardContent}
+          </div>
+          <div class="blk-edit-container" id="room-edit-${index}" style="display: none;">
+              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer;">
+                  <input type="checkbox" id="global-toggle-${index}" class="global-toggle-checkbox" data-index="${index}" ${isGlobalChecked} style="accent-color: var(--primary-main); width: 16px; height: 16px;">
+                  <span style="font-size: 13px; color: var(--primary-main); font-weight: 600;">🌍 Jadikan Kalender Akademik</span>
+              </label>
+
+              <div class="autocomplete-container" id="auto-wrap-${index}" data-placeholder="Ketik nama ruangan..." style="${isAutoWrapFaded}">
+                  <select id="select-room-${index}" class="form-select">${optionsHtml}</select>
+              </div>
+              <div class="blk-edit-actions">
+                  <button type="button" class="btn-save-room blk-btn-inline primary" data-index="${index}">Simpan</button>
+                  <button type="button" class="btn-cancel-room blk-btn-inline outline" data-index="${index}">Batal</button>
+              </div>
+          </div>
+      `;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td>
-                  <div class="blk-agenda-info">
-                    <strong>${row.title || "Tanpa Judul"}</strong>
-                    <span class="blk-agenda-desc">${row.description || "-"}</span>
-                    ${row.location ? `<span class="blk-agenda-loc">📍 ${row.location}</span>` : ''}
-                  </div>
-                </td>
-                <td class="${timeTdClass}">${timeHtml}</td>
-                <td>
-                  <div class="blk-req-card">
-                    <div class="blk-req-avatar">${avatarHtml}</div>
-                    <div class="blk-req-details">
-                      <span class="blk-req-name">${row.requester_name || "Unknown"}</span>
-                      <span class="blk-req-email">${row.requester_email || "-"}</span>
-                      <span class="blk-req-role ${roleClass}">${row.requester_role || "user"}</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="${roomTdClass}">${roomHtml}</td>
-            `;
+          <td>${index + 1}</td>
+          <td>
+            <div class="blk-agenda-info">
+              <strong>${row.title || "Tanpa Judul"}</strong>
+              <span class="blk-agenda-desc">${row.description || "-"}</span>
+              ${row.location ? `<span class="blk-agenda-loc">📍 ${row.location}</span>` : ''}
+            </div>
+          </td>
+          <td class="${timeTdClass}">${timeHtml}</td>
+          <td>
+            <div class="blk-req-card">
+              <div class="blk-req-avatar">${avatarHtml}</div>
+              <div class="blk-req-details">
+                <span class="blk-req-name">${row.requester_name || "Unknown"}</span>
+                <span class="blk-req-email">${row.requester_email || "-"}</span>
+                <span class="blk-req-role ${roleClass}">${row.requester_role || "user"}</span>
+              </div>
+            </div>
+          </td>
+          <td class="${roomTdClass}">${roomHtml}</td>
+      `;
       tbody.appendChild(tr);
     });
 
@@ -804,12 +818,12 @@ export function initCsvUploader(
             const startFmt = formatDateTime(c.start_time);
             const endFmt = formatDateTime(c.end_time);
             detailHtml += `
-                            <li style="background: var(--bg-default); padding: 12px; border-radius: 8px; border-left: 4px solid var(--error-main);">
-                                <strong style="display: block; color: var(--text-primary); font-size: 1rem; margin-bottom: 4px;">${c.title}</strong>
-                                <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">📅 ${startFmt.date}</span>
-                                <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">⏰ ${startFmt.time} - ${endFmt.time}</span>
-                            </li>
-                        `;
+              <li style="background: var(--bg-default); padding: 12px; border-radius: 8px; border-left: 4px solid var(--error-main);">
+                  <strong style="display: block; color: var(--text-primary); font-size: 1rem; margin-bottom: 4px;">${c.title}</strong>
+                  <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">📅 ${startFmt.date}</span>
+                  <span style="display: block; font-size: 0.85rem; color: var(--text-secondary);">⏰ ${startFmt.time} - ${endFmt.time}</span>
+              </li>
+            `;
           });
 
           detailHtml += "</ul></div>";
@@ -828,12 +842,25 @@ export function initCsvUploader(
         const idx = this.getAttribute("data-index");
         document.getElementById(`room-card-${idx}`).style.display = "none";
         document.getElementById(`room-edit-${idx}`).style.display = "block";
-        const autoContainer = document
-          .getElementById(`room-edit-${idx}`)
-          .querySelector(".autocomplete-container");
+        
+        const autoContainer = document.getElementById(`room-edit-${idx}`).querySelector(".autocomplete-container");
         if (!autoContainer.dataset.initialized) {
           new AutocompleteClass(autoContainer);
           autoContainer.dataset.initialized = "true";
+        }
+      });
+    });
+
+    document.querySelectorAll(".global-toggle-checkbox").forEach((cb) => {
+      cb.addEventListener("change", function() {
+        const idx = this.getAttribute("data-index");
+        const wrap = document.getElementById(`auto-wrap-${idx}`);
+        if (this.checked) {
+          wrap.style.opacity = '0.4';
+          wrap.style.pointerEvents = 'none';
+        } else {
+          wrap.style.opacity = '1';
+          wrap.style.pointerEvents = 'auto';
         }
       });
     });
@@ -850,21 +877,33 @@ export function initCsvUploader(
       btn.addEventListener("click", function () {
         const idx = this.getAttribute("data-index");
         const selectEl = document.getElementById(`select-room-${idx}`);
-        if (!selectEl.value) {
-          showModal({
-            title: "Perhatian",
-            message: "Pilih ruangan terlebih dahulu.",
-            type: "alert",
-          });
-          return;
-        }
-        const selectedOption = selectEl.options[selectEl.selectedIndex];
+        const isGlobalCb = document.getElementById(`global-toggle-${idx}`);
+        
         let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-        csvData[idx].ruangan_id = selectEl.value;
-        csvData[idx].ruangan_name = selectedOption.getAttribute("data-name");
-        csvData[idx].ruangan_capacity = selectedOption.getAttribute("data-capacity");
-        csvData[idx]._roomError = false;
+        if (isGlobalCb && isGlobalCb.checked) {
+          csvData[idx].is_global = 1;
+          csvData[idx].ruangan_id = null;
+          csvData[idx].ruangan_name = null;
+          csvData[idx].ruangan_capacity = null;
+          csvData[idx]._roomError = false;
+        } else {
+          if (!selectEl.value) {
+            showModal({
+              title: "Perhatian",
+              message: "Pilih ruangan terlebih dahulu, atau centang opsi Kalender Akademik.",
+              type: "alert",
+            });
+            return;
+          }
+          const selectedOption = selectEl.options[selectEl.selectedIndex];
+          csvData[idx].is_global = 0;
+          csvData[idx].ruangan_id = selectEl.value;
+          csvData[idx].ruangan_name = selectedOption.getAttribute("data-name");
+          csvData[idx].ruangan_capacity = selectedOption.getAttribute("data-capacity");
+          csvData[idx]._roomError = false;
+        }
+
         csvData[idx]._timeError = false;
         csvData[idx]._dbConflict = null;
 

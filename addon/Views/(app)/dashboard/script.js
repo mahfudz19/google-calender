@@ -5,34 +5,62 @@ function initFullCalendar() {
       initialView: "dayGridMonth",
       height: "100%", 
       headerToolbar: {
-        // Susunan GCal sebenar: Butang dan Tajuk Bulan disatukan di sebelah kiri
         left: "today prev,next title", 
         center: "", 
         right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
       },
       buttonText: {
-        today: 'Hari ini',
-        month: 'Bulan',
-        week: 'Minggu',
-        day: 'Hari',
-        list: 'Agenda'
+        today: 'Hari ini', month: 'Bulan', week: 'Minggu', day: 'Hari', list: 'Agenda'
       },
-      events: (window.approvedAgendas || []).map((agenda) => ({
-        id: agenda.id,
-        title: agenda.title,
-        start: agenda.start_time,
-        end: agenda.end_time,
-        extendedProps: agenda,
-        color: 'var(--primary-main)'
-      })),
+      
+      // 1. PETAKAN SELURUH DATA & TANGANI "ALL-DAY"
+      events: (window.approvedAgendas || []).map((agenda) => {
+        // Cek apakah ini Kalender Akademik
+        const isGlobal = agenda.is_global == 1 || agenda.is_global == '1' || agenda.is_global === true;
+        
+        let eventStart = agenda.start_time;
+        let eventEnd = agenda.end_time;
+        let eventColor = 'var(--primary-main)'; // Default Biru Mazu
+        let eventTextColor = '#ffffff';
+
+        if (isGlobal) {
+          // Hilangkan jam, ambil tanggalnya saja (YYYY-MM-DD)
+          eventStart = agenda.start_time.split(' ')[0];
+          
+          // FullCalendar "allDay" bersifat eksklusif untuk tanggal akhir.
+          // Kita harus memanipulasi tanggal akhir +1 hari agar blok kalender merentang penuh.
+          if (agenda.end_time) {
+            const endDateObj = new Date(agenda.end_time.replace(' ', 'T'));
+            endDateObj.setDate(endDateObj.getDate() + 1); // Tambah 1 hari
+            eventEnd = endDateObj.toISOString().split('T')[0];
+          }
+
+          // Ubah warnanya menjadi Kuning khas Google Workspace agar sangat menonjol
+          eventColor = '#fbbc04'; 
+          eventTextColor = '#202124'; // Teks gelap agar mudah dibaca di atas kuning
+        }
+
+        return {
+          id: agenda.id,
+          title: agenda.title,
+          start: eventStart,
+          end: eventEnd,
+          allDay: isGlobal,           // <--- KUNCI: Menghilangkan teks jam "12a"
+          color: eventColor,
+          textColor: eventTextColor,
+          extendedProps: agenda       // Membawa sisa data JSON untuk keperluan Modal
+        };
+      }),
       
       eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false },
       dayMaxEvents: true,
 
+      // 2. TAMBAHKAN EVENT CLICK (MODAL CERDAS)
       eventClick: function(info) {
-        info.jsEvent.preventDefault();
+        info.jsEvent.preventDefault(); // Mencegah reload
         const data = info.event.extendedProps;
         
+        // --- Ekstrak & Format Data ---
         document.getElementById('modal-ev-title').textContent = data.title;
         
         const start = new Date((data.start_time || "").replace(' ', 'T'));
@@ -41,33 +69,67 @@ function initFullCalendar() {
         const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const timeOptions = { hour: '2-digit', minute: '2-digit' };
         
+        const isGlobal = data.is_global == 1 || data.is_global == '1' || data.is_global === true;
+
         if (!isNaN(start.getTime())) {
-          const dateStr = start.toLocaleDateString('id-ID', dateOptions);
-          const timeStr = start.toLocaleTimeString('id-ID', timeOptions) + ' – ' + end.toLocaleTimeString('id-ID', timeOptions);
-          document.getElementById('modal-ev-time').innerHTML = `${dateStr}<br><span style="color: var(--text-secondary);">${timeStr}</span>`;
+          const startDateStr = start.toLocaleDateString('id-ID', dateOptions);
+          const endDateStr = end.toLocaleDateString('id-ID', dateOptions);
+          const timeStrStart = start.toLocaleTimeString('id-ID', timeOptions).replace(':', '.');
+          const timeStrEnd = end.toLocaleTimeString('id-ID', timeOptions).replace(':', '.');
+          
+          let displayDate = startDateStr;
+          let displayTime = `${timeStrStart} – ${timeStrEnd}`;
+
+          // Jika acara beda hari
+          if (startDateStr !== endDateStr) {
+            displayDate = `${startDateStr} – ${endDateStr}`;
+          }
+
+          // Jika Kalender Akademik
+          if (isGlobal) {
+            displayTime = "Sepanjang Hari (All-Day)";
+          }
+          
+          document.getElementById('modal-ev-time').innerHTML = `
+            <div class="ds-modal-text">${displayDate}</div>
+            <div class="ds-modal-subtext">${displayTime}</div>
+          `;
         }
         
+        // --- Lokasi Cerdas ---
         let locText = "";
-        if (data.ruangan_name) locText += `<div style="font-weight: 500;">${data.ruangan_name} ${data.ruangan_capacity ? `<span style="color: var(--text-secondary); font-weight: 400;">(${data.ruangan_capacity} org)</span>` : ''}</div>`;
-        if (data.location) locText += `<div>${data.location}</div>`;
-        document.getElementById('modal-ev-location').innerHTML = locText || '<span style="color: var(--text-disabled);">Tidak ada lokasi</span>';
+        if (isGlobal) {
+           locText = `<div class="ds-modal-text" style="color: var(--primary-main); font-weight: 600;">🌍 Berlaku Global (Seluruh Kampus)</div>`;
+        } else {
+            if (data.ruangan_name) {
+              locText += `<div class="ds-modal-text">${data.ruangan_name} ${data.ruangan_capacity ? `<span class="ds-modal-subtext">(${data.ruangan_capacity} org)</span>` : ''}</div>`;
+            }
+            if (data.location) {
+              const link = data.location.startsWith('http') ? data.location : 'https://' + data.location;
+              locText += `<div><a href="${link}" target="_blank" style="color: #1a73e8; text-decoration: underline; font-size: 14px;">${data.location}</a></div>`;
+            }
+            if (!locText) locText = '<div class="ds-modal-subtext">Tidak ada lokasi</div>';
+        }
+        document.getElementById('modal-ev-location').innerHTML = locText;
 
+        // --- Profil Pemohon ---
         const avatarStr = data.requester_avatar 
-          ? `<img src="${data.requester_avatar}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">` 
-          : `<div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-default); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">${(data.requester_name || 'U').charAt(0).toUpperCase()}</div>`;
+          ? `<img src="${data.requester_avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">` 
+          : `<div style="width: 32px; height: 32px; border-radius: 50%; background: var(--bg-default); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-secondary);">${(data.requester_name || 'U').charAt(0).toUpperCase()}</div>`;
         
         document.getElementById('modal-ev-requester').innerHTML = `
           <div style="display: flex; align-items: center; gap: 12px;">
             ${avatarStr}
             <div>
-              <div style="font-size: 14px; color: var(--text-primary);">${data.requester_name || 'User'}</div>
-              <div style="font-size: 12px; color: var(--text-secondary); text-transform: capitalize;">${data.requester_email || ''} • ${data.requester_role || 'User'}</div>
+              <div class="ds-modal-text">${data.requester_name || 'User'}</div>
+              <div class="ds-modal-subtext" style="text-transform: capitalize;">${(data.requester_email || '').toLowerCase()} • ${data.requester_role || 'User'}</div>
             </div>
           </div>
         `;
 
         document.getElementById('modal-ev-desc').textContent = data.description || "Tidak ada deskripsi.";
         
+        // Munculkan Modal
         document.getElementById('modal-event-detail').classList.add('show');
       }
     });
