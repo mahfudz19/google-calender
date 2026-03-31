@@ -6,6 +6,7 @@
   background: var(--bg-paper);
   border: 1px solid var(--divider);
   border-radius: 16px;
+  min-height: 260px;
   max-height: calc(100vh - 6.5rem);
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
   display: flex;
