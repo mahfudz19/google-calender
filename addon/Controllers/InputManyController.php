@@ -77,6 +77,7 @@ class InputManyController
           'description'      => $agenda['description'] ?? null,
           'start_time'       => $agenda['start_time'],
           'end_time'         => $agenda['end_time'],
+          'is_global'        => !empty($agenda['is_global']) ? 1 : 0,
           // Optional fields
           'location'         => current(explode(' - ', $agenda['ruangan_name'] ?? '')) ?? null, // Fallback location
           'ruangan_id'       => $agenda['ruangan_id'] ?? null,

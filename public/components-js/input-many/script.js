@@ -91,6 +91,10 @@ export function initCsvUploader(
     modalEl.classList.add("show");
   }
 
+  function isGlobalAgenda(row) {
+    return row.is_global == '1' || String(row.is_global).toLowerCase() === 'true';
+  }
+
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================
@@ -226,6 +230,15 @@ export function initCsvUploader(
     let errorCount = 0;
 
     csvData = csvData.map((row) => {
+      // 1. Bypass Cek Ruangan Jika Ini Adalah Kalender Akademik (is_global)
+      if (isGlobalAgenda(row)) {
+        row.ruangan_id = null;
+        row.ruangan_name = null;
+        row.ruangan_capacity = null;
+        row._roomError = false;
+        return row;
+      }
+
       const rId = parseInt(row.ruangan_id);
       const rName = String(row.ruangan_name || "").trim().toLowerCase();
 
@@ -286,6 +299,11 @@ export function initCsvUploader(
         let r1 = csvData[i];
         let r2 = csvData[j];
 
+        // 2. Bypass Cek Internal Jika Salah Satu Adalah Kalender Akademik
+        if (isGlobalAgenda(r1) || isGlobalAgenda(r2)) {
+            continue;
+        }
+
         if (r1.ruangan_id && r1.ruangan_id === r2.ruangan_id) {
           let start1 = new Date(r1.start_time.replace(" ", "T")).getTime();
           let end1 = new Date(r1.end_time.replace(" ", "T")).getTime();
@@ -332,12 +350,14 @@ export function initCsvUploader(
 
     let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
+    // 3. Sertakan is_global di Payload agar backend bisa Bypass Cek Database
     const payload = {
       agendas: csvData.map((row) => ({
         _rowId: row._rowId,
         start_time: row.start_time,
         end_time: row.end_time,
         ruangan_id: row.ruangan_id,
+        is_global: isGlobalAgenda(row) ? 1 : 0
       })),
     };
 
@@ -430,8 +450,10 @@ export function initCsvUploader(
       try {
         let csvData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
+        // 4. Pastikan flag is_global dikirim ke Backend
         const cleanData = csvData.map((row) => {
           const { _rowId, _roomError, _timeError, _dbConflict, _conflictWith, ...cleanRow } = row;
+          cleanRow.is_global = isGlobalAgenda(cleanRow) ? 1 : 0;
           return cleanRow;
         });
 
@@ -688,40 +710,52 @@ export function initCsvUploader(
                 </div>
             `;
 
+      // 5. Ubah Tampilan Ruangan Jika Kalender Akademik
       let roomTdClass = row._roomError ? "blk-cell-error" : "";
-      let optionsHtml = '<option value="">Pilih Ruangan...</option>';
-      roomCache.forEach((r) => {
-        const isSelected = !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan) ? "selected" : "";
-        optionsHtml += `<option value="${r.ID_ruangan}" data-name="${r.name}" data-capacity="${r.capacity}" ${isSelected}>ID ${r.ID_ruangan} - ${r.name}</option>`;
-      });
-
-      const cardContent = row._roomError
-        ? `
-                <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
-                <span class="blk-room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                <div class="blk-error-msg danger">Tak terdaftar!</div>
-                <button type="button" class="btn-fix-room blk-btn-inline danger" data-index="${index}">Perbaiki</button>
-            `
-        : `
-                <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
-                <span class="blk-room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
-                <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Ruangan</button>
-            `;
-
-      let roomHtml = `
-                <div class="blk-room-card" id="room-card-${index}">
-                    ${cardContent}
-                </div>
-                <div class="blk-edit-container" id="room-edit-${index}" style="display: none;">
-                    <div class="autocomplete-container" data-placeholder="Ketik nama ruangan...">
-                        <select id="select-room-${index}" class="form-select">${optionsHtml}</select>
+      let roomHtml = "";
+      
+      if (isGlobalAgenda(row)) {
+          roomHtml = `
+              <div class="blk-room-card" id="room-card-${index}">
+                  <span class="blk-room-name" style="color: var(--primary-main);">🌍 Kalender Akademik</span>
+                  <span class="blk-room-meta">Bypass Validasi Server</span>
+              </div>
+          `;
+      } else {
+          let optionsHtml = '<option value="">Pilih Ruangan...</option>';
+          roomCache.forEach((r) => {
+            const isSelected = !row._roomError && parseInt(row.ruangan_id) === parseInt(r.ID_ruangan) ? "selected" : "";
+            optionsHtml += `<option value="${r.ID_ruangan}" data-name="${r.name}" data-capacity="${r.capacity}" ${isSelected}>ID ${r.ID_ruangan} - ${r.name}</option>`;
+          });
+    
+          const cardContent = row._roomError
+            ? `
+                    <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id || "-"}`}</span>
+                    <span class="blk-room-meta" style="text-decoration: line-through;">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+                    <div class="blk-error-msg danger">Tak terdaftar!</div>
+                    <button type="button" class="btn-fix-room blk-btn-inline danger" data-index="${index}">Perbaiki</button>
+                `
+            : `
+                    <span class="blk-room-name">${row.ruangan_name || `ID: ${row.ruangan_id}`}</span>
+                    <span class="blk-room-meta">Kapasitas: ${row.ruangan_capacity || "?"} org</span>
+                    <button type="button" class="btn-fix-room blk-btn-inline outline" data-index="${index}">✏️ Edit Ruangan</button>
+                `;
+    
+          roomHtml = `
+                    <div class="blk-room-card" id="room-card-${index}">
+                        ${cardContent}
                     </div>
-                    <div class="blk-edit-actions">
-                        <button type="button" class="btn-save-room blk-btn-inline primary" data-index="${index}">Simpan</button>
-                        <button type="button" class="btn-cancel-room blk-btn-inline outline" data-index="${index}">Batal</button>
+                    <div class="blk-edit-container" id="room-edit-${index}" style="display: none;">
+                        <div class="autocomplete-container" data-placeholder="Ketik nama ruangan...">
+                            <select id="select-room-${index}" class="form-select">${optionsHtml}</select>
+                        </div>
+                        <div class="blk-edit-actions">
+                            <button type="button" class="btn-save-room blk-btn-inline primary" data-index="${index}">Simpan</button>
+                            <button type="button" class="btn-cancel-room blk-btn-inline outline" data-index="${index}">Batal</button>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+      }
 
       const tr = document.createElement("tr");
       tr.innerHTML = `

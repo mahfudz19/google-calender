@@ -186,27 +186,43 @@ if ($error && $message) {
   function initGlobalCheckboxToggle() {
     const globalCheckbox = document.getElementById('is_global_checkbox');
     const ruanganWrapper = document.getElementById('ruangan_input_wrapper');
-    const ruanganRow = document.getElementById('ruangan_row');
 
     if (!globalCheckbox || !ruanganWrapper) return;
 
     const toggleRuangan = () => {
+      // Cari container dan input text yang dihasilkan oleh script Autocomplete
+      const autoContainer = ruanganWrapper.querySelector('.autocomplete-container');
+      const autoInput = ruanganWrapper.querySelector('input[type="text"]');
+
       if (globalCheckbox.checked) {
-        // Redupkan dan matikan interaksi pada form ruangan
+        // 1. Redupkan dan matikan interaksi
         ruanganWrapper.style.opacity = '0.4';
         ruanganWrapper.style.pointerEvents = 'none';
         
-        // Hapus custom validation error jika ada
+        // 2. CABUT ATRIBUT REQUIRED AGAR BROWSER TIDAK MEMBLOKIR SUBMIT
+        if (autoContainer) autoContainer.setAttribute('data-required', 'false');
+        if (autoInput) autoInput.removeAttribute('required');
+
+        // 3. Hapus pesan error validasi (jika sempat muncul sebelumnya)
         const err = ruanganWrapper.parentNode.querySelector('.autocomplete-error');
         if (err) err.remove();
+
+        // 4. Kosongkan nilai ID yang tersembunyi agar database menyimpan NULL
+        const inId = document.getElementById('input_ruangan_id');
+        if (inId) inId.value = '';
+
       } else {
-        // Nyalakan kembali
+        // Nyalakan kembali interaksi
         ruanganWrapper.style.opacity = '1';
         ruanganWrapper.style.pointerEvents = 'auto';
+        
+        // Pasang kembali atribut required
+        if (autoContainer) autoContainer.setAttribute('data-required', 'true');
+        if (autoInput) autoInput.setAttribute('required', 'required');
       }
     };
 
-    // Pasang Event Listener dan jalankan saat pertama load (untuk mode Edit)
+    // Pasang Event Listener dan panggil sekali saat awal render
     globalCheckbox.removeEventListener('change', toggleRuangan);
     globalCheckbox.addEventListener('change', toggleRuangan);
     toggleRuangan();
