@@ -186,7 +186,9 @@ class CalenderJob
             'location'    => trim(($agenda['ruangan_name'] ?? '') . ' ' . ($agenda['location'] ?? '')),
         ];
 
-        // 2. LOGIKA PERCABANGAN (Global vs Reguler)
+        // VARIABEL KUNCI: Target Kalender (Default ke kalender pribadi user)
+        $targetCalendarId = 'primary'; 
+
         if ($isGlobal) {
             $eventData['start_date']   = $start->format('Y-m-d');
             $end->modify('+1 day'); 
@@ -194,7 +196,9 @@ class CalenderJob
             $eventData['transparency'] = 'transparent'; 
             
             $sendUpdates = 'none'; 
-            // Field 'attendees' sengaja tidak disertakan agar tombol RSVP hilang
+            
+            // AMBIL ID DARI .env (Menembak ke Papan Pengumuman Kampus)
+            $targetCalendarId = env('GLOBAL_CALENDAR_ID', 'primary'); 
         } else {
             $eventData['start_time'] = $start->format('c');
             $eventData['end_time']   = $end->format('c');
@@ -210,11 +214,11 @@ class CalenderJob
 
         $gcal = new GoogleCalendarService();
 
-        // 3. Eksekusi API Insert
+        // 3. Eksekusi API dengan melemparkan $targetCalendarId
         $googleEventId = $gcal->impersonate($this->adminEmail)
-            ->insertEvent($eventData, ['sendUpdates' => $sendUpdates]);
+            ->insertEvent($eventData, ['sendUpdates' => $sendUpdates], $targetCalendarId);
 
         // 4. Catat Keberhasilan di Database
-        $this->model->updateStatus($id, 'approved', 'Telah disinkronisasi ke Google Calendar', $googleEventId);
+        $this->model->updateStatus($id, 'approved', 'Telah disinkronisasi ke Kalender', $googleEventId);
     }
 }

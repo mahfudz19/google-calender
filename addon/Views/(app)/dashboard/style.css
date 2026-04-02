@@ -40,6 +40,43 @@
   gap: 12px;
 }
 
+/* TOMBOL BERLANGGANAN (MAGIC LINK) */
+.subscribe-btn-wrapper {
+  padding: 0 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.btn-subscribe-calendar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-paper);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border: 1px solid var(--border-color, #dadce0);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-subscribe-calendar svg {
+  color: #fbbc04; /* Warna kuning senada dengan Kalender Akademik */
+  transition: transform 0.2s;
+}
+
+.btn-subscribe-calendar:hover {
+  background-color: #f8f9fa;
+  border-color: #fbbc04;
+  color: #202124;
+}
+
+.btn-subscribe-calendar:hover svg {
+  transform: scale(1.1);
+}
+
 .section-header {
   display: flex;
   align-items: flex-end; /* Sejajarkan ke bawah agar rapi jika judul 2 baris */

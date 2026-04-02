@@ -85,30 +85,29 @@ class GoogleCalendarService
   /**
    * INSERT: Membuat event baru
    */
-  public function insertEvent(array $data, array $optParams = []): string
+  public function insertEvent(array $data, array $optParams = [], string $calendarId = 'primary'): string
   {
     $event = $this->buildEventObject($data);
-    $createdEvent = $this->service->events->insert('primary', $event, $optParams);
+    $createdEvent = $this->service->events->insert($calendarId, $event, $optParams);
     return $createdEvent->getId();
   }
 
   /**
    * UPDATE: Mengubah event yang sudah ada (Menggunakan PATCH agar bisa parsial)
    */
-  public function updateEvent(string $eventId, array $data, array $optParams = []): string
+  public function updateEvent(string $eventId, array $data, array $optParams = [], string $calendarId = 'primary'): string
   {
-    // Build event object hanya dengan data yang dikirimkan (parsial)
     $event = $this->buildEventObject($data);
-    $updatedEvent = $this->service->events->patch('primary', $eventId, $event, $optParams);
+    $updatedEvent = $this->service->events->patch($calendarId, $eventId, $event, $optParams);
     return $updatedEvent->getId();
   }
 
   /**
    * DELETE: Menghapus event
    */
-  public function deleteEvent(string $eventId, array $optParams = []): bool
+  public function deleteEvent(string $eventId, array $optParams = [], string $calendarId = 'primary'): bool
   {
-    $this->service->events->delete('primary', $eventId, $optParams);
+    $this->service->events->delete($calendarId, $eventId, $optParams);
     return true;
   }
 
