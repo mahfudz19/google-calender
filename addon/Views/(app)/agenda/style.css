@@ -529,7 +529,7 @@
 .widget-nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* Jarak rapat antar menu */
+  gap: 4px;
 }
 
 .widget-nav-item {
@@ -537,7 +537,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  border-radius: 100px; /* Bentuk Pill membulat ke ujung */
+  border-radius: 100px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
@@ -546,13 +546,13 @@
 }
 
 .widget-nav-item:hover {
-  background-color: var(--bg-default); /* Abu-abu terang saat di-hover */
+  background-color: var(--bg-default);
 }
 
 /* State Aktif (Menu yang sedang dibuka) */
 .widget-nav-item.active {
-  background-color: var(--primary-bg); /* Biru sangat muda */
-  color: var(--primary-dark); /* Biru gelap */
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
   font-weight: 600;
 }
 
@@ -562,10 +562,9 @@
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-left: 2px; /* Penyesuaian sejajar dengan ikon SVG */
+  margin-left: 2px;
 }
 
 .widget-nav-item.active .widget-nav-dot {
-  /* Opsional: Membuat dot lebih menonjol saat aktif */
   box-shadow: 0 0 0 2px var(--bg-paper);
 }

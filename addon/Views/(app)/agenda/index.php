@@ -4,6 +4,27 @@ $currentStatus = $currentStatus ?? null;
 $currentPage = $currentPage ?? 1;
 $totalPages = $totalPages ?? 1;
 $totalAgendas = $totalAgendas ?? 0;
+
+$error = $_GET['error'] ?? null;
+$message = $_GET['message'] ?? null;
+
+if ($error && $message) {
+  $decodedMessage = urldecode($message);
+  $errorType = match ($error) {
+    '500' => 'error',
+    '400' => 'warning',
+    '403' => 'warning',
+    '404' => 'info',
+    default => 'error'
+  };
+  $errorTitle = match ($error) {
+    '500' => 'Kesalahan Server',
+    '400' => 'Kesalahan Permintaan',
+    '403' => 'Akses Ditolak',
+    '404' => 'Data Tidak Ditemukan',
+    default => 'Terjadi Kesalahan'
+  };
+}
 ?>
 
 <div class="app-layout">
@@ -54,6 +75,16 @@ $totalAgendas = $totalAgendas ?? 0;
       </a>
     </div>
 
+    <?php if ($error && $message): ?>
+      <div class="alert alert-<?= $errorType ?> mb-4" role="alert" style="margin: 0 24px 16px 24px;">
+        <div class="alert-header">
+          <strong><?= $errorTitle ?></strong>
+          <button type="button" class="alert-close" onclick="this.parentElement.parentElement.remove();const cleanUrl = window.location.pathname;window.history.replaceState({}, document.title, cleanUrl);"><span>&times;</span></button>
+        </div>
+        <div class="alert-message"><?= htmlspecialchars($decodedMessage) ?></div>
+      </div>
+    <?php endif; ?>
+    
     <div class="agenda-list-container">
       <?php if (empty($agendas)): ?>
         <div class="empty-state">

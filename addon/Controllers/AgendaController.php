@@ -218,9 +218,12 @@ class AgendaController
       if ($oldAgenda['status'] === 'approved') {
         $this->roleMiddleware->isCanAccess(['admin']);
 
-        $conflicts = $this->model->checkTimeConflict($body['start_time'], $body['end_time'], $body['ruangan_id'],  $id);
-        if (!empty($conflicts)) {
-          throw new \Exception("Conflict detected! Jadwal bertabrakan.");
+        // Bypass cek bentrok jika agenda adalah global
+        if (empty($body['is_global'])) {
+            $conflicts = $this->model->checkTimeConflict($body['start_time'], $body['end_time'], $body['ruangan_id'],  $id);
+            if (!empty($conflicts)) {
+              throw new \Exception("Conflict detected! Jadwal bertabrakan.");
+            }
         }
       }
 
@@ -239,16 +242,30 @@ class AgendaController
           'title'       => $body['title'] ?? $oldAgenda['title'],
           'description' => $body['description'] ?? $oldAgenda['description'],
           'location'    => $body['location'] ?? $oldAgenda['location'],
-          'start_time'  => $start->format('c'),
-          'end_time'    => $end->format('c'),
         ];
+
+        // TENTUKAN TARGET KALENDER (Ambil dari data lama sebelum di-update)
+        $targetCalendarId = !empty($oldAgenda['is_global']) ? env('GLOBAL_CALENDAR_ID', 'primary') : 'primary';
+
+        // FORMAT DATA (Berdasarkan status is_global yang baru)
+        if (!empty($body['is_global'])) {
+            $updatedEventData['start_date'] = $start->format('Y-m-d');
+            $end->modify('+1 day');
+            $updatedEventData['end_date'] = $end->format('Y-m-d');
+            $updatedEventData['transparency'] = 'transparent';
+            $sendUpdates = 'none';
+        } else {
+            $updatedEventData['start_time'] = $start->format('c');
+            $updatedEventData['end_time'] = $end->format('c');
+            $sendUpdates = 'all';
+        }
 
         // Hilangkan field yang null agar method patch GCal tidak error
         $updatedEventData = array_filter($updatedEventData);
 
-        // Update via Google API
+        // Update via Google API dengan parameter $targetCalendarId
         $gcal->impersonate($this->adminEmail)
-          ->updateEvent($oldAgenda['google_event_id'], $updatedEventData, ['sendUpdates' => 'all']);
+          ->updateEvent($oldAgenda['google_event_id'], $updatedEventData, ['sendUpdates' => $sendUpdates], $targetCalendarId);
       }
 
       if ($oldAgenda['status'] === 'approved') {
@@ -270,9 +287,14 @@ class AgendaController
       // 1. Jika agenda sudah disetujui, HAPUS dulu dari Google Calendar
       if ($agenda['status'] === 'approved' && !empty($agenda['google_event_id'])) {
         $gcal = new GoogleCalendarService();
-        // Hapus dan kirim notifikasi batal ke peserta
+        
+        // TENTUKAN TARGET KALENDER
+        $targetCalendarId = !empty($agenda['is_global']) ? env('GLOBAL_CALENDAR_ID', 'primary') : 'primary';
+        $sendUpdates = !empty($agenda['is_global']) ? 'none' : 'all';
+
+        // Hapus via API dengan Parameter $targetCalendarId
         $gcal->impersonate($this->adminEmail)
-          ->deleteEvent($agenda['google_event_id'], ['sendUpdates' => 'all']);
+          ->deleteEvent($agenda['google_event_id'], ['sendUpdates' => $sendUpdates], $targetCalendarId);
       }
 
       // 2. Hapus dari Database Lokal
@@ -283,7 +305,6 @@ class AgendaController
       return $response->redirect('/agenda?error=500&message=' . urlencode($th->getMessage()));
     }
   }
-
   public function getCalendarEvents(Request $request, Response $response): JsonResponse
   {
     try {
