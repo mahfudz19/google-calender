@@ -98,19 +98,21 @@ class AgendaController
       $body['requester_email'] = $user['email'] ?? null;
       $body['requester_role'] = $user['role'] ?? 'user';
       $body['requester_avatar'] = $user['avatar'] ?? null;
-      $body['is_global'] = $data['is_global'] ?? false;
       $body['status'] = 'pending';
-
-      if ($body['is_global']) {
+      $data['is_global'] = $data['is_global'] ?? false;
+      
+      if ($data['is_global']) {
         $body['ruangan_id'] = null;
         $body['ruangan_name'] = null;
         $body['ruangan_location'] = null;
         $body['ruangan_capacity'] = null;
-      } else {
-        $body['ruangan_id'] = $data['ruangan_id'] ?? null;
-        $body['ruangan_name'] = $data['ruangan_name'] ?? null;
-        $body['ruangan_location'] = $data['ruangan_location'] ?? null;
-        $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+        $body['is_global'] = 1;
+        } else {
+          $body['ruangan_id'] = $data['ruangan_id'] ?? null;
+          $body['ruangan_name'] = $data['ruangan_name'] ?? null;
+          $body['ruangan_location'] = $data['ruangan_location'] ?? null;
+          $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+          $body['is_global'] = 0;
       }
       $this->model->create($body);
 
@@ -198,19 +200,21 @@ class AgendaController
       $body['description'] = $data['description'] ?? null;
       $body['start_time'] = $data['start_time'] ?? null;
       $body['end_time'] = $data['end_time'] ?? null;
-      $body['is_global'] = $data['is_global'] ?? false;
       $body['location'] = $data['location'] ?? null;
+      $data['is_global'] = $data['is_global'] ?? false;
 
-      if ($body['is_global']) {
+      if ($data['is_global']) {
         $body['ruangan_id'] = null;
         $body['ruangan_name'] = null;
         $body['ruangan_location'] = null;
         $body['ruangan_capacity'] = null;
+        $body['is_global'] = 1;
       } else {
         $body['ruangan_id'] = $data['ruangan_id'] ?? null;
         $body['ruangan_name'] = $data['ruangan_name'] ?? null;
         $body['ruangan_location'] = $data['ruangan_location'] ?? null;
         $body['ruangan_capacity'] = $data['ruangan_capacity'] ?? null;
+        $body['is_global'] = 0;
       }
 
       $oldAgenda = $this->model->find($id);
