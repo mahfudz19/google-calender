@@ -198,7 +198,7 @@ if ($error && $message) {
         // 1. Redupkan dan matikan interaksi
         ruanganWrapper.style.opacity = '0.4';
         ruanganWrapper.style.pointerEvents = 'none';
-        
+
         // 2. CABUT ATRIBUT REQUIRED AGAR BROWSER TIDAK MEMBLOKIR SUBMIT
         if (autoContainer) autoContainer.setAttribute('data-required', 'false');
         if (autoInput) autoInput.removeAttribute('required');
@@ -215,7 +215,7 @@ if ($error && $message) {
         // Nyalakan kembali interaksi
         ruanganWrapper.style.opacity = '1';
         ruanganWrapper.style.pointerEvents = 'auto';
-        
+
         // Pasang kembali atribut required
         if (autoContainer) autoContainer.setAttribute('data-required', 'true');
         if (autoInput) autoInput.setAttribute('required', 'required');
@@ -270,11 +270,11 @@ if ($error && $message) {
 
     if (!form.dataset.autocompleteHandled) {
       select.addEventListener('change', updateHiddenFields);
-      
+
       form.addEventListener('submit', (e) => {
         const inId = document.getElementById('input_ruangan_id');
         const isGlobal = document.getElementById('is_global_checkbox');
-        
+
         // JIKA bukan agenda global, MAKA ruangan wajib diisi
         if ((!isGlobal || !isGlobal.checked) && (!inId || !inId.value)) {
           e.preventDefault();

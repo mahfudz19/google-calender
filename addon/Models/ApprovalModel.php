@@ -232,7 +232,7 @@ class ApprovalModel extends Model
             if (!empty($agenda['is_global']) && $agenda['is_global'] == 1) {
                 continue;
             }
-            
+
             // Validasi data minimal harus ada
             if (empty($agenda['start_time']) || empty($agenda['end_time']) || empty($agenda['ruangan_id'])) {
                 continue;

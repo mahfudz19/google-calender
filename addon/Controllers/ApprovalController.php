@@ -38,13 +38,17 @@ class ApprovalController
 
   public function approve(Request $request, Response $response): JsonResponse
   {
+    $conflicts = [];
     try {
       $id = $request->param('id');
       $agenda = $this->model->find($id);
+
       // check if time conflict
-      $conflicts = $this->model->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $agenda['ruangan_id'], $agenda['ruangan_id'], $id);
-      if (!empty($conflicts)) {
-        throw new \Exception("Conflict detected! Jadwal bertabrakan.");
+      if ($agenda['is_global'] === 0) {
+        $conflicts = $this->model->checkTimeConflict($agenda['start_time'], $agenda['end_time'], $agenda['ruangan_id'], $agenda['ruangan_id']);
+        if (!empty($conflicts)) {
+          throw new \Exception("Conflict detected! Jadwal bertabrakan.");
+        }
       }
 
       $this->dispatcher->dispatch(CalenderJob::class, ['id' => $id]);
