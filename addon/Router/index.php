@@ -8,6 +8,8 @@ use Addon\Controllers\InputManyController;
 use Addon\Controllers\QueueController;
 use Addon\Controllers\UserController;
 
+/** @var \App\Core\Routing\Router $router */
+
 $router->get('/', [AuthController::class, 'index'], ['guest']);
 
 $router->get('/login', [AuthController::class, 'login']);
