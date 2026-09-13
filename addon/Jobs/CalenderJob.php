@@ -44,7 +44,7 @@ class CalenderJob
             // Step 2: Ambil target email peserta (50%)
             $targetEmails = [];
             if ($isGlobal) {
-                // OPTIMASI: Bypass pemanggilan Google Directory API yang lambat untuk Kalender Akademik
+                // Bypass pemanggilan Google Directory API yang lambat untuk Kalender Akademik
                 $this->updateProgress($jobId, 50, 'processing', 'Bypass Directory API untuk Kalender Global...');
             } else {
                 $this->updateProgress($jobId, 50, 'processing', 'Mengambil data Directory Users...');
@@ -176,7 +176,7 @@ class CalenderJob
         $timezone = new \DateTimeZone('Asia/Makassar');
         $start = new \DateTime($agenda['start_time'], $timezone);
         $end = new \DateTime($agenda['end_time'], $timezone);
-        
+
         $isGlobal = !empty($agenda['is_global']);
 
         // 1. Siapkan Data Dasar
@@ -187,28 +187,28 @@ class CalenderJob
         ];
 
         // VARIABEL KUNCI: Target Kalender (Default ke kalender pribadi user)
-        $targetCalendarId = 'primary'; 
+        $targetCalendarId = 'primary';
 
         if ($isGlobal) {
             $eventData['start_date']   = $start->format('Y-m-d');
-            $end->modify('+1 day'); 
+            $end->modify('+1 day');
             $eventData['end_date']     = $end->format('Y-m-d');
-            $eventData['transparency'] = 'transparent'; 
-            
-            $sendUpdates = 'none'; 
-            
+            $eventData['transparency'] = 'transparent';
+
+            $sendUpdates = 'none';
+
             // AMBIL ID DARI .env (Menembak ke Papan Pengumuman Kampus)
-            $targetCalendarId = env('GLOBAL_CALENDAR_ID', 'primary'); 
+            $targetCalendarId = env('GLOBAL_CALENDAR_ID', 'primary');
         } else {
             $eventData['start_time'] = $start->format('c');
             $eventData['end_time']   = $end->format('c');
-            
+
             $attendees = [];
             foreach ($targetEmails as $email) {
                 $attendees[] = ['email' => $email];
             }
             $eventData['attendees']  = $attendees;
-            
+
             $sendUpdates = 'all';
         }
 

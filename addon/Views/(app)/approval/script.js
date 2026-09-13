@@ -22,8 +22,8 @@ function submitApprove(id) {
   closeModal(`approveModal_${id}`);
   applyOptimisticLock(id);
 
-  fetch(`${window.SWR_CONFIG.getBaseUrl}/approval/${id}/approve`, {
-    method: "POST",
+
+fetch(`${window.SWR_CONFIG.getBaseUrl.replace(/\/$/, "")}/approval/${id}/approve`, {    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Requested-With": "XMLHttpRequest",

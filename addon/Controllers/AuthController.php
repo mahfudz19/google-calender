@@ -83,7 +83,12 @@ class AuthController
 
       return $response->redirect($redirect_url);
     } catch (Exception $e) {
-      throw new HttpException($errorCode, 'Login Failed: ' . $e->getMessage());
+      $message = $e->getMessage();
+
+      if (str_contains($message, 'cURL error 28') || str_contains($message, 'timed out')) {
+        $message = 'Koneksi ke Google lambat atau terputus. Silakan periksa jaringan Anda dan coba lagi.';
+      }
+      throw new HttpException($errorCode, 'Login Failed: ' . $message);
     }
   }
 

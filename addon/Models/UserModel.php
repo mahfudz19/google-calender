@@ -23,8 +23,17 @@ class UserModel extends Model
 
   protected array $seed = [
     [
+      'email' => 'kalender@univeral.ac.id',
+      'name' => 'Default Admin',
+      'google_id' => null,
+      'avatar' => null,
+      'is_active' => 1,
+      'last_login_at' => null,
+      'role' => 'admin',
+    ],
+    [
       'email' => 'mahfudz@inbitef.ac.id',
-      'name' => 'Default User',
+      'name' => 'Default Admin',
       'google_id' => null,
       'avatar' => null,
       'is_active' => 1,
@@ -33,7 +42,7 @@ class UserModel extends Model
     ],
     [
       'email' => 'bondan@inbitef.ac.id',
-      'name' => 'Default Admin',
+      'name' => 'Default Approver',
       'google_id' => null,
       'avatar' => null,
       'is_active' => 1,

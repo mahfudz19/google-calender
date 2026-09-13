@@ -53,6 +53,7 @@ export function initCsvUploader(
     modalTitle.className = "modal-title";
     modalIcon.className = "modal-icon-wrapper";
     modalIcon.style.display = "flex";
+    modalIcon.style.justifyContent = 'center';
     modalConfirmBtn.className = "btn-confirm";
 
     if (type === "error") {
@@ -808,7 +809,7 @@ export function initCsvUploader(
         let conflicts = csvData[idx]._dbConflict;
 
         if (conflicts && conflicts.length > 0) {
-          let detailHtml = '<div style="text-align: left; margin-top: 10px;">';
+          let detailHtml = '<div style="text-align: center; margin-top: 10px;">';
           detailHtml +=
             '<p style="margin-bottom: 12px; font-size: 0.95rem; color: var(--text-secondary);">Agenda Anda bertabrakan dengan jadwal berikut yang sudah ada di database:</p>';
           detailHtml +=

@@ -139,6 +139,17 @@ class Router
 
     $request->setMatchedRoutePattern($route['pattern']);
 
+    if (php_sapi_name() === 'cli-server') {
+      $handler = $route['route']['handler'];
+      $controllerClass = is_array($handler) ? ($handler[0] ?? '') : '';
+
+      if (!str_contains($controllerClass, 'AssetController')) {
+        $shortClass = is_array($handler) ? (basename(str_replace('\\', '/', $handler[0])) . '@' . $handler[1]) : 'Closure';
+        $time = date('H:i:s');
+        file_put_contents('php://stdout', "   {$time} \033[35mROUTE\033[0m     /{$route['pattern']} -> {$shortClass}\n");
+      }
+    }
+
     return $this->handleRoute($route['route'], $route['params'], $request, $response);
   }
 

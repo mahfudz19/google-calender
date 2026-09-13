@@ -55,7 +55,7 @@ $router->group(['middleware' => ['auth']], function ($router) {
   });
 
   // --- Role: Admin Only (User Management) ---
-  $router->group(['middleware' => ['role:admin']], function ($router) {
+  $router->group(['middleware' => ['role:approver,admin']], function ($router) {
 
     // Manajemen User
     $router->get('/users', [UserController::class, 'index']);

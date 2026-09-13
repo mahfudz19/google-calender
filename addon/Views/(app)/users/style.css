@@ -25,14 +25,6 @@
   margin-bottom: 24px;
 }
 
-@media (min-width: 768px) {
-  .usr-header-section {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-  }
-}
-
 .usr-page-title {
   font-size: 1.75rem;
   font-weight: 400;

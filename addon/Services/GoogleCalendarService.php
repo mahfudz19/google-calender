@@ -19,6 +19,11 @@ class GoogleCalendarService
     // Sesuaikan path ke file JSON Service Account Anda
     $this->client->setAuthConfig(env('GOOGLE_AUTH_CONFIG', __DIR__ . '/../../storage/secrets/broadcast-agenda-kampus-597196c77bd7.json'));
     $this->client->addScope(Google_Service_Calendar::CALENDAR);
+
+    $this->client->setHttpClient(new \GuzzleHttp\Client([
+      'timeout' => 15,
+      'connect_timeout' => 5,
+    ]));
   }
 
   /**
@@ -31,7 +36,7 @@ class GoogleCalendarService
     return $this;
   }
 
-/**
+  /**
    * Helper private untuk membangun objek Event Google
    */
   private function buildEventObject(array $data, ?Google_Service_Calendar_Event $event = null): Google_Service_Calendar_Event
@@ -43,7 +48,7 @@ class GoogleCalendarService
     if (isset($data['title'])) $event->setSummary($data['title']);
     if (isset($data['description'])) $event->setDescription($data['description']);
     if (isset($data['location'])) $event->setLocation($data['location']);
-    
+
     if (isset($data['transparency'])) {
       $event->setTransparency($data['transparency']);
     }
@@ -52,7 +57,7 @@ class GoogleCalendarService
     if (isset($data['start_date'])) {
       $start->setDate($data['start_date']);
     } elseif (isset($data['start_time'])) {
-      $start->setDateTime($data['start_time']); 
+      $start->setDateTime($data['start_time']);
     }
     if (isset($data['start_date']) || isset($data['start_time'])) {
       $event->setStart($start);

@@ -18,6 +18,11 @@ class GoogleAuthService
     $clientSecret = env('GOOGLE_CLIENT_SECRET');
     $redirectUri = env('GOOGLE_REDIRECT_URI');
 
+    $this->client->setHttpClient(new \GuzzleHttp\Client([
+      'timeout' => 15,
+      'connect_timeout' => 5,
+    ]));
+
     if (!$clientId || !$clientSecret) {
       throw new Exception("Google OAuth Credentials not set in .env");
     }

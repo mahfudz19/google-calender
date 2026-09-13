@@ -114,7 +114,6 @@
         if (showSkeleton) {
             listBody.innerHTML = Array(3).fill(0).map(() => `
                 <div class="queue-item">
-                    <div class="skel skel-icon"></div>
                     <div class="queue-content" style="justify-content: center;">
                         <div class="skel skel-text"></div>
                         <div class="skel skel-text short"></div>
@@ -131,8 +130,6 @@
 
         listBody.innerHTML = queueData.map(item => {
             let statusColor = 'var(--md-sys-color-outline)';
-            let icon = '📄';
-            let iconClass = 'icon-blue';
             let actionHtml = '';
 
             const currentUnixTime = Math.floor(Date.now() / 1000);
@@ -141,7 +138,6 @@
             // LOGIKA TOMBOL & STATUS
             if (item.status === 'Processing' || item.status === 'Optimistic') {
                 statusColor = 'var(--md-sys-color-primary)';
-                icon = '⚙️';
                 
                 // Jika Processing (terutama yang zombie), munculkan tombol Detail
                 actionHtml += `
@@ -162,10 +158,7 @@
                 // Tombol Hapus TIDAK DIMUNCULKAN di sini (Hanya bisa dihapus dari Modal Detail jika terpaksa)
 
             } else if (item.status === 'Failed') {
-                statusColor = 'var(--md-sys-color-error)';
-                icon = '❌';
-                iconClass = 'icon-red';
-                
+                statusColor = 'var(--md-sys-color-error)';                
                 // Failed: Munculkan Retry dan Hapus (Sesuai kesepakatan baru: Hapus boleh di Failed & Pending)
                 actionHtml += `
                     <button type="button" class="btn-retry" data-id="${item.id}" title="Coba proses ulang" style="cursor:pointer; margin-right: 8px;">
@@ -187,7 +180,6 @@
 
             return `
                 <div class="queue-item ${item.status === 'Failed' ? 'failed' : ''}">
-                    <div class="queue-icon ${iconClass}">${icon}</div>
                     <div class="queue-content">
                         <h4 class="queue-title">${item.title}</h4>
                         <p class="queue-meta">
@@ -356,7 +348,7 @@
         btnDelete.style.display = 'none';
 
         try {
-            const res = await fetch(`/queue/${id}`, { headers: { 'Accept': 'application/json' } });
+            const res = await fetch(`${window.SWR_CONFIG.getBaseUrl.replace(/\/$/, "")}/queue/${id}`, { headers: { 'Accept': 'application/json' } });
             
             if (res.ok) {
                 const data = await res.json();
@@ -433,7 +425,7 @@
         btnEl.disabled = true;
         showToast(`⏳ Meminta proses ulang Job #${itemId}...`);
         try {
-            const res = await fetch(`/queue/${itemId}/retry`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+            const res = await fetch(`${window.SWR_CONFIG.getBaseUrl.replace(/\/$/, "")}/queue/${itemId}/retry`, { method: 'POST', headers: { 'Accept': 'application/json' } });
             const result = await res.json();
             if (res.ok) {
                 showToast(`✅ ${result.message}`);
@@ -453,7 +445,7 @@
         btnEl.disabled = true;
         showToast(`⏳ Menghapus Job #${itemId}...`);
         try {
-            const res = await fetch(`/queue/${itemId}/delete`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+            const res = await fetch(`${window.SWR_CONFIG.getBaseUrl.replace(/\/$/, "")}/queue/${itemId}/delete`, { method: 'POST', headers: { 'Accept': 'application/json' } });
             const result = await res.json();
             if (res.ok) {
                 showToast(`✅ ${result.message}`);
