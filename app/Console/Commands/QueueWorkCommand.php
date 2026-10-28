@@ -36,11 +36,14 @@ class QueueWorkCommand implements CommandInterface
   {
     $queueName = 'default';
     $isDaemon = false;
+    $sleepSeconds = 3;
 
     foreach ($arguments as $arg) {
       if ($arg === '--daemon') {
         $isDaemon = true;
-      } else {
+      } elseif (str_starts_with($arg, '--sleep=')) {
+        $sleepSeconds = max(1, (int) substr($arg, 8));
+      } elseif (!str_starts_with($arg, '--')) {
         $queueName = $arg;
       }
     }
@@ -131,10 +134,10 @@ class QueueWorkCommand implements CommandInterface
         $this->processJob($payload, $container, $logFileName, $queueDriver);
         $jobsProcessed++;
       } else {
-        // If cron mode (non-blocking) and no job, exit
         if (!$isDaemon) {
           break;
         }
+        sleep($sleepSeconds);
       }
 
       if ($jobsProcessed >= self::MAX_JOBS_PER_RUN) {

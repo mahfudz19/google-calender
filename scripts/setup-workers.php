@@ -85,7 +85,7 @@ User={$serviceUser}
 Group={$serviceGroup}
 WorkingDirectory={$projectRoot}
 # Menjalankan queue:work untuk antrian spesifik
-ExecStart={$phpPath} {$mazuPath} queue:work {$queue} --daemon
+ExecStart={$phpPath} {$mazuPath} queue:work {$queue} --daemon --sleep=3
 Restart=always
 RestartSec=5
 StartLimitInterval=0
